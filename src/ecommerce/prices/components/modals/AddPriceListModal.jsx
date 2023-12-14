@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Dialog, DialogContent, DialogTitle, Typography, TextField,
     DialogActions, Box, Alert, InputLabel, Select, MenuItem, FormHelperText
@@ -195,7 +195,7 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
                         {...commonTextFieldProps}
                         error={formik.touched.IdListaOK && Boolean(formik.errors.IdListaOK)}
                         helperText={formik.touched.IdListaOK && formik.errors.IdListaOK}
-                        disabled={!!mensajeExitoAlert}
+                        disabled={true}
                     />
                     <TextField
                         id="IdListaBK"
