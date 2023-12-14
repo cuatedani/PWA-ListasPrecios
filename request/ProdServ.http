@@ -1,0 +1,9 @@
+@api = http://localhost:3020/api/pwa/prod-prec
+### GET
+GET {{api}}
+### GET ITEM
+GET {{api}}/
+### GET ITEM
+GET {{api}}/SKU1001:OK
+### GET ITEM
+GET {{api}}/SKU1001?keyType=OK
