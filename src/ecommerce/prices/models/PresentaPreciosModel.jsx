@@ -3,7 +3,6 @@ import { getDetailRow } from "../helpers/Utils";
 export function PresentaPreciosModel() {
     let cat_listas_presenta_precios = {
         cat_listas_presenta_precios: [{
-            _id: false,
             IdProdServOK: { type: String },
             IdPresentaBK: { type: String },
             IdTipoFormulaOK: { type: String },

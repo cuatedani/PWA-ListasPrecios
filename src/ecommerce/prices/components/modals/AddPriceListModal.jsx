@@ -12,7 +12,8 @@ import * as Yup from "yup";
 import { PriceListValues } from "../../helpers/PriceListValues";
 import { AddOnePriceList } from "../../../prices/services/remote/post/AddOnePriceList";
 import getAllInstitutes from "../../../../security/institutes/services/remote/get/getInstitutesAll";
-import getAllLabels from "../../../labels/services/remote/get/GetAllLabels";
+import GetAllLabels from "../../services/remote/get/getAllLabels";
+import { v4 as genID } from "uuid";
 
 const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
@@ -20,6 +21,9 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
     const [InstitutesValues, setInstitutesValues] = useState([]);
     const [TipoListaValues, setTipoListaValues] = useState([]);
     const [Loading, setLoading] = useState(false);
+    const [IdGen, setIdGen] = useState(
+        genID().replace(/-/g, "").substring(0, 12)
+    );
 
     useEffect(() => {
         getDataSelectInstitutes();
@@ -41,7 +45,7 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
         try {
             const Labels = await getAllLabels();
             const InstitutesTypes = Labels.find(
-                (label) => label.IdEtiquetaOK === "IdTipoGiros"
+                (label) => label.IdEtiquetaOK === "IdTipoListasPrecios"
             );
             setInstitutesValuesLabel(InstitutesTypes.valores);
         } catch (e) {
@@ -169,9 +173,8 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
                         error={formik.touched.IdInstitutoOK && Boolean(formik.errors.IdInstitutoOK)}
                         onChange={(e) => {
                             const selectedInstituto = e.target.value;
-                            const generatedId = generateId(); // Puedes utilizar tu lógica para generar el IdGenerado
                             formik.setFieldValue("IdInstitutoOK", selectedInstituto);
-                            formik.setFieldValue("IdListaOK", `${selectedInstituto}-${generatedId}`);
+                            formik.setFieldValue("IdListaOK", `${selectedInstituto}-${genID}`);
                             formik.handleChange;
                         }}
                     >

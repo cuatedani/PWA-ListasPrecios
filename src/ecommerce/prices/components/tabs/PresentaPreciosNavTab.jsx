@@ -1,7 +1,7 @@
 import { Box, Tabs, Tab } from "@mui/material";
 import React, { useEffect, useState } from "react";
 //import { Link, useHistory } from "react-router-dom";
-const PresentaPreciosTab = ["Presenta Precios"];
+const PresentaPreciosTabs = ["Presenta Precios"];
 
 const PresentaPreciosNavTab = ({
     currentRowInPresentaPreciosTab,

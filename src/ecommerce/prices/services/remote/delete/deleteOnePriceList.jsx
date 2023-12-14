@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export function DeleteOnePriceList(id) {
+export default function deleteOnePriceList(id) {
    
     console.log("<<EJECUTA>> API <<DeleteOnePriceList>> Requiere:")
     return new Promise((resolve, reject) => {

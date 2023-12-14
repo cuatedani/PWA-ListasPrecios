@@ -1,5 +1,5 @@
 import axios from "axios";
-export function getAllInstitutes() {
+export default function getAllInstitutes() {
     return new Promise((resolve, reject) => {
       //Equipo 2: 'http://localhost:3020/api/pwa/precio/' 
       axios.get(`${import.meta.env.VITE_CAT_PRICES_LIST_URL}`)

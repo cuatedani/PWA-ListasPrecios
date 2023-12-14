@@ -16,7 +16,7 @@ import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice"
 import { useSelector } from "react-redux";
 
 
-const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal }) => {
+const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal, rowData }) => {
     //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
@@ -210,4 +210,4 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
         </Dialog>
     );
 };
-export default AddPresentaPreciosModal;
+export default EditPresentaPreciosModal;

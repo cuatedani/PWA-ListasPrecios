@@ -1,7 +1,5 @@
 export function PatchOnePriceList(id, pricelist) {
   console.log("<<EJECUTA>> API <<PatchOnePriceList>> Requiere:", pricelist);
-  const { id } = pricelist; // Asegúrate de que el objeto pricelist tiene un campo 'id'
-
   return new Promise((resolve, reject) => {
     axios.patch(`http://localhost:3020/api/pwa/prices-list/${id}`, pricelist)
       .then((response) => {
