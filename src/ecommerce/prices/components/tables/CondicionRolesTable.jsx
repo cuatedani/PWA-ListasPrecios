@@ -18,8 +18,9 @@ import { PatchOnePriceList } from '../../services/remote/patch/PatchOnePriceList
 //Equipo 2: Modals
 //import AddCondicionRolesModal from "../modals/AddCondicionRolesModal";
 //import EditCondicionRolesModal from "../modals/UpdateCondicionRolesModal";
-//Equipo 2: Redux
-import { useSelector } from "react-redux";
+//Equipo 2: Redux+
+import { useSelector, useDispatch } from "react-redux";
+import { SET_SELECTED_CONDICIONROLES_DATA } from "../../redux/slices/CondicionRolesSlice";
 
 //Equipo 2: Columns Table Definition.
 const CondicionRolesColumns = [
@@ -81,6 +82,9 @@ const CondicionRolesTable = () => {
         fetchData();
     }, [priceListData]);
 
+    //Equipo 2: Para eviar data mediante redux
+    const dispatch = useDispatch();
+
     //Equipo 2: Metodo para seleccionar la data de una fila
     //Este es el metodo para seleccionar la orden de la tabla
     useEffect(() => {
@@ -91,6 +95,8 @@ const CondicionRolesTable = () => {
                 setIdRowSel(clickedRow.DesCondicion);
                 setSelectedRowIndex(index);
                 setRowData(clickedRow);
+                //console.log("<<DATA DEL DOCUMENTO SELECCIONADO>>:", clickedRow);
+                dispatch(SET_SELECTED_CONDICIONROLES_DATA(clickedRow));
             }
         };
         //Delimita el rango de selecion en la tabla

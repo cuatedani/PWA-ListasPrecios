@@ -4,7 +4,7 @@ import CondProConValoresNavTab from "../tabs/CondProConValoresNavTab";
 import CondProConValoresTable from "../tables/CondProConValoresTable";
 
 export default function CondProConValoresTab() {
-    const [CurrentTabInPricesListTab, setCurrentTabInPricesListTab] = useState("COND_PRODUCTO");
+    const [CurrentTabInPricesListTab, setCurrentTabInPricesListTab] = useState("COND_PROD_COND_VALORES");
     const [CurrentNameTabInPricipalTabIsSelected, setCurrentNameTabInPricipalTabIsSelected] = useState(0);
 
     return (

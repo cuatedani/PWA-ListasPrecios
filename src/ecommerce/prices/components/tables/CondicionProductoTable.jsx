@@ -19,7 +19,8 @@ import { PatchOnePriceList } from '../../services/remote/patch/PatchOnePriceList
 //import AddCondicionProductoModal from "../modals/AddCondicionProductoModal";
 //import EditCondicionProductoModal from "../modals/UpdateCondicionProductoModal";
 //Equipo 2: Redux
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { SET_SELECTED_CONDICIONPRODUCTO_DATA } from "../../redux/slices/CondicionProductoSlice";
 
 //Equipo 2: Columns Table Definition.
 const CondicionProductoColumns = [
@@ -76,16 +77,21 @@ const CondicionProductoTable = () => {
         fetchData();
     }, [priceListData]);
 
+     //Equipo 2: Para eviar data mediante redux
+     const dispatch = useDispatch();
+
     //Equipo 2: Metodo para seleccionar la data de una fila
     //Este es el metodo para seleccionar la orden de la tabla
     useEffect(() => {
         const handleRowClick = (index) => {
             const clickedRow = CondicionProductoData[index];
             if (clickedRow) {
-                //console.log("<<ID DEL DOCUMENTO SELECCIONADO>>:", clickedRow.DesCondicion);
+                console.log("<<ID DEL DOCUMENTO SELECCIONADO>>:", clickedRow.DesCondicion);
                 setIdRowSel(clickedRow.DesCondicion);
                 setSelectedRowIndex(index);
                 setRowData(clickedRow);
+                //console.log("<<DATA DEL DOCUMENTO SELECCIONADO>>:", clickedRow);
+                dispatch(SET_SELECTED_CONDICIONPRODUCTO_DATA(clickedRow));
             }
         };
         //Delimita el rango de selecion en la tabla
@@ -207,6 +213,16 @@ const CondicionProductoTable = () => {
                             {/* ------- BARRA DE ACCIONES FIN ------ */}
                         </>
                     )}
+                    muiTableBodyRowProps={({ row }) => ({
+                        onClick: () => {
+                            setSelectedRowIndex(row.id);
+                        },
+                        sx: {
+                            cursor: loadingTable ? "not-allowed" : "pointer",
+                            backgroundColor:
+                                selectedRowIndex === row.id ? darken("#EFF999", 0.01) : "inherit",
+                        },
+                    })}
                 />
             </Box>
             {/* M O D A L E S */}
