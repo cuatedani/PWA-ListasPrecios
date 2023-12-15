@@ -13,7 +13,7 @@ export default function getAllPricesList() {
             resolve([]);
           } else if (data.success) {
             const PricesListData = data.data[0].dataRes;
-            console.log("Colección: <<cat_listas>>", PricesListData);
+            //console.log("Colección: <<cat_listas>>", PricesListData);
             resolve(JSON.parse(JSON.stringify(PricesListData))); //
           }
         })

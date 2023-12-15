@@ -10,7 +10,7 @@ const PricesListSlice = createSlice({
     initialState,
     reducers: {
         SET_SELECTED_PRICELIST_DATA: (state, action) => {
-            console.log('<<REDUX-REDUCER>>:<<SET_SELECTED_PRICELIST_DATA>>', action.payload);
+            //console.log('<<REDUX-REDUCER>>:<<SET_SELECTED_PRICELIST_DATA>>', action.payload);
             state.SelPriceListData = action.payload;
         },
     }

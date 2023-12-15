@@ -69,7 +69,7 @@ const PresentaPreciosTable = () => {
 
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const priceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
-    console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
+    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
 
     //Equipo 2: useEffect para cargar datos en la tabla
     useEffect(() => {

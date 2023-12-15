@@ -118,7 +118,7 @@ const PricesListTable = () => {
                 setIdRowSel(clickedRow.IdListaOK);
                 setSelectedRowIndex(index);
                 setRowData(clickedRow);
-                console.log("<<DATA DEL DOCUMENTO SELECCIONADO>>:", clickedRow);
+                //console.log("<<DATA DEL DOCUMENTO SELECCIONADO>>:", clickedRow);
                 dispatch(SET_SELECTED_PRICELIST_DATA(clickedRow));
             }
         };
