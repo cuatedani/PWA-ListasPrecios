@@ -9,7 +9,6 @@ const CondicionProductoTabs = [
 const CondicionProductoNavTab = ({
     CurrentRowInCondicionProductoTab,
     CurrentTabInCondicionProductoTab,
-    setCurrentNameTabInPrincipalTabIsSelected,
 }) => {
     const [CurrentTabIndex, setCurrentTabIndex] = useState(0);
 

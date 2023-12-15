@@ -10,7 +10,7 @@ export default function CondRolCondicionTab() {
     return (
         <Box>
             <CondRolCondicionNavTab
-                setCurrentTabInPricesListTab={setCurrentTabInPricesListTab}
+                CurrentTabInPricesListTab={setCurrentTabInPricesListTab}
                 setCurrentNameTabInPricipalTabIsSelected={setCurrentNameTabInPricipalTabIsSelected}
             />
             {CurrentTabInPricesListTab === "COND_ROL_CONDICION" && <CondRolCondicionTable />}

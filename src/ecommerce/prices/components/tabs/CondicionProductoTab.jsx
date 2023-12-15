@@ -5,14 +5,13 @@ import CondicionProductoTable from "../tables/CondicionProductoTable";
 import CondProCondicionTab from '../tabs/CondProCondicionTab';
 
 export default function CondicionProductoTab() {
-  const [CurrentTabInPricesListTab, setCurrentTabInPricesListTab] = useState("COND_PRODUCTO");
   const [CurrentTabInCondicionProductoTab, setCurrentTabInCondicionProductoTab] = useState("COND_PRODUCTO");
   const [CurrentNameTabInPricipalTabIsSelected, setCurrentNameTabInPricipalTabIsSelected] = useState(0);
 
   return (
     <Box>
       <CondicionProductoNavTab
-        setCurrentTabInCondicionProductoTab={setCurrentTabInCondicionProductoTab}
+        CurrentTabInCondicionProductoTab={setCurrentTabInCondicionProductoTab}
         setCurrentNameTabInPricipalTabIsSelected={setCurrentNameTabInPricipalTabIsSelected}
       />
       {CurrentTabInCondicionProductoTab === "COND_PRODUCTO" && <CondicionProductoTable />}

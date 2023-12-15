@@ -7,16 +7,15 @@ const CondProCondicionTabs = [
 ];
 
 const CondProCondicionNavTab = ({
-    CurrentRowInPricesListTab,
-    setCurrentTabInPrincipalTab,
-    setCurrentNameTabInPrincipalTabIsSelected,
+    CurrentRowInCondProCondicionTab,
+    CurrentTabInCondProCondicionTab,
 }) => {
     const [CurrentTabIndex, setCurrentTabIndex] = useState(0);
 
     const handleChange = (e, newIndex) => {
         setCurrentTabIndex((prevIndex) => newIndex);
         console.log("Entró al handleChange", e.target.innerText.toUpperCase());
-        setCurrentTabInPrincipalTab(e.target.innerText.toUpperCase());
+        CurrentTabInCondProCondicionTab(e.target.innerText.toUpperCase());
         switch (e.target.innerText.toUpperCase()) {
             case "COND_PROD_CONDICION":
                 setCurrentTabIndex(0);
@@ -41,7 +40,7 @@ const CondProCondicionNavTab = ({
                         <Tab
                             key={tab}
                             label={tab}
-                            disabled={CurrentRowInPricesListTab === null}
+                            disabled={CurrentRowInCondProCondicionTab === null}
                         />
                     );
                 })}

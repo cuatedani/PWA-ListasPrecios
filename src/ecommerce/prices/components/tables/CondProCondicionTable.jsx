@@ -1,8 +1,26 @@
+//Equipo 2: React
+import React, { useEffect, useState } from "react";
+//Equipo 2: Material UI
+import { MaterialReactTable } from 'material-react-table';
+import { Box, Stack, Tooltip, Button, IconButton, Dialog } from "@mui/material";
+import { MRT_Localization_ES } from "material-react-table/locales/es";
+import { darken } from '@mui/system';
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import EditIcon from "@mui/icons-material/Edit";
+import InfoIcon from "@mui/icons-material/Info";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {
+    showMensajeConfirm,
+    showMensajeError,
+} from "../../../../share/components/elements/messages/MySwalAlerts";
 //Equipo 2: DB
-import getAllPricesList from '../../services/remote/get/getAllPricesList';
+import { PatchOnePriceList } from '../../services/remote/patch/PatchOnePriceList';
 //Equipo 2: Modals
-import AddCondProCondicionModal from "../modals/AddCondProCondicionModal";
+//import AddCondProCondicionModal from "../modals/AddCondProCondicionModal";
+//import UpdateCondProCondicionModal from "../modals/UpdateCondProCondicionModal";
+//Equipo 2: Redux
+import { useSelector } from "react-redux";
+
 //Equipo 2: Columns Table Definition.
 const CondProCondicionColumns = [
     {
@@ -35,18 +53,7 @@ const CondProCondicionTable = () => {
     const [CondProCondicionData, setCondProCondicionData] = useState([]);
     //Equipo 2: controlar el estado que muesta u oculta la modal de nuevo CondProCondicion.
     const [AddCondProCondicionShowModal, setAddCondProCondicionShowModal] = useState(false);
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const AllPricesListData = await getAllPricesList();
-                setCondProCondicion(AllPricesListData);
-                setLoadingTable(false);
-            } catch (error) {
-                console.error("Error al obtener las listas de precios en useEffect de PriceListTable:", error);
-            }
-        }
-        fetchData();
-    }, []);
+
     return (
         <Box>
             <Box>
@@ -62,7 +69,7 @@ const CondProCondicionTable = () => {
                                 <Box>
                                     <Tooltip title="Agregar">
                                         <IconButton
-                                            onClick={() => setAddCondProCondicionShowModal(true)}
+                                            //onClick={() => setAddCondProCondicionShowModal(true)}
                                         >
                                             <AddCircleIcon />
                                         </IconButton>
@@ -90,13 +97,6 @@ const CondProCondicionTable = () => {
                 />
             </Box>
             {/* M O D A L E S */}
-            <Dialog open={AddCondProCondicionShowModal}>
-                <AddCondProCondicionModal
-                    AddCondProCondicionShowModal={AddCondProCondicionShowModal}
-                    setAddCondProCondicionShowModal={setAddCondProCondicionShowModal}
-                    onClose={() => setAddCondProCondicionShowModal(false)}
-                />
-            </Dialog>
         </Box>
     );
 };

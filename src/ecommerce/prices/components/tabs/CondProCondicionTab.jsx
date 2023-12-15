@@ -5,17 +5,17 @@ import CondProCondicionTable from "../tables/CondProCondicionTable";
 import CondProConValoresTab from '../tabs/CondProConValoresTab';
 
 export default function CondProCondicionTab() {
-    const [CurrentTabInPricesListTab, setCurrentTabInPricesListTab] = useState("COND_PRODUCTO");
+    const [CurrentTabInCondProCondicionTab, setCurrentTabInCondProCondicionTab] = useState("COND_PROD_CONDICION");
     const [CurrentNameTabInPricipalTabIsSelected, setCurrentNameTabInPricipalTabIsSelected] = useState(0);
 
     return (
         <Box>
             <CondProCondicionNavTab
-                setCurrentTabInPricesListTab={setCurrentTabInPricesListTab}
+                CurrentTabInCondProCondicionTab={setCurrentTabInCondProCondicionTab}
                 setCurrentNameTabInPricipalTabIsSelected={setCurrentNameTabInPricipalTabIsSelected}
             />
-            {CurrentTabInPricesListTab === "COND_PROD_CONDICION" && <CondProCondicionTable />}
-            {CurrentTabInPricesListTab === "COND_PROD_COND_VALORES" && <CondProConValoresTab />}
+            {CurrentTabInCondProCondicionTab === "COND_PROD_CONDICION" && <CondProCondicionTable />}
+            {CurrentTabInCondProCondicionTab === "COND_PROD_COND_VALORES" && <CondProConValoresTab />}
         </Box>
     );
 };

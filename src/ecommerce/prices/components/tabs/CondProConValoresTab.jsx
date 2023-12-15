@@ -10,7 +10,7 @@ export default function CondProConValoresTab() {
     return (
         <Box>
             <CondProConValoresNavTab
-                setCurrentTabInPricesListTab={setCurrentTabInPricesListTab}
+                CurrentTabInPricesListTab={setCurrentTabInPricesListTab}
                 setCurrentNameTabInPricipalTabIsSelected={setCurrentNameTabInPricipalTabIsSelected}
             />
             {CurrentTabInPricesListTab === "COND_PROD_COND_VALORES" && <CondProConValoresTable />}
