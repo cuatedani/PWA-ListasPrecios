@@ -1,6 +1,6 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 //Equipo 2: DB
-import { getAllPricesList } from '../../services/remote/get/getAllPricesList';
+import getAllPricesList from '../../services/remote/get/getAllPricesList';
 //Equipo 2: Modals
 import AddCondRolCondicionModal from "../modals/AddCondRolCondicionModal";
 //Equipo 2: Columns Table Definition.

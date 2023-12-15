@@ -1,5 +1,5 @@
 import axios from "axios";
-export function getAllPricesList() {
+export default function getAllPricesList() {
     return new Promise((resolve, reject) => {
       axios.get('http://localhost:3020/api/pwa/precio/')
         .then((response) => {

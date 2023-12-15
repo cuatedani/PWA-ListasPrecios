@@ -11,7 +11,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { PriceListValues } from "../../helpers/PriceListValues";
 import { PatchOnePriceList } from "../../../prices/services/remote/patch/PatchOnePriceList";
-//import getAllInstitutes from "../../../../security/institutes/services/remote/get/getInstitutesAll";
 import GetAllLabels from "../../services/remote/get/getAllLabels";
 
 const EditPriceListModal =
@@ -23,20 +22,12 @@ const EditPriceListModal =
         const [ListaPreciosData, setPricesListData] = useState([]);
         const [Loading, setLoading] = useState(false);
 
+
+
         useEffect(() => {
-            //getDataSelectInstitutes();
+            setPricesListData(RowData);
             getDataSelectTipoLista();
         }, []);
-
-        //Equipo 2: Ejecutamos la API que obtiene todos los institutos.
-        /* async function getDataSelectInstitutes() {
-            try {
-                const Institutes = await getAllInstitutes();
-                setInstitutesValues(Institutes);
-            } catch (e) {
-                console.error("Error al obtener Etiquetas para Tipos Giros de Institutos:", e);
-            }
-        } */
 
         //Equipo 2: Funcion para obtener los Tipos de Lista
         async function getDataSelectTipoLista() {

@@ -4,12 +4,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { MaterialReactTable } from 'material-react-table';
 import { MRT_Localization_ES } from "material-react-table/locales/es";
 import { Box, Stack, Tooltip, Button, IconButton, Dialog } from "@mui/material";
+import { darken } from '@mui/system';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import InfoIcon from "@mui/icons-material/Info";
 import DeleteIcon from "@mui/icons-material/Delete";
 //Equipo 2: DB
-import { getAllPricesList } from '../../services/remote/get/getAllPricesList';
+import getAllPricesList from '../../services/remote/get/getAllPricesList';
 import deleteOnePriceList from '../../services/remote/delete/deleteOnePriceList';
 //Equipo 2: Modals
 import AddPriceListModal from "../modals/AddPriceListModal";
@@ -117,17 +118,18 @@ const PricesListTable = () => {
                 setIdRowSel(clickedRow.IdListaOK);
                 setSelectedRowIndex(index);
                 setRowData(clickedRow);
+                console.log("<<DATA DEL DOCUMENTO SELECCIONADO>>:", clickedRow);
                 dispatch(SET_SELECTED_PRICELIST_DATA(clickedRow));
             }
         };
-
-        //Delimita el rango de selecion en la tabla
+    
+        // Delimita el rango de selección en la tabla
         const rows = document.querySelectorAll(".MuiTableRow-root");
-
         rows.forEach((row, index) => {
-            row.addEventListener("click", () => handleRowClick(index - 1));
+            row.addEventListener("click", () => handleRowClick(index-1));
         });
     }, [PricesListData]);
+    
 
     //Equipo 2: Metodo para eliminar una lista de precios
     const Delete = async () => {

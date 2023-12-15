@@ -9,7 +9,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import DeleteIcon from "@mui/icons-material/Delete";
 //FIC: DB
 //import InstitutesStaticData from '../../../../../db/security/json/institutes/InstitutesData';
-import getAllInstitutes from '../../services/remote/get/getInstitutesAll';
+import {getAllInstitutes} from '../../services/remote/get/getInsitutesAll';
 //FIC: Modals
 import AddInstituteModal from "../modals/AddInstituteModal";
 //FIC: Columns Table Definition.

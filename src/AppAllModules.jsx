@@ -1,23 +1,15 @@
 import { RouterProvider } from "react-router-dom";
 import RouterEducation from "./navigation/NaviRoutesEducation";
-import RouterSecurity from "./navigation/NaviRoutesSecurity";
 import RouterCommerce from "./navigation/NaviRoutesCommerce";
 import Footer from "./share/footer/components/Footer";
-import { GET_DATA_START } from "./security/redux/thunks";
-import { useDispatch } from "react-redux";
-import { useEffect } from "react";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { Provider } from "react-redux";
+import store from './ecommerce/prices/redux/store/Store';
 
 export default function AppAllModules() {
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(GET_DATA_START()).then(() => {
-            console.log("<<END-DISPATCH>>: GET_DATA_START se ejecuto de forma correcta");
-        });
-    }, []);
     return (
-        <>
+        <Provider store={store}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <div id='div-app'>
                     <RouterProvider router={RouterCommerce} />
@@ -26,6 +18,6 @@ export default function AppAllModules() {
                     </div>
                 </div>
             </LocalizationProvider>
-        </>
+        </Provider>
     );
 }

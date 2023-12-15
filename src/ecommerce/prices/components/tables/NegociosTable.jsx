@@ -8,7 +8,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import InfoIcon from "@mui/icons-material/Info";
 import DeleteIcon from "@mui/icons-material/Delete";
 //Equipo 2: DB
-import { getAllPricesList } from '../../services/remote/get/getAllPricesList';
+import getAllPricesList from '../../services/remote/get/getAllPricesList';
 //Equipo 2: Modals
 import AddNegociosModal from "../modals/AddNegociosModal";
 //Equipo 2: Columns Table Definition.

@@ -1,49 +1,50 @@
-import { Box, Tabs, Tab } from "@mui/material";
+import { Box, Tabs, Tab, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
-//import { Link, useHistory } from "react-router-dom";
-import PricesListTab from '../tabs/PricesListTab';
-import NegociosTab from '../tabs/NegociosTab';
-import PresentaPreciosTab from '../tabs/PresentaPreciosTab';
-import CondicionRolesTab from '../tabs/CondicionRolesTab';
-import CondicionProductoTab from '../tabs/CondicionProductoTab';
-const PricesListTabs = ["PricesList", "NegociosTab", "PresentaPreciosTab", "CondicionRolesTab", "CondicionProductoTab"];
+
+const PricesListTabs = [
+    "LISTA_PRECIOS",
+    "PRESENTACION_PRECIOS",
+    "CONDICION_ROLES",
+    "CONDICION_PRODUCTO",
+    "NEGOCIOS"
+];
 
 const PricesListNavTab = ({
     currentRowInPricesListTab,
     setCurrentTabInPrincipalTab,
-    setBusinessTabInPrincipalTabIsSelected,
+    setPresentaPreciosTabInPrincipalTabIsSelected,
 }) => {
     const [currenTabIndex, setCurrentTabIndex] = useState(0);
 
-    const handleChange = (e) => {
+    const handleChange = (e, newIndex) => {
+        setCurrentTabIndex((prevIndex) => newIndex);
         console.log("entro al handleChange", e.target.innerText.toUpperCase());
         //Equipo 2: actualizar el nombre de la pestaña seleccionada.
         setCurrentTabInPrincipalTab(e.target.innerText.toUpperCase());
         //Equipo 2: cada que realice un click en algun tap page
-        //reiniciamos el valor del tap pase de business a false.
-        setBusinessTabInPrincipalTabIsSelected(false);
+        //reiniciamos el valor del tap pase de PresentaPrecios a false.
+        setPresentaPreciosTabInPrincipalTabIsSelected(false);
         //Equipo 2: opciones (subdocumentos de la coleccion principal de institutos).
         switch (e.target.innerText.toUpperCase()) {
-            case "PRICESLIST":
+            case "LISTA_PRECIOS":
                 setCurrentTabIndex(0);
                 break;
-            case "NEGOCIOS":
+            case "PRESENTACION_PRECIOS":
                 setCurrentTabIndex(1);
                 break;
-            case "PRESENTACION PRECIOS":
+            case "CONDICION_ROLES":
                 setCurrentTabIndex(2);
                 break;
-            case "CONDICION ROLES":
+            case "CONDICION_PRODUCTO":
                 setCurrentTabIndex(3);
                 break;
-            case "CONDICION PRODUCTO":
+            case "NEGOCIOS":
                 setCurrentTabIndex(4);
                 break;
 
         }
 
-        if (e.target.innerText.toUpperCase() == "NEGOCIOS")
-            setBusinessTabInPrincipalTabIsSelected(true);
+        if (e.target.innerText.toUpperCase() == "PRESENTACION_PRECIOS"){setPresentaPreciosTabInPrincipalTabIsSelected(true);}
     };
 
     return (

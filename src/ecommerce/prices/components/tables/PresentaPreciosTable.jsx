@@ -3,10 +3,16 @@ import React, { useEffect, useMemo, useState } from "react";
 //Equipo 2: Material UI
 import { MaterialReactTable } from 'material-react-table';
 import { Box, Stack, Tooltip, Button, IconButton, Dialog } from "@mui/material";
+import { MRT_Localization_ES } from "material-react-table/locales/es";
+import { darken } from '@mui/system';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import InfoIcon from "@mui/icons-material/Info";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {
+    showMensajeConfirm,
+    showMensajeError,
+  } from "../../../../share/components/elements/messages/MySwalAlerts";
 //Equipo 2: DB
 import { PatchOnePriceList } from '../../services/remote/patch/PatchOnePriceList'
 //Equipo 2: Modals
@@ -55,19 +61,22 @@ const PresentaPreciosTable = () => {
     //Equipo 2: controlar el estado que muesta u oculta la modal de Edit PresentaPrecios.
     const [EditPresentaPreciosShowModal, setEditPresentaPreciosShowModal] = useState(false);
     //Equipo 2: Controlar la seleccion de datos
-    //Indice de la fila, Id de la fila, datos de la fila
+    // Indice de la fila, Id de la fila, datos de la fila
     const [selectedRowIndex, setSelectedRowIndex] = useState(null);
     const [idRowSel, setIdRowSel] = useState(null);
     const [RowData, setRowData] = useState(null);
-    const selectedPriceListData = useState(null);
+    const [SelectedPriceListData, setSelectedPriceListData] = useState(null);
+
+    //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
+    const priceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
+    console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
 
     //Equipo 2: useEffect para cargar datos en la tabla
     useEffect(() => {
         async function fetchData() {
             try {
-                //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
-                setselectedPriceListData(useSelector((state) => state.PricesListReducer.SelPriceListData));
-                setPresentaPreciosData(selectedPriceListData.cat_listas_presenta_precios);
+                setSelectedPriceListData(priceListData);
+                setPresentaPreciosData(priceListData.cat_listas_presenta_precios);
                 setLoadingTable(false);
                 setSelectedRowIndex(null);
                 setIdRowSel(null);
@@ -76,7 +85,7 @@ const PresentaPreciosTable = () => {
             }
         }
         fetchData();
-    }, []);
+    }, [priceListData]);
 
     //Equipo 2: Metodo para seleccionar la data de una fila
     //Este es el metodo para seleccionar la orden de la tabla
@@ -113,10 +122,10 @@ const PresentaPreciosTable = () => {
                 // Actualizar el array en el objeto
                 setPresentaPreciosData(updatedPresentaPreciosData);
 
-                selectedPriceListData.cat_listas_presenta_precios = PresentaPreciosData;
+                SelectedPriceListData.cat_listas_presenta_precios = PresentaPreciosData;
 
                 // Actualizar el documento PriceList
-                await PatchOnePriceList(selectedPriceListData.IdListaOK, selectedPriceListData);
+                await PatchOnePriceList(SelectedPriceListData.IdListaOK, SelectedPriceListData);
 
                 showMensajeConfirm("Documento Eliminado");
                 fetchData();
