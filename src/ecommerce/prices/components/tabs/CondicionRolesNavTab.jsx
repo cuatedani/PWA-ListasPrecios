@@ -1,21 +1,22 @@
 import { Box, Tabs, Tab } from "@mui/material";
-import React, { useEffect, useState } from "react";
-const CondicionRolesTabs = ["COND_ROLES", "COND_ROL_CONDICION"];
+import React, { useState } from "react";
+
+const CondicionRolesTabs = [
+    "COND_ROLES", 
+    "COND_ROL_CONDICION"
+];
 
 const CondicionRolesNavTab = ({
-    CurrentRowInPricesListTab,
-    setCurrentTabInPrincipalTab,
-    setCondicionRolesTabInPrincipalTabIsSelected,
+    CurrentRowInCondicionRolesTab,
+    CurrentTabInCondicionRolesTab,
+    setCurrentNameTabInPrincipalTabIsSelected,
 }) => {
-    const [currenTabIndex, setCurrentTabIndex] = useState(0);
+    const [CurrentTabIndex, setCurrentTabIndex] = useState(0);
 
     const handleChange = (e, newIndex) => {
         setCurrentTabIndex((prevIndex) => newIndex);
-
-        console.log("entro al handleChange", e.target.innerText.toUpperCase());
-        setCurrentTabInPrincipalTab(e.target.innerText.toUpperCase());
-        setCondicionRolesTabInPrincipalTabIsSelected(false);
-
+        console.log("Entró al handleChange", e.target.innerText.toUpperCase());
+        CurrentTabInCondicionRolesTab(e.target.innerText.toUpperCase());
         switch (e.target.innerText.toUpperCase()) {
             case "COND_ROLES":
                 setCurrentTabIndex(0);
@@ -29,7 +30,7 @@ const CondicionRolesNavTab = ({
     return (
         <Box sx={{ border: (theme) => `2px solid ${theme.palette.divider}`, mx: 1, padding: 0.5 }}>
             <Tabs
-                value={currenTabIndex}
+                value={CurrentTabIndex}
                 variant={"fullWidth"}
                 onChange={handleChange}
                 aria-label="icon tabs example"
@@ -40,7 +41,7 @@ const CondicionRolesNavTab = ({
                         <Tab
                             key={tab}
                             label={tab}
-                            disabled={CurrentRowInPricesListTab === null}
+                            disabled={CurrentRowInCondicionRolesTab === null}
                         />
                     );
                 })}

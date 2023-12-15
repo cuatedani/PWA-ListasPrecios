@@ -1,21 +1,19 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
+import NegociosNavTab from "../tabs/NegociosNavTab";
 import NegociosTable from "../tables/NegociosTable";
-import NegociosNavTab from '../tabs/NegociosNavTab'
 
 export default function NegociosTab() {
-  const [CurrentRowInPricesListTab, setCurrentRowInPricesListTab] = useState(0);
-  const [CurrentTabInPrincipalTab, setCurrentTabInPrincipalTab] = useState("NEGOCIOS");
-  const [NegociosTabInPrincipalTabIsSelected, setNegociosTabInPrincipalTabIsSelected] = useState(false);
+  const [CurrentTabInPricesListTab, setCurrentTabInPricesListTab] = useState("NEGOCIOS");
+  const [CurrentNameTabInPricipalTabIsSelected, setCurrentNameTabInPricipalTabIsSelected] = useState(0);
 
   return (
     <Box>
       <NegociosNavTab
-        CurrentRowInPricesListTab={setCurrentRowInPricesListTab}
-        setCurrentTabInPrincipalTab={setCurrentTabInPrincipalTab}
-        setNegociosTabInPrincipalTabIsSelected={setNegociosTabInPrincipalTabIsSelected}
+        setCurrentTabInPricesListTab={setCurrentTabInPricesListTab}
+        setCurrentNameTabInPricipalTabIsSelected={setCurrentNameTabInPricipalTabIsSelected}
       />
-      {CurrentTabInPrincipalTab === "NEGOCIOS" && <NegociosTable />}
+      {CurrentTabInPricesListTab === "NEGOCIOS" && <NegociosTable />}
     </Box>
   );
 };

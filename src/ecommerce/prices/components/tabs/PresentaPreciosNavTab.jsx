@@ -1,27 +1,21 @@
 import { Box, Tabs, Tab } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const PresentaPreciosTabs = [
     "PRESENTACION_PRECIOS"
 ];
 
 const PresentaPreciosNavTab = ({
-    currentRowInPricesListTab,
+    CurrentRowInPricesListTab,
     setCurrentTabInPrincipalTab,
-    setPresentaPreciosTabInPrincipalTabIsSelected,
+    setCurrentNameTabInPrincipalTabIsSelected,
 }) => {
-    const [currenTabIndex, setCurrentTabIndex] = useState(0);
+    const [CurrentTabIndex, setCurrentTabIndex] = useState(0);
 
     const handleChange = (e, newIndex) => {
         setCurrentTabIndex((prevIndex) => newIndex);
-        console.log("entro al handleChange", e.target.innerText.toUpperCase());
-
-        //Equipo 2: actualizar el nombre de la pestaña seleccionada.
+        console.log("Entró al handleChange", e.target.innerText.toUpperCase());
         setCurrentTabInPrincipalTab(e.target.innerText.toUpperCase());
-
-        //Equipo 2: cada que realice un click en algun tap page
-        //reiniciamos el valor del tap pase de business a false.
-        //Equipo 2: opciones (subdocumentos de la coleccion principal de institutos).
         switch (e.target.innerText.toUpperCase()) {
             case "PRESENTACION_PRECIOS":
                 setCurrentTabIndex(0);
@@ -38,7 +32,7 @@ const PresentaPreciosNavTab = ({
             }}
         >
             <Tabs
-                value={currenTabIndex}
+                value={CurrentTabIndex}
                 variant={"fullWidth"}
                 onChange={handleChange}
                 aria-label="icon tabs example"
@@ -49,7 +43,7 @@ const PresentaPreciosNavTab = ({
                         <Tab
                             key={tab}
                             label={tab}
-                            disabled={currentRowInPricesListTab === null}
+                            disabled={CurrentRowInPricesListTab === null}
                         />
                     );
                 })}

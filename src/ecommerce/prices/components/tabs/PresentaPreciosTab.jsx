@@ -4,16 +4,16 @@ import PresentaPreciosTable from "../tables/PresentaPreciosTable";
 import PresentaPreciosNavTab from '../tabs/PresentaPreciosNavTab';
 
 export default function PresentaPreciosTab() {
-  const [CurrentRowInPricesListTab, setCurrentRowInPricesListTab] = useState(0);
-  const [CurrentTabInPrincipalTab, setCurrentTabInPrincipalTab] = useState("PRESENTACION_PRECIOS");
+  const [CurrentTabInPricesListTab, setCurrentTabInPricesListTab] = useState("PRESENTACION_PRECIOS");
+  const [CurrentNameTabInPricipalTabIsSelected, setCurrentNameTabInPricipalTabIsSelected] = useState(0);
 
   return (
     <Box>
       <PresentaPreciosNavTab
-        setCurrentRowInPricesListTab={CurrentRowInPricesListTab}
-        setCurrentTabInPrincipalTab={CurrentTabInPrincipalTab}
+        setCurrentTabInPricesListTab={setCurrentTabInPricesListTab}
+        setCurrentNameTabInPricipalTabIsSelected={setCurrentNameTabInPricipalTabIsSelected}
       />
-      {CurrentTabInPrincipalTab === "PRESENTACION_PRECIOS" && <PresentaPreciosTable />}
+      {CurrentTabInPricesListTab === "PRESENTACION_PRECIOS" && <PresentaPreciosTable />}
     </Box>
   );
 };

@@ -6,18 +6,16 @@ import PresentaPreciosTab from "../components/tabs/PresentaPreciosTab";
 import CondicionRolesTab from "../components/tabs/CondicionRolesTab";
 import CondicionProductoTab from "../components/tabs/CondicionProductoTab";
 import NegociosTab from "../components/tabs/NegociosTab";
-import { Print } from "@mui/icons-material";
 
 const Prices = () => {
-    const [CurrentRowInPricesListTab, setCurrentRowInPricesListTab] = useState(0);
     const [CurrentTabInPrincipalTab, setCurrentTabInPrincipalTab] = useState("LISTA_PRECIOS");
-    const [PricesListTabInPrincipalTabIsSelected, setPricesListTabInPrincipalTabIsSelected] = useState(false);
+    const [PricesListTabInPricipalTabIsSelected, setPricesListTabInPricipalTabIsSelected] = useState(0);
 
     return (
         <Box>
             <PricesListNavTab
-                setCurrentRowInPricesListTab={CurrentRowInPricesListTab}
-                setCurrentTabInPrincipalTab={CurrentTabInPrincipalTab}
+                setCurrentTabInPrincipalTab={setCurrentTabInPrincipalTab}
+                setPricesListTabInPricipalTabIsSelected={setPricesListTabInPricipalTabIsSelected}
             />
             {CurrentTabInPrincipalTab === "LISTA_PRECIOS" && <PricesListTab />}
             {CurrentTabInPrincipalTab === "PRESENTACION_PRECIOS" && <PresentaPreciosTab />}

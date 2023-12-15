@@ -2,22 +2,21 @@ import React, { useState } from 'react';
 import { Box } from '@mui/material';
 import CondicionRolesTable from "../tables/CondicionRolesTable";
 import CondicionRolesNavTab from '../tabs/CondicionRolesNavTab';
-//import CondRolCondicionTab from '../tabs/CondRolCondicionTab';
-//{CurrentTabInPrincipalTab === "COND_ROL_CONDICION" && <CondRolCondicionTab />}
+import CondRolCondicionTab from '../tabs/CondRolCondicionTab';
 
 export default function CondicionRolesTab() {
-  const [CurrentRowInPricesListTab, setCurrentRowInPricesListTab] = useState(0);
-  const [CurrentTabInPrincipalTab, setCurrentTabInPrincipalTab] = useState("COND_ROLES");
-  const [CondicionRolesTabInPrincipalTabIsSelected, setCondicionRolesTabInPrincipalTabIsSelected] = useState(false);
-  console.log(CurrentTabInPrincipalTab);
+  const [CurrentTabInPricesListTab, setCurrentTabInPricesListTab] = useState("COND_ROLES");
+  const [CurrentTabInCondicionRolesTab, setCurrentTabInCondicionRolesTab] = useState("COND_ROLES");
+  const [CurrentNameTabInPricipalTabIsSelected, setCurrentNameTabInPricipalTabIsSelected] = useState(0);
+
   return (
     <Box>
       <CondicionRolesNavTab
-        CurrentRowInPricesListTab={setCurrentRowInPricesListTab}
-        setCurrentTabInPrincipalTab={setCurrentTabInPrincipalTab}
-        setCondicionRolesTabInPrincipalTabIsSelected={setCondicionRolesTabInPrincipalTabIsSelected}
+        CurrentTabInCondicionRolesTab={setCurrentTabInCondicionRolesTab}
+        setCurrentNameTabInPricipalTabIsSelected={setCurrentNameTabInPricipalTabIsSelected}
       />
-      {CurrentTabInPrincipalTab === "COND_ROLES" && <CondicionRolesTable />}
+      {CurrentTabInCondicionRolesTab === "COND_ROLES" && <CondicionRolesTable />}
+      {CurrentTabInCondicionRolesTab === "COND_ROL_CONDICION" && <CondRolCondicionTab />}
     </Box>
   );
 };

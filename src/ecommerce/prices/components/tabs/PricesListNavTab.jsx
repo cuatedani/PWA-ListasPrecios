@@ -4,26 +4,23 @@ import React, { useEffect, useState } from "react";
 const PricesListTabs = [
     "LISTA_PRECIOS",
     "PRESENTACION_PRECIOS",
-    "CONDICION_ROLES",
-    "CONDICION_PRODUCTO",
+    "COND_ROLES",
+    "COND_PRODUCTO",
     "NEGOCIOS"
 ];
 
 const PricesListNavTab = ({
-    setCurrentRowInPricesListTab,
+    CurrentRowInPricesListTab,
     setCurrentTabInPrincipalTab,
-    setPriceListTabInPrincipalTabIsSelected,
+    setCurrentNameTabInPrincipalTabIsSelected,
 }) => {
-    const [currenTabIndex, setCurrentTabIndex] = useState(0);
+    const [CurrentTabIndex, setCurrentTabIndex] = useState(0);
 
     const handleChange = (e, newIndex) => {
         setCurrentTabIndex((prevIndex) => newIndex);
-        console.log("entro al handleChange", e.target.innerText.toUpperCase());
+        console.log("Entró al handleChange", e.target.innerText.toUpperCase());
         //Equipo 2: actualizar el nombre de la pestaña seleccionada.
         setCurrentTabInPrincipalTab(e.target.innerText.toUpperCase());
-        //Equipo 2: cada que realice un click en algun tap page
-        //reiniciamos el valor del tap pase de business a false.
-        setPriceListTabInPrincipalTabIsSelected(false);
         //Equipo 2: opciones (subdocumentos de la coleccion principal de institutos).
         switch (e.target.innerText.toUpperCase()) {
             case "LISTA_PRECIOS":
@@ -54,7 +51,7 @@ const PricesListNavTab = ({
             }}
         >
             <Tabs
-                value={currenTabIndex}
+                value={CurrentTabIndex}
                 variant={"fullWidth"}
                 onChange={handleChange}
                 aria-label="icon tabs example"
@@ -65,7 +62,7 @@ const PricesListNavTab = ({
                         <Tab
                             key={tab}
                             label={tab}
-                            disabled={setCurrentRowInPricesListTab === null}
+                            disabled={CurrentRowInPricesListTab === null}
                         />
                     );
                 })}

@@ -1,21 +1,21 @@
 import { Box, Tabs, Tab } from "@mui/material";
-import React, { useEffect, useState } from "react";
-//import { Link, useHistory } from "react-router-dom";
-const NegociosTabs = ["NEGOCIOS"];
+import React, { useState } from "react";
+
+const NegociosTabs = [
+    "NEGOCIOS"
+];
 
 const NegociosNavTab = ({
     CurrentRowInPricesListTab,
     setCurrentTabInPrincipalTab,
-    setNegociosTabInPrincipalTabIsSelected,
+    setCurrentNameTabInPrincipalTabIsSelected,
 }) => {
-    const [currenTabIndex, setCurrentTabIndex] = useState(0);
+    const [currentTabIndex, setCurrentTabIndex] = useState(0);
 
     const handleChange = (e, newIndex) => {
         setCurrentTabIndex((prevIndex) => newIndex);
         console.log("entro al handleChange", e.target.innerText.toUpperCase());
-
         setCurrentTabInPrincipalTab(e.target.innerText.toUpperCase());
-
         switch (e.target.innerText.toUpperCase()) {
             case "NEGOCIOS":
                 setCurrentTabIndex(0);
@@ -32,7 +32,7 @@ const NegociosNavTab = ({
             }}
         >
             <Tabs
-                value={currenTabIndex}
+                value={currentTabIndex}
                 variant={"fullWidth"}
                 onChange={handleChange}
                 aria-label="icon tabs example"
