@@ -1,4 +1,4 @@
-import { Box, Tabs, Tab, Stack } from "@mui/material";
+import { Box, Tabs, Tab } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
 const PricesListTabs = [
@@ -10,9 +10,9 @@ const PricesListTabs = [
 ];
 
 const PricesListNavTab = ({
-    currentRowInPricesListTab,
+    setCurrentRowInPricesListTab,
     setCurrentTabInPrincipalTab,
-    setPresentaPreciosTabInPrincipalTabIsSelected,
+    setPriceListTabInPrincipalTabIsSelected,
 }) => {
     const [currenTabIndex, setCurrentTabIndex] = useState(0);
 
@@ -22,8 +22,8 @@ const PricesListNavTab = ({
         //Equipo 2: actualizar el nombre de la pestaña seleccionada.
         setCurrentTabInPrincipalTab(e.target.innerText.toUpperCase());
         //Equipo 2: cada que realice un click en algun tap page
-        //reiniciamos el valor del tap pase de PresentaPrecios a false.
-        setPresentaPreciosTabInPrincipalTabIsSelected(false);
+        //reiniciamos el valor del tap pase de business a false.
+        setPriceListTabInPrincipalTabIsSelected(false);
         //Equipo 2: opciones (subdocumentos de la coleccion principal de institutos).
         switch (e.target.innerText.toUpperCase()) {
             case "LISTA_PRECIOS":
@@ -43,12 +43,16 @@ const PricesListNavTab = ({
                 break;
 
         }
-
-        if (e.target.innerText.toUpperCase() == "PRESENTACION_PRECIOS"){setPresentaPreciosTabInPrincipalTabIsSelected(true);}
     };
 
     return (
-        <Box sx={{ border: (theme) => `2px solid ${theme.palette.divider}`, mx: 1, padding: 0.5 }}>
+        <Box
+            sx={{
+                border: (theme) => `2px solid ${theme.palette.divider}`,
+                mx: 1,
+                padding: 0.5
+            }}
+        >
             <Tabs
                 value={currenTabIndex}
                 variant={"fullWidth"}
@@ -61,7 +65,7 @@ const PricesListNavTab = ({
                         <Tab
                             key={tab}
                             label={tab}
-                            disabled={currentRowInPricesListTab === null}
+                            disabled={setCurrentRowInPricesListTab === null}
                         />
                     );
                 })}

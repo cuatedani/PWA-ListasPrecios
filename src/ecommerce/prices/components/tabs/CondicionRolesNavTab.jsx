@@ -1,34 +1,29 @@
 import { Box, Tabs, Tab } from "@mui/material";
 import React, { useEffect, useState } from "react";
-//import { Link, useHistory } from "react-router-dom";
-const CondicionProductoTab = ["Condicion Producto", "Condicion"];
+const CondicionRolesTabs = ["COND_ROLES", "COND_ROL_CONDICION"];
 
-const CondicionProductoNavTab = ({
-    currentRowInCondicionProductoTab,
+const CondicionRolesNavTab = ({
+    CurrentRowInPricesListTab,
     setCurrentTabInPrincipalTab,
-    setCondicionTabInPrincipalTabIsSelected,
+    setCondicionRolesTabInPrincipalTabIsSelected,
 }) => {
     const [currenTabIndex, setCurrentTabIndex] = useState(0);
 
-    const handleChange = (e) => {
+    const handleChange = (e, newIndex) => {
+        setCurrentTabIndex((prevIndex) => newIndex);
+
         console.log("entro al handleChange", e.target.innerText.toUpperCase());
-        //Equipo 2: actualizar el nombre de la pestaña seleccionada.
         setCurrentTabInPrincipalTab(e.target.innerText.toUpperCase());
-        //Equipo 2: cada que realice un click en algun tap page
-        //reiniciamos el valor del tap pase de business a false.
-        setCondicionInPrincipalTabIsSelected(false);
-        //Equipo 2: opciones (subdocumentos de la coleccion principal de institutos).
+        setCondicionRolesTabInPrincipalTabIsSelected(false);
+
         switch (e.target.innerText.toUpperCase()) {
-            case "CONDICION PRODUCTO":
+            case "COND_ROLES":
                 setCurrentTabIndex(0);
                 break;
-            case "CONDICION":
+            case "COND_ROL_CONDICION":
                 setCurrentTabIndex(1);
                 break;
         }
-
-        if (e.target.innerText.toUpperCase() == "CONDICION")
-            setCondicionTabInPrincipalTabIsSelected(true);
     };
 
     return (
@@ -40,12 +35,12 @@ const CondicionProductoNavTab = ({
                 aria-label="icon tabs example"
                 textColor="primary"
             >
-                {CondicionProductoTabs.map((tab) => {
+                {CondicionRolesTabs.map((tab) => {
                     return (
                         <Tab
                             key={tab}
                             label={tab}
-                            disabled={currentRowInCondicionProductoTab === null}
+                            disabled={CurrentRowInPricesListTab === null}
                         />
                     );
                 })}
@@ -53,4 +48,4 @@ const CondicionProductoNavTab = ({
         </Box>
     );
 };
-export default CondicionProductoNavTab;
+export default CondicionRolesNavTab;

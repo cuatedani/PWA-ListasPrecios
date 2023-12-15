@@ -1,34 +1,28 @@
 import { Box, Tabs, Tab } from "@mui/material";
 import React, { useEffect, useState } from "react";
 //import { Link, useHistory } from "react-router-dom";
-const CondicionProductoTab = ["Condicion Producto", "Condicion"];
+const CondicionProductoTabs = ["COND_PRODUCTOS", "COND_PROD_CONDICION"];
 
 const CondicionProductoNavTab = ({
     currentRowInCondicionProductoTab,
     setCurrentTabInPrincipalTab,
-    setCondicionTabInPrincipalTabIsSelected,
+    setCondicionProductoTabInPrincipalTabIsSelected,
 }) => {
     const [currenTabIndex, setCurrentTabIndex] = useState(0);
 
     const handleChange = (e) => {
         console.log("entro al handleChange", e.target.innerText.toUpperCase());
-        //Equipo 2: actualizar el nombre de la pestaña seleccionada.
         setCurrentTabInPrincipalTab(e.target.innerText.toUpperCase());
-        //Equipo 2: cada que realice un click en algun tap page
-        //reiniciamos el valor del tap pase de business a false.
-        setCondicionInPrincipalTabIsSelected(false);
-        //Equipo 2: opciones (subdocumentos de la coleccion principal de institutos).
+        setCondicionProductoTabInPrincipalTabIsSelected(false);
+
         switch (e.target.innerText.toUpperCase()) {
-            case "CONDICION ROLES":
+            case "COND_PRODUCTOS":
                 setCurrentTabIndex(0);
                 break;
-            case "CONDICION":
+            case "COND_PROD_CONDICION":
                 setCurrentTabIndex(1);
                 break;
         }
-
-        if (e.target.innerText.toUpperCase() == "CONDICION")
-            setCondicionTabInPrincipalTabIsSelected(true);
     };
 
     return (
