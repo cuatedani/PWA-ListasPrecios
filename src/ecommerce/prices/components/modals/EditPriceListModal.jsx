@@ -7,13 +7,12 @@ import { LoadingButton } from "@mui/lab";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from 'dayjs';
 import CloseIcon from "@mui/icons-material/Close";
-import SaveIcon from "@mui/icons-material/Save";
+import EditIcon from "@mui/icons-material/Edit";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { PriceListValues } from "../../helpers/PriceListValues";
-import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
-//import getAllInstitutes from "../../../../security/institutes/services/remote/get/getInstitutesAll";
-import GetAllLabels from "../../services/remote/get/getAllLabels";
+import getAllInstitutes from "../../services/remote/get/getAllInstitutes";
+import getAllLabels from "../../services/remote/get/getAllLabels";
 
 const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal, RowData }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
@@ -23,24 +22,24 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
     const [Loading, setLoading] = useState(false);
 
     useEffect(() => {
-        //getDataSelectInstitutes();
+        getDataSelectInstitutes();
         getDataSelectTipoLista();
     }, []);
 
     //Equipo 2: Ejecutamos la API que obtiene todos los institutos.
-    /* async function getDataSelectInstitutes() {
+    async function getDataSelectInstitutes() {
         try {
             const Institutes = await getAllInstitutes();
             setInstitutesValues(Institutes);
         } catch (e) {
             console.error("Error al obtener Etiquetas para Tipos Giros de Institutos:", e);
         }
-    } */
+    }
 
     //Equipo 2: Funcion para obtener los Tipos de Lista
     async function getDataSelectTipoLista() {
         try {
-            const Labels = await GetAllLabels();
+            const Labels = await getAllLabels();
             const TipoListasTypes = Labels.find(
                 (label) => label.IdEtiquetaOK === "IdTipoListas"
             );
@@ -213,8 +212,8 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
                     <DatePicker
                         id="FechaExpiraIni"
                         label="FechaExpiraIni*"
-                        value={formik.values.FechaExpiraIni}
-                        onChange={(date) => formik.setFieldValue("FechaExpiraIni", date)}
+                        value={formik.values.FechaExpiraIni ? dayjs(formik.values.FechaExpiraIni) : null}
+                        onChange={(date) => formik.setFieldValue("FechaExpiraIni", date ? date.toDate() : null)}
                         renderInput={(params) => (
                             <TextField
                                 {...params.inputProps}
@@ -227,8 +226,7 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
                     <DatePicker
                         id="FechaExpiraFin"
                         label="FechaExpiraFin*"
-                        value={formik.values.FechaExpiraFin}
-                        minDate={formik.values.FechaExpiraIni}
+                        value={formik.values.FechaExpiraFin ? dayjs(formik.values.FechaExpiraFin) : null}
                         onChange={(date) => formik.setFieldValue("FechaExpiraFin", date)}
                         renderInput={(params) => (
                             <TextField
@@ -323,7 +321,7 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
                     <LoadingButton
                         color="primary"
                         loadingPosition="start"
-                        startIcon={<SaveIcon />}
+                        startIcon={<EditIcon />}
                         variant="contained"
                         type="submit"
                         disabled={!!mensajeExitoAlert}

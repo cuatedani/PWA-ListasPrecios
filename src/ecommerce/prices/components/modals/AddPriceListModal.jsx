@@ -11,8 +11,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { PriceListValues } from "../../helpers/PriceListValues";
 import { AddOnePriceList } from "../../../prices/services/remote/post/AddOnePriceList";
-import getAllInstitutes from "../../../../security/institutes/services/remote/get/getInstitutesAll";
-import GetAllLabels from "../../services/remote/get/getAllLabels";
+import getAllInstitutes from "../../../prices/services/remote/get/getAllInstitutes";
+import GetAllLabels from "../../../prices/services/remote/get/getAllLabels";
 import { v4 as genID } from "uuid";
 
 const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) => {
@@ -40,28 +40,16 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
         }
     }
 
-
-    async function getDataSelectTipoLista() {
-        try {
-            const Labels = await getAllLabels();
-            const InstitutesTypes = Labels.find(
-                (label) => label.IdEtiquetaOK === "IdTipoListasPrecios"
-            );
-            setInstitutesValuesLabel(InstitutesTypes.valores);
-        } catch (e) {
-            console.error("Error al obtener Etiquetas para Tipos Giros de Institutos:", e);
-        }
-    }
-
+    //Equipo 2: Ejecutamos la API que obtiene todos los Etiquetas.
     async function getDataSelectTipoLista() {
         try {
             const Labels = await GetAllLabels();
-            const TipoListasTypes = Labels.find(
-                (label) => label.IdEtiquetaOK === "IdTipoListas"
+            const TipoListaValues = Labels.find(
+                (Labels) => Labels.IdEtiquetaOK === "IdTipoListasPrecios"
             );
-            setTipoListaValues(TipoListasTypes);
+            setTipoListaValues(TipoListaValues.Labels);
         } catch (e) {
-            console.error("Error al obtener Etiquetas para Tipo de Listas de Lista de Precios:", e);
+            console.error("Error al obtener Etiquetas para Tipos Giros de Institutos:", e);
         }
     }
 
@@ -95,44 +83,18 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
         onSubmit: async (values) => {
             //Equipo 2: Mostramos el loading
             setLoading(true);
-
             console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
-            //Equipo 2: reiniciamos los estados de las alertas de exito y error.
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
             try {
-                //Equipo 2: si fuera necesario meterle valores compuestos o no compuestos
-                //a alguns propiedades de formik por la razon que sea, se muestren o no
-                //estas propiedades en la ventana modal a travez de cualquier control.
-                //La forma de hacerlo seria:
-                //formik.values.IdInstitutoBK = `${formik.values.IdInstitutoOK}-${formik.values.IdCEDI}`;
-                //formik.values.Matriz = autoChecksSelecteds.join(",");
-
-                //Equipo 2: Extraer los datos de los campos de
-                //la ventana modal que ya tiene Formik.
                 const PriceList = PriceListValues(values);
-
-                //Equipo 2: mandamos a consola los datos extraidos
                 console.log("<<PriceList>>", PriceList);
-
-                //Equipo 2: llamar el metodo que desencadena toda la logica
-                //para ejecutar la API "AddOnePriceList" y que previamente
-                //construye todo el JSON de la coleccion de PricesList para
-                //que pueda enviarse en el "body" de la API y determinar si
-                //la inserción fue o no exitosa.
                 await AddOnePriceList(PriceList);
-                //Equipo 2: si no hubo error en el metodo anterior
-                //entonces lanzamos la alerta de exito.
                 setMensajeExitoAlert("PriceList fue creado y guardado Correctamente");
-                //Equipo 2: falta actualizar el estado actual (documentos/data) para que
-                //despues de insertar el nuevo instituto se visualice en la tabla,
-                //pero esto se hara en la siguiente nota.
-                //fetchDataPriceList();
             } catch (e) {
                 setMensajeExitoAlert(null);
                 setMensajeErrorAlert("No se pudo crear la PriceList");
             }
-            //Equipo: ocultamos el Loading.
             setLoading(false);
         },
     });
@@ -303,8 +265,6 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
                     sx={{ display: 'flex', flexDirection: 'row' }}
                 >
                     <Box m="auto">
-                        {console.log("mensajeExitoAlert", mensajeExitoAlert)}
-                        {console.log("mensajeErrorAlert", mensajeErrorAlert)}
                         {mensajeErrorAlert && (
                             <Alert severity="error">
                                 <b>¡ERROR!</b> ─ {mensajeErrorAlert}
