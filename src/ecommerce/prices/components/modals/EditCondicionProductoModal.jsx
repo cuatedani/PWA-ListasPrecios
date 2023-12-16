@@ -94,14 +94,6 @@ const EditCondicionProductoModal = ({EditCondicionProductoShowModal, setEditCond
                         error={ formik.touched.Formula && Boolean(formik.errors.Formula) }
                         helperText={ formik.touched.IdLisFormulataBK && formik.errors.Formula }
                     />
-                    <TextField
-                        id="Formula"
-                        label="Formula*"
-                        value={formik.values.Formula}
-                        {...commonTextFieldProps}
-                        error={ formik.touched.Formula && Boolean(formik.errors.Formula) }
-                        helperText={ formik.touched.Formula && formik.errors.Formula }
-                    />
                         </DialogContent>
                 {/* Equipo 2: Aqui van las acciones del usuario como son las alertas o botones */}
                 <DialogActions

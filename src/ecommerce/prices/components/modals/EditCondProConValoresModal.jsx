@@ -8,13 +8,13 @@ import * as Yup from "yup";
 import { CondProConValoresValues } from "../../helpers/CondProConValoresValues";
 import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
 
-const EditCondProConValoresModal = ({ EditCondProConValoresShowModal, setEditCondProConValoresShowModal }) => {
+const EditCondProConValoresModal = ({ EditCondProConValoresShowModal, setEditCondProConValoresShowModal, RowData }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
     const formik = useFormik({
         initialValues: {
-            valor: "",
-            IdComparaValor: "",
+            valor: RowData.valor,
+            IdComparaValor: RowData.IdComparaValor,
         },
         validationSchema: Yup.object({
             valor: Yup.string().required("Campo requerido"),

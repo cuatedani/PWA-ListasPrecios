@@ -8,15 +8,15 @@ import * as Yup from "yup";
 import { CondicionRolesValues } from "../../helpers/CondicionRolesValues";
 import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
 
-const EditCondicionRolesModal = ({ EditCondicionRolesShowModal, setEditCondicionRolesShowModal }) => {
+const EditCondicionRolesModal = ({ EditCondicionRolesShowModal, setEditCondicionRolesShowModal, RowData }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
     const formik = useFormik({
         initialValues: {
-            DesCondicion: "",
-            FechaExpiraIni: "",
-            FechaExpiraFin: "",
-            Condicion: "",
+            DesCondicion: RowData.DesCondicion,
+            FechaExpiraIni: RowData.FechaExpiraIni,
+            FechaExpiraFin: RowData.FechaExpiraFin,
+            Condicion: RowData.Condicion,
         },
         validationSchema: Yup.object({
             DesCondicion: Yup.string().required("Campo requerido"),

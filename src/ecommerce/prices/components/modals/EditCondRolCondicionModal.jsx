@@ -8,15 +8,15 @@ import * as Yup from "yup";
 import { CondRolCondicionValues } from "../../helpers/CondRolCondicionValues";
 import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
 
-const EditCondRolCondicionModal = ({ EditCondRolCondicionShowModal, setEditCondRolCondicionShowModal }) => {
+const EditCondRolCondicionModal = ({ EditCondRolCondicionShowModal, setEditCondRolCondicionShowModal, RowData }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
     const formik = useFormik({
         initialValues: {
-            IdTipoCondicionOK: "",
-            IdTipoOperadorOK: "",
-            Valor: "",
-            Secuecia: "",
+            IdTipoCondicionOK: RowData.IdTipoCondicionOK,
+            IdTipoOperadorOK: RowData.IdTipoOperadorOK,
+            Valor: RowData.Valor,
+            Secuecia: RowData.Secuecia,
         },
         validationSchema: Yup.object({
             IdTipoCondicionOK: Yup.string().required("Campo requerido"),

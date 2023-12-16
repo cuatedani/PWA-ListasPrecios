@@ -8,12 +8,12 @@ import * as Yup from "yup";
 import { NegociosValues } from "../../helpers/NegociosValues";
 import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
 
-const EditNegociosModal = ({ EditNegociosShowModal, setEditNegociosShowModal }) => {
+const EditNegociosModal = ({ EditNegociosShowModal, setEditNegociosShowModal, RowData }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
     const formik = useFormik({
         initialValues: {
-            IdNegocioOK: "",
+            IdNegocioOK: RowData.IdNegocioOK,
         },
         validationSchema: Yup.object({
             IdNegocioOK: Yup.string().required("Campo requerido"),
