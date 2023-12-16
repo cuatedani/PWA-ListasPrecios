@@ -1,7 +1,7 @@
 import axios from "axios";
 export default function getAllPricesList() {
     return new Promise((resolve, reject) => {
-      axios.get('http://localhost:3020/api/pwa/precio/')
+      axios.get('http://localhost:3020/api/pwa/precios/')
         .then((response) => {
           const data = response.data;
  

@@ -126,36 +126,45 @@ const PricesListTable = () => {
                 dispatch(SET_SELECTED_PRICELIST_DATA(clickedRow));
             }
         };
-    
+
         // Delimita el rango de selección en la tabla
         const rows = document.querySelectorAll(".MuiTableRow-root");
         rows.forEach((row, index) => {
-            row.addEventListener("click", () => handleRowClick(index-1));
+            row.addEventListener("click", () => handleRowClick(index - 1));
         });
     }, [PricesListData]);
-    
+
 
     //Equipo 2: Metodo para eliminar una lista de precios
     const Delete = async () => {
-        const confirmed = await showMensajeConfirm(`¿Está seguro de eliminar el documento: ${idRowSel}? No podrá revertir esta acción.`);
+        const confirmed = await showMensajeConfirm(`¿Está seguro de eliminar el documento <<SELECCIONADO>>? No podrá revertir esta acción.`);
         if (confirmed) {
             try {
                 await deleteOnePriceList(RowData);
                 showMensajeConfirm("Documento Eliminado");
-                fetchData();
+                Reload();
             } catch (error) {
                 console.error("Error al Eliminar:", error);
                 showMensajeError(`No se pudo Eliminar el Documento ${idRowSel}`);
+                Reload();
             }
         }
     };
-    
+
+    const Reload = async () => {
+        const AllPricesListData = await getAllPricesList();
+        setPricesListData(AllPricesListData);
+        setLoadingTable(false);
+        setSelectedRowIndex(null);
+        setIdRowSel(null);
+    };
+
 
     //Equipo 2: Metodo para editar una Lista de Precios
     const Edit = async () => {
         if (RowData) {
             setEditPriceListShowModal(true)
-        }else{
+        } else {
             await showMensajeConfirm(
                 `Primero Seleccione una Fila`
             );
@@ -262,7 +271,7 @@ const PricesListTable = () => {
                 <EditPriceListModal
                     EditPriceListShowModal={EditPriceListShowModal}
                     setEditPriceListShowModal={setEditPriceListShowModal}
-                    RowData = {RowData}
+                    RowData={RowData}
                     onClose={() => {
                         setEditPriceListShowModal(false);
                         fetchData();
