@@ -9,6 +9,10 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import InfoIcon from "@mui/icons-material/Info";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {
+    showMensajeConfirm,
+    showMensajeError,
+} from "../../../../share/components/elements/messages/MySwalAlerts";
 //Equipo 2: DB
 import getAllPricesList from '../../services/remote/get/getAllPricesList';
 import deleteOnePriceList from '../../services/remote/delete/deleteOnePriceList';
@@ -133,24 +137,19 @@ const PricesListTable = () => {
 
     //Equipo 2: Metodo para eliminar una lista de precios
     const Delete = async () => {
-        const res = await showMensajeConfirm(
-            `Esta seguro de eliminar el documento: ${(idRowSel)
-            } no podra revertir esta accion, ¿Desea continuar?`
-        );
-        if (res) {
-            let delListaPrecio = idRowSel;
-            let temp = idRowSel;
+        const confirmed = await showMensajeConfirm(`¿Está seguro de eliminar el documento: ${idRowSel}? No podrá revertir esta acción.`);
+        if (confirmed) {
             try {
-                await deleteOnePriceList(delListaPrecio);
+                await deleteOnePriceList(RowData);
                 showMensajeConfirm("Documento Eliminado");
                 fetchData();
-            } catch (e) {
-                console.error("Error al Eliminar:", e);
-                showMensajeError(`No se pudo Eliminar el Docuemento ${(temp)
-                    } `);
+            } catch (error) {
+                console.error("Error al Eliminar:", error);
+                showMensajeError(`No se pudo Eliminar el Documento ${idRowSel}`);
             }
         }
     };
+    
 
     //Equipo 2: Metodo para editar una Lista de Precios
     const Edit = async () => {

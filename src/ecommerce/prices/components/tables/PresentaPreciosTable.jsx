@@ -111,22 +111,25 @@ const PresentaPreciosTable = () => {
         const res = await showMensajeConfirm(
             `¿Estás seguro de eliminar el documento: ${idRowSel}? No podrás revertir esta acción. ¿Deseas continuar?`
         );
-
+    
         if (res) {
             try {
                 // Filtrar los elementos distintos al que queremos eliminar
                 const updatedPresentaPreciosData = PresentaPreciosData.filter(
                     presenta_precios => presenta_precios.IdPresentaBK !== idRowSel
                 );
-
-                // Actualizar el array en el objeto
-                setPresentaPreciosData(updatedPresentaPreciosData);
-
-                SelectedPriceListData.cat_listas_presenta_precios = PresentaPreciosData;
-
+    
+                // Crear un nuevo objeto con las actualizaciones
+                const updatedPriceListData = {
+                    ...SelectedPriceListData,
+                    cat_listas_presenta_precios: updatedPresentaPreciosData,
+                };
+    
                 // Actualizar el documento PriceList
-                await PatchOnePriceList(SelectedPriceListData.IdListaOK, SelectedPriceListData);
-
+                await PatchOnePriceList(updatedPriceListData.IdListaOK, updatedPriceListData);
+    
+                setPresentaPreciosData(updatedPresentaPreciosData);
+    
                 showMensajeConfirm("Documento Eliminado");
                 fetchData();
             } catch (e) {
@@ -135,7 +138,6 @@ const PresentaPreciosTable = () => {
             }
         }
     };
-
 
     //Equipo 2: Metodo para editar una Presentacion de Precios
     const Edit = async () => {
