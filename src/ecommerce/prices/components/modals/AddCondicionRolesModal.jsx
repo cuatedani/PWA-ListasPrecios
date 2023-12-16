@@ -6,7 +6,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { CondicionRolesValues } from "../../helpers/CondicionRolesValues";
-import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
+import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
 
 const AddCondicionRolesModal = ({ AddCondicionRolesShowModal, setAddCondicionRolesShowModal }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");

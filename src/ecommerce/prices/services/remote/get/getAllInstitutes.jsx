@@ -13,7 +13,7 @@ export default function getAllInstitutes() {
             resolve([]);
           } else if (data.success) {
             const labels = data.data[0].dataRes;
-            console.log("Coleccion: <<cat_institutos>>", labels);
+            //console.log("Coleccion: <<cat_institutos>>", labels);
             resolve(JSON.parse(JSON.stringify(labels))); // Resuelve la promesa y hace una copia profunda
           }
         })

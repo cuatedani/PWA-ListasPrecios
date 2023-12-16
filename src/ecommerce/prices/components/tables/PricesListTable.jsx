@@ -260,10 +260,7 @@ const PricesListTable = () => {
                 <AddPriceListModal
                     AddPriceListShowModal={AddPriceListShowModal}
                     setAddPriceListShowModal={setAddPriceListShowModal}
-                    onClose={() => {
-                        setAddPriceListShowModal(false);
-                        fetchData();
-                    }}
+                    onClose={Reload}
                 />
             </Dialog>
             {/* EDIT MODAL */}
@@ -272,10 +269,7 @@ const PricesListTable = () => {
                     EditPriceListShowModal={EditPriceListShowModal}
                     setEditPriceListShowModal={setEditPriceListShowModal}
                     RowData={RowData}
-                    onClose={() => {
-                        setEditPriceListShowModal(false);
-                        fetchData();
-                    }}
+                    onClose={Reload}
                 />
             </Dialog>
         </Box>

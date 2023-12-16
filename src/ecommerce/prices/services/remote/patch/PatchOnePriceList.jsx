@@ -1,9 +1,11 @@
 import axios from 'axios';
 
-export function PatchOnePriceList(id, pricelist) {
-  console.log("<<EJECUTA>> API <<PatchOnePriceList>> Requiere:", pricelist);
+export default function PatchOnePriceList(pricelist) {
+  console.log("<<EJECUTA>> API <<PatchOnePriceList>> Requiere: IdInstitutoOK-> ", pricelist.IdInstitutoOK, "  IdListaOK->",pricelist.IdListaOK );
+  let IdInstitutoOK = pricelist.IdInstitutoOK;
+  let IdListaOK = pricelist.IdListaOK;
   return new Promise((resolve, reject) => {
-    axios.patch(`http://localhost:3020/api/pwa/precio/one`, pricelist)
+    axios.patch(`http://localhost:3020/api/pwa/precios/one?IdInstitutoOK=${IdInstitutoOK}&IdListaOK=${IdListaOK}`, pricelist)
       .then((response) => {
         console.log("<<RESPONSE>> PatchOnePriceList", pricelist);
         const data = response.data;

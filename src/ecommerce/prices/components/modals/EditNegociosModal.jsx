@@ -6,7 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { NegociosValues } from "../../helpers/NegociosValues";
-import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
+import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
 
 const EditNegociosModal = ({ EditNegociosShowModal, setEditNegociosShowModal, RowData }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");

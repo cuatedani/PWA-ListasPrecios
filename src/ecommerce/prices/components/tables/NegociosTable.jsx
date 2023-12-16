@@ -14,7 +14,7 @@ import {
     showMensajeError,
 } from "../../../../share/components/elements/messages/MySwalAlerts";
 //Equipo 2: DB
-import { PatchOnePriceList } from '../../services/remote/patch/PatchOnePriceList';
+import PatchOnePriceList from '../../services/remote/patch/PatchOnePriceList';
 //Equipo 2: Modals
 import AddNegociosModal from "../modals/AddNegociosModal";
 import EditNegociosModal from "../modals/EditNegociosModal";

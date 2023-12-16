@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default function getAllLabels() {
   return new Promise((resolve, reject) => {
-    axios.get("http://localhost:3020/api/pwa/labels/")
+    axios.get("http://localhost:3020/api/pwa/etiquetas/")
       .then((response) => {
         const data = response.data;
         if (!data.success) {
@@ -13,7 +13,7 @@ export default function getAllLabels() {
           resolve([]);
         } else if (data.success) {
           const labels = data.data[0].dataRes;
-          console.log("Coleccion: <<cat_etiquetas>>", labels);
+          //console.log("Coleccion: <<cat_etiquetas>>", labels);
           resolve(JSON.parse(JSON.stringify(labels))); // Resuelve la promesa y hace una copia profunda
         }
       })

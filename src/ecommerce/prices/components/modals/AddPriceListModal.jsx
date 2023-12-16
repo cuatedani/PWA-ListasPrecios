@@ -15,7 +15,7 @@ import getAllInstitutes from "../../../prices/services/remote/get/getAllInstitut
 import GetAllLabels from "../../../prices/services/remote/get/getAllLabels";
 import { v4 as genID } from "uuid";
 
-const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) => {
+const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal, onClose }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
     const [InstitutesValues, setInstitutesValues] = useState([]);
@@ -36,7 +36,7 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
             const Institutes = await getAllInstitutes();
             setInstitutesValues(Institutes);
         } catch (e) {
-            console.error("Error al obtener Etiquetas para Tipos Giros de Institutos:", e);
+            console.error("Error al obtener los Institutos:", e);
         }
     }
 
@@ -44,12 +44,12 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
     async function getDataSelectTipoLista() {
         try {
             const Labels = await GetAllLabels();
-            const TipoListaValues = Labels.find(
+            const values = Labels.find(
                 (Labels) => Labels.IdEtiquetaOK === "IdTipoListasPrecios"
             );
-            setTipoListaValues(TipoListaValues.Labels);
+            setTipoListaValues(values.valores);
         } catch (e) {
-            console.error("Error al obtener Etiquetas para Tipos Giros de Institutos:", e);
+            console.error("Error al obtener Etiquetas para Tipos de Lista:", e);
         }
     }
 
@@ -71,10 +71,8 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
             IdListaOK: Yup.string().required("Campo requerido"),
             IdListaBK: Yup.string().required("Campo requerido"),
             DesLista: Yup.string().required("Campo requerido"),
-            FechaExpiraIni: Yup.date().required("Campo requerido"),
-            FechaExpiraFin: Yup.date()
-                .required("Campo requerido")
-                .min(Yup.ref("FechaExpiraIni"), "La fecha final no puede ser antes que la fecha de Inicio"),
+            FechaExpiraIni: Yup.date(),
+            FechaExpiraFin: Yup.date().min(Yup.ref("FechaExpiraIni"), "La fecha final no puede ser antes que la fecha de Inicio"),
             IdTipoListaOK: Yup.string().required("Campo requerido"),
             IdTipoGeneraListaOK: Yup.string().required("Campo requerido"),
             IdListaBaseOK: Yup.string().required("Campo requerido"),
@@ -87,8 +85,16 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
             try {
+                var fechaDayjs1 = values.FechaExpiraIni;
+                const fechaJS1 = fechaDayjs1.toDate();
+                values.FechaExpiraIni = fechaJS1.toISOString();
+
+                var fechaDayjs2 = values.FechaExpiraFin;
+                const fechaJS2 = fechaDayjs2.toDate();
+                values.FechaExpiraFin = fechaJS2.toISOString();
+
                 const PriceList = PriceListValues(values);
-                console.log("<<PriceList>>", PriceList);
+                //console.log("<<PriceList>>", PriceList);
                 await AddOnePriceList(PriceList);
                 setMensajeExitoAlert("PriceList fue creado y guardado Correctamente");
             } catch (e) {
@@ -110,7 +116,10 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
     return (
         <Dialog
             open={AddPriceListShowModal}
-            onClose={() => setAddPriceListShowModal(false)}
+            onClose={() => {
+                setAddPriceListShowModal(false);
+                onClose();
+            }}
             fullWidth
         >
             <form onSubmit={formik.handleSubmit}>
@@ -136,8 +145,8 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
                         onChange={(e) => {
                             const selectedInstituto = e.target.value;
                             formik.setFieldValue("IdInstitutoOK", selectedInstituto);
-                            formik.setFieldValue("IdListaOK", `${selectedInstituto}-${genID}`);
-                            formik.handleChange;
+                            formik.setFieldValue("IdListaOK", `${selectedInstituto}-${IdGen}`);
+                            formik.handleChange(e);
                         }}
                     >
                         {InstitutesValues.map((instituto) => (
@@ -156,8 +165,8 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
                         value={formik.values.IdListaOK}
                         {...commonTextFieldProps}
                         error={formik.touched.IdListaOK && Boolean(formik.errors.IdListaOK)}
-                        helperText={formik.touched.IdListaOK && formik.errors.IdListaOK}
                         disabled={true}
+                        helperText={formik.touched.IdListaOK && formik.errors.IdListaOK}
                     />
                     <TextField
                         id="IdListaBK"
@@ -180,38 +189,29 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
                         label="FechaExpiraIni*"
                         value={formik.values.FechaExpiraIni}
                         onChange={(date) => formik.setFieldValue("FechaExpiraIni", date)}
-                        renderInput={(params) => (
+                        TextFieldComponent={(props) => (
                             <TextField
-                                {...params.inputProps}
+                                {...props}
                                 {...commonTextFieldProps}
                                 error={formik.touched.FechaExpiraIni && Boolean(formik.errors.FechaExpiraIni)}
                                 helperText={formik.touched.FechaExpiraIni && formik.errors.FechaExpiraIni}
                             />
                         )}
                     />
-
                     <DatePicker
                         id="FechaExpiraFin"
                         label="FechaExpiraFin*"
                         value={formik.values.FechaExpiraFin}
                         minDate={formik.values.FechaExpiraIni}
                         onChange={(date) => formik.setFieldValue("FechaExpiraFin", date)}
-                        renderInput={(params) => (
+                        TextFieldComponent={(props) => (
                             <TextField
-                                {...params.inputProps}
+                                {...props}
                                 {...commonTextFieldProps}
                                 error={formik.touched.FechaExpiraFin && Boolean(formik.errors.FechaExpiraFin)}
                                 helperText={formik.touched.FechaExpiraFin && formik.errors.FechaExpiraFin}
                             />
                         )}
-                    />
-                    <TextField
-                        id="IdTipoListaOK"
-                        label="IdTipoListaOK*"
-                        value={formik.values.IdTipoListaOK}
-                        {...commonTextFieldProps}
-                        error={formik.touched.IdTipoListaOK && Boolean(formik.errors.IdTipoListaOK)}
-                        helperText={formik.touched.IdTipoListaOK && formik.errors.IdTipoListaOK}
                     />
                     <Select
                         value={formik.values.IdTipoListaOK}
@@ -223,7 +223,7 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
                         onChange={(e) => {
                             const selectedTipoLista = e.target.value;
                             formik.setFieldValue("IdTipoListaOK", selectedTipoLista);
-                            formik.handleChange;
+                            formik.handleChange(e);
                         }}
                     >
                         {TipoListaValues.map((tipo) => (
@@ -282,7 +282,10 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
                         loadingPosition="start"
                         startIcon={<CloseIcon />}
                         variant="outlined"
-                        onClick={() => setAddPriceListShowModal(false)}
+                        onClick={() => {
+                            setAddPriceListShowModal(false);
+                            onClose();
+                        }}
                     >
                         <span>CERRAR</span>
                     </LoadingButton>

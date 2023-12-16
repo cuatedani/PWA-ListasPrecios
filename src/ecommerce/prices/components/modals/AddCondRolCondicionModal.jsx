@@ -6,7 +6,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { CondRolCondicionValues } from "../../helpers/CondRolCondicionValues";
-import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
+import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
 
 const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolCondicionShowModal }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");

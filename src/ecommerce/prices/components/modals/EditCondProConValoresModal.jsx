@@ -6,7 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { CondProConValoresValues } from "../../helpers/CondProConValoresValues";
-import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
+import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
 
 const EditCondProConValoresModal = ({ EditCondProConValoresShowModal, setEditCondProConValoresShowModal, RowData }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");

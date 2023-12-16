@@ -10,20 +10,27 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { v4 as genID } from "uuid";
 import { PriceListValues } from "../../helpers/PriceListValues";
 import getAllInstitutes from "../../services/remote/get/getAllInstitutes";
 import getAllLabels from "../../services/remote/get/getAllLabels";
+import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
 
-const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal, RowData }) => {
+const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal, RowData, onClose }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    const [InstitutesValues, setInstitutesValues] = useState([]);
     const [TipoListaValues, setTipoListaValues] = useState([]);
-    const [ListaPreciosData, setPricesListData] = useState([]);
+    const [SelectedTipoLista, setSelectedTipoLista] = useState([]);
     const [Loading, setLoading] = useState(false);
+    const [IdGen, setIdGen] = useState(
+        genID().replace(/-/g, "").substring(0, 12)
+    );
 
     useEffect(() => {
         getDataSelectInstitutes();
         getDataSelectTipoLista();
+        setSelectedTipoLista(RowData.IdTipoListaOK);
     }, []);
 
     //Equipo 2: Ejecutamos la API que obtiene todos los institutos.
@@ -32,22 +39,23 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
             const Institutes = await getAllInstitutes();
             setInstitutesValues(Institutes);
         } catch (e) {
-            console.error("Error al obtener Etiquetas para Tipos Giros de Institutos:", e);
+            console.error("Error al obtener los Institutos:", e);
         }
     }
 
-    //Equipo 2: Funcion para obtener los Tipos de Lista
+    //Equipo 2: Ejecutamos la API que obtiene todos los Etiquetas.
     async function getDataSelectTipoLista() {
         try {
             const Labels = await getAllLabels();
-            const TipoListasTypes = Labels.find(
-                (label) => label.IdEtiquetaOK === "IdTipoListas"
+            const values = Labels.find(
+                (Labels) => Labels.IdEtiquetaOK === "IdTipoListasPrecios"
             );
-            setTipoListaValues(TipoListasTypes);
+            setTipoListaValues(values.valores);
         } catch (e) {
-            console.error("Error al obtener Etiquetas para Tipo de Listas de Lista de Precios:", e);
+            console.error("Error al obtener Etiquetas para Tipos de Lista:", e);
         }
     }
+
 
     const formik = useFormik({
         initialValues: {
@@ -57,7 +65,7 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
             DesLista: RowData.DesLista || "",
             FechaExpiraIni: RowData.FechaExpiraIni || null,
             FechaExpiraFin: RowData.FechaExpiraFin || null,
-            IdTipoListaOK: RowData.IdTipoListaOK || "",
+            IdTipoListaOK: SelectedTipoLista || "",
             IdTipoGeneraListaOK: RowData.IdTipoGeneraListaOK || "",
             IdListaBaseOK: RowData.IdListaBaseOK || "",
             IdTipoFormulaOK: RowData.IdTipoFormulaOK || "",
@@ -80,38 +88,15 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
             //Equipo 2: Mostramos el loading
             setLoading(true);
 
-            console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
-            //Equipo 2: reiniciamos los estados de las alertas de exito y error.
+            console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Editar");
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
             try {
-                //Equipo 2: si fuera necesario meterle valores compuestos o no compuestos
-                //a alguns propiedades de formik por la razon que sea, se muestren o no
-                //estas propiedades en la ventana modal a travez de cualquier control.
-                //La forma de hacerlo seria:
-                //formik.values.IdInstitutoBK = `${formik.values.IdInstitutoOK}-${formik.values.IdCEDI}`;
-                //formik.values.Matriz = autoChecksSelecteds.join(",");
-
-                //Equipo 2: Extraer los datos de los campos de
-                //la ventana modal que ya tiene Formik.
                 const PriceList = PriceListValues(values);
-
-                //Equipo 2: mandamos a consola los datos extraidos
                 console.log("<<PriceList>>", PriceList);
+                await PatchOnePriceList(PriceList.IdListaOK, PriceList);
 
-                //Equipo 2: llamar el metodo que desencadena toda la logica
-                //para ejecutar la API "AddOnePriceList" y que previamente
-                //construye todo el JSON de la coleccion de PricesList para
-                //que pueda enviarse en el "body" de la API y determinar si
-                //la inserción fue o no exitosa.
-                await PatchOne(PriceList.IdListaOK, PriceList);
-                //Equipo 2: si no hubo error en el metodo anterior
-                //entonces lanzamos la alerta de exito.
                 setMensajeExitoAlert("PriceList fue Actualizado Correctamente");
-                //Equipo 2: falta actualizar el estado actual (documentos/data) para que
-                //despues de insertar el nuevo instituto se visualice en la tabla,
-                //pero esto se hara en la siguiente nota.
-                //fetchDataPriceList();
             } catch (e) {
                 setMensajeExitoAlert(null);
                 setMensajeErrorAlert("No se pudo Actualizar la PriceList");
@@ -132,7 +117,10 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
     return (
         <Dialog
             open={EditPriceListShowModal}
-            onClose={() => setEditPriceListShowModal(false)}
+            onClose={() => {
+                setEditPriceListShowModal(false);
+                onClose(); // Llama a la función onClose pasada como prop
+            }}
             fullWidth
         >
             <form onSubmit={formik.handleSubmit}>
@@ -173,24 +161,22 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
                         ))}
                     </Select>
                     */}
-
                     <TextField
                         id="IdInstitutoOK"
                         label="IdInstitutoOK*"
                         value={formik.values.IdInstitutoOK}
-                        disabled={true}
                         {...commonTextFieldProps}
                         error={formik.touched.IdInstitutoOK && Boolean(formik.errors.IdInstitutoOK)}
+                        disabled={true}
                         helperText={formik.touched.IdInstitutoOK && formik.errors.IdInstitutoOK}
                     />
-
                     <TextField
                         id="IdListaOK"
                         label="IdListaOK*"
                         value={formik.values.IdListaOK}
-                        disabled={true}
                         {...commonTextFieldProps}
                         error={formik.touched.IdListaOK && Boolean(formik.errors.IdListaOK)}
+                        disabled={true}
                         helperText={formik.touched.IdListaOK && formik.errors.IdListaOK}
                     />
                     <TextField
@@ -214,9 +200,9 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
                         label="FechaExpiraIni*"
                         value={formik.values.FechaExpiraIni ? dayjs(formik.values.FechaExpiraIni) : null}
                         onChange={(date) => formik.setFieldValue("FechaExpiraIni", date ? date.toDate() : null)}
-                        renderInput={(params) => (
+                        textField={(props) => (
                             <TextField
-                                {...params.inputProps}
+                                {...props}
                                 {...commonTextFieldProps}
                                 error={formik.touched.FechaExpiraIni && Boolean(formik.errors.FechaExpiraIni)}
                                 helperText={formik.touched.FechaExpiraIni && formik.errors.FechaExpiraIni}
@@ -227,26 +213,18 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
                         id="FechaExpiraFin"
                         label="FechaExpiraFin*"
                         value={formik.values.FechaExpiraFin ? dayjs(formik.values.FechaExpiraFin) : null}
-                        onChange={(date) => formik.setFieldValue("FechaExpiraFin", date)}
-                        renderInput={(params) => (
+                        onChange={(date) => formik.setFieldValue("FechaExpiraFin", date ? date.toDate() : null)}
+                        textField={(props) => (
                             <TextField
-                                {...params.inputProps}
+                                {...props}
                                 {...commonTextFieldProps}
                                 error={formik.touched.FechaExpiraFin && Boolean(formik.errors.FechaExpiraFin)}
                                 helperText={formik.touched.FechaExpiraFin && formik.errors.FechaExpiraFin}
                             />
                         )}
                     />
-                    <TextField
-                        id="IdTipoListaOK"
-                        label="IdTipoListaOK*"
-                        value={formik.values.IdTipoListaOK}
-                        {...commonTextFieldProps}
-                        error={formik.touched.IdTipoListaOK && Boolean(formik.errors.IdTipoListaOK)}
-                        helperText={formik.touched.IdTipoListaOK && formik.errors.IdTipoListaOK}
-                    />
                     <Select
-                        value={formik.values.IdTipoListaOK}
+                        value={formik.values.IdTipoListaOK || ""}  // Asegúrate de proporcionar un valor por defecto o vacío
                         label="Selecciona un Tipo de Lista:"
                         name="IdTipoListaOK"
                         onBlur={formik.handleBlur}

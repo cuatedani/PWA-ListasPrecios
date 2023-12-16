@@ -6,7 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 //Equipo 2: DB
-import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
+import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
 //Equipo 2: Helpers
 import { PresentaPreciosValues } from "../../helpers/PresentaPreciosValues";
 //Equipo 2: Services
