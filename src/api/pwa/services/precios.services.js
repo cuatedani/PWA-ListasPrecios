@@ -224,7 +224,7 @@ export const deletePricesListByValueService = async (IdInstitutoOK, IdListaOK) =
         let { message } = error;
         if (!data.messageDEV) data.messageDEV = message;
         if (!data.dataRes.length === 0) data.dataRes = error;
-        data.messageUSR = `La eliminacion de la lista de precios con ID ${ID} falló`;
+        data.messageUSR = `La eliminacion de la lista de precios con ID ${IdInstitutoOK} falló`;
 
         bitacora = AddMSG(bitacora, data, 'FAIL');
 
