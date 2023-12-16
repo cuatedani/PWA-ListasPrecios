@@ -64,7 +64,7 @@ const EditCondProCondicionModal = ({ EditCondProCondicionShowModal, setEditCondP
                 {/* Equipo 2: Aqui va el Titulo de la Modal */}
                 <DialogTitle>
                     <Typography>
-                        <strong>Editar Nueva Condicion</strong>
+                        <strong>Editar Condicion</strong>
                     </Typography>
                 </DialogTitle>
                 {/* Equipo 2: Aqui va un tipo de control por cada Propiedad de la Lista de Precios*/}
@@ -144,7 +144,7 @@ const EditCondProCondicionModal = ({ EditCondProCondicionShowModal, setEditCondP
                         type="submit"
                         disabled={!!mensajeExitoAlert}
                     >
-                        <span>GUARDAR</span>
+                        <span>MODIFICAR</span>
                     </LoadingButton>
                 </DialogActions>
             </form>

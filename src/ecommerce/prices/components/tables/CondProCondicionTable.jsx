@@ -16,8 +16,8 @@ import {
 //Equipo 2: DB
 import { PatchOnePriceList } from '../../services/remote/patch/PatchOnePriceList';
 //Equipo 2: Modals
-//import AddCondProCondicionModal from "../modals/AddCondProCondicionModal";
-//import UpdateCondProCondicionModal from "../modals/UpdateCondProCondicionModal";
+import AddCondProCondicionModal from "../modals/AddCondProCondicionModal";
+import EditCondProCondicionModal from "../modals/EditCondProCondicionModal";
 //Equipo 2: Redux
 import { useSelector, useDispatch } from "react-redux";
 import { SET_SELECTED_CONDPROCONDICION_DATA } from "../../redux/slices/CondProCondicionSlice";
@@ -247,7 +247,7 @@ const CondProCondicionTable = () => {
             {/* M O D A L E S */}
             {/* ADD MODAL */}
             <Dialog open={AddCondProCondicionShowModal}>
-                <AddCondRolCondicionModal
+                <AddCondProCondicionModal
                     AddCondProCondicionShowModal={AddCondProCondicionShowModal}
                     setAddCondProCondicionShowModal={setAddCondProCondicionShowModal}
                     onClose={() => {
@@ -258,7 +258,7 @@ const CondProCondicionTable = () => {
             </Dialog>
             {/* EDIT MODAL */}
             <Dialog open={EditCondProCondicionShowModal}>
-                <EditCondRolCondicionModal
+                <EditCondProCondicionModal
                     EditCondProCondicionShowModal={EditCondProCondicionShowModal}
                     setEditCondProCondicionShowModal={setEditCondProCondicionShowModal}
                     RowData={RowData}

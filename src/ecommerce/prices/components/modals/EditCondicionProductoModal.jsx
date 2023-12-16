@@ -8,14 +8,14 @@ import * as Yup from "yup";
 import { CondicionProductoValues } from "../../helpers/CondicionProductoValues";
 import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
 
-const EditCondicionProductoModal = ({EditCondicionProductoShowModal, setEditCondicionProductoShowModal}) => {
+const EditCondicionProductoModal = ({EditCondicionProductoShowModal, setEditCondicionProductoShowModal, RowData}) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
     const formik = useFormik({
         initialValues: {
-            DesPromo: "",
-            IdTipoPromoOK: "",
-            Formula: ""
+            DesPromo: RowData.DesPromo,
+            IdTipoPromoOK: RowData.IdTipoPromoOK,
+            Formula: RowData.Formula
         },
         validationSchema: Yup.object({
             DesPromo: Yup.string().required("Campo requerido"),
@@ -60,7 +60,7 @@ const EditCondicionProductoModal = ({EditCondicionProductoShowModal, setEditCond
                 {/* Equipo 2: Aqui va el Titulo de la Modal */}
                 <DialogTitle>
                     <Typography>
-                        <strong>Editar Nueva Condicion de Producto</strong>
+                        <strong>Editar Promocion</strong>
                     </Typography>
                 </DialogTitle>
                 {/* Equipo 2: Aqui va un tipo de control por cada Propiedad de la Lista de Precios*/}
@@ -140,7 +140,7 @@ const EditCondicionProductoModal = ({EditCondicionProductoShowModal, setEditCond
                         type="submit"
                         disabled={!!mensajeExitoAlert}
                     >
-                    <span>GUARDAR</span>
+                    <span>MODIFICAR</span>
                     </LoadingButton>
                 </DialogActions>
             </form>

@@ -16,8 +16,8 @@ import {
 //Equipo 2: DB
 import { PatchOnePriceList } from '../../services/remote/patch/PatchOnePriceList';
 //Equipo 2: Modals
-//import AddCondicionRolesModal from "../modals/AddCondicionRolesModal";
-//import EditCondicionRolesModal from "../modals/UpdateCondicionRolesModal";
+import AddCondicionRolesModal from "../modals/AddCondicionRolesModal";
+import EditCondicionRolesModal from "../modals/EditCondicionRolesModal";
 //Equipo 2: Redux+
 import { useSelector, useDispatch } from "react-redux";
 import { SET_SELECTED_CONDICIONROLES_DATA } from "../../redux/slices/CondicionRolesSlice";

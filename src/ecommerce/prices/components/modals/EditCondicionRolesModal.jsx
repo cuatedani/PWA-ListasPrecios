@@ -64,7 +64,7 @@ const EditCondicionRolesModal = ({ EditCondicionRolesShowModal, setEditCondicion
                 {/* Equipo 2: Aqui va el Titulo de la Modal */}
                 <DialogTitle>
                     <Typography>
-                        <strong>Editar Nueva Condicion Roles</strong>
+                        <strong>Editar Condicion Roles</strong>
                     </Typography>
                 </DialogTitle>
                 {/* Equipo 2: Aqui va un tipo de control por cada Propiedad de la Lista de Precios*/}
@@ -144,7 +144,7 @@ const EditCondicionRolesModal = ({ EditCondicionRolesShowModal, setEditCondicion
                         type="submit"
                         disabled={!!mensajeExitoAlert}
                     >
-                        <span>GUARDAR</span>
+                        <span>MODIFICAR</span>
                     </LoadingButton>
                 </DialogActions>
             </form>

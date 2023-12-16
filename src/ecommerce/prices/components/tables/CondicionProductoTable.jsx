@@ -16,8 +16,8 @@ import {
 //Equipo 2: DB
 import { PatchOnePriceList } from '../../services/remote/patch/PatchOnePriceList';
 //Equipo 2: Modals
-//import AddCondicionProductoModal from "../modals/AddCondicionProductoModal";
-//import EditCondicionProductoModal from "../modals/UpdateCondicionProductoModal";
+import AddCondicionProductoModal from "../modals/AddCondicionProductoModal";
+import EditCondicionProductoModal from "../modals/EditCondicionProductoModal";
 //Equipo 2: Redux
 import { useSelector, useDispatch } from "react-redux";
 import { SET_SELECTED_CONDICIONPRODUCTO_DATA } from "../../redux/slices/CondicionProductoSlice";

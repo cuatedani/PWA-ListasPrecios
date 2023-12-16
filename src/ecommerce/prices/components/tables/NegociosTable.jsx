@@ -16,8 +16,8 @@ import {
 //Equipo 2: DB
 import { PatchOnePriceList } from '../../services/remote/patch/PatchOnePriceList';
 //Equipo 2: Modals
-//import AddNegociosModal from "../modals/AddNegociosModal";
-//import EditNegociosModal from "../modals/UpdateNegociosModal";
+import AddNegociosModal from "../modals/AddNegociosModal";
+import EditNegociosModal from "../modals/EditNegociosModal";
 //Equipo 2: Redux
 import { useSelector } from "react-redux";
 
@@ -163,7 +163,7 @@ const NegociosTable = () => {
                                     {/* ------- AGREGAR ------ */}
                                     <Tooltip title="Agregar">
                                         <IconButton
-                                        onClick={() => setAddPresentaPreciosShowModal(true)}
+                                        onClick={() => setAddNegociosShowModal(true)}
                                         >
                                             <AddCircleIcon />
                                         </IconButton>
@@ -212,8 +212,8 @@ const NegociosTable = () => {
             {/* ADD MODAL */}
             <Dialog open={AddNegociosShowModal}>
                 <AddNegociosModal
-                    AddPriceListShowModal={AddNegociosShowModal}
-                    setAddPriceListShowModal={setAddNegociosShowModal}
+                    AddNegociosShowModal={AddNegociosShowModal}
+                    setAddNegociosShowShowModal={setAddNegociosShowModal}
                     onClose={() => {
                         setAddNegociosShowModal(false);
                         fetchData();

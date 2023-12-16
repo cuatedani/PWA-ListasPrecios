@@ -81,7 +81,7 @@ const AddCondicionProductoModal = ({AddCondicionProductoShowModal, setAddCondici
                 {/* Equipo 2: Aqui va el Titulo de la Modal */}
                 <DialogTitle>
                     <Typography>
-                        <strong>Agregar Nueva Condicion de Producto</strong>
+                        <strong>Agregar Nueva Promocion</strong>
                     </Typography>
                 </DialogTitle>
                 {/* Equipo 2: Aqui va un tipo de control por cada Propiedad de la Lista de Precios*/}

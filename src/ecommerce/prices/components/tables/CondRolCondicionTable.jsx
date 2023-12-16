@@ -16,8 +16,8 @@ import {
 //Equipo 2: DB
 import { PatchOnePriceList } from '../../services/remote/patch/PatchOnePriceList';
 //Equipo 2: Modals
-//import AddCondRolCondicionModal from "../modals/AddCondRolCondicionModal";
-//import EditCondRolCondicionModal from "../modals/UpdateCondRolCondicionModal";
+import AddCondRolCondicionModal from "../modals/AddCondRolCondicionModal";
+import EditCondRolCondicionModal from "../modals/EditCondRolCondicionModal";
 //Equipo 2: Redux
 import { useSelector } from "react-redux";
 
@@ -54,9 +54,9 @@ const CondRolCondicionTable = () => {
     //Equipo 2: controlar el estado de la data de CondRolCondicion.
     const [CondRolCondicionData, setCondRolCondicionData] = useState([]);
     //Equipo 2: controlar el estado que muesta u oculta la modal de nuevo Negocios.
-    const [AddNegociosShowModal, setAddNegociosShowModal] = useState(false);
+    const [AddCondRolCondicionShowModal, setAddCondRolCondicionShowModal] = useState(false);
     //Equipo 2: controlar el estado que muesta u oculta la modal de editar Negocios.
-    const [EditNegociosShowModal, setEditNegociosShowModal] = useState(false);
+    const [EditCondRolCondicionShowModal, setEditCondRolCondicionShowModal] = useState(false);
     //Equipo 2: Controlar la seleccion de datos
     // Indice de la fila, Id de la fila, datos de la fila
     const [selectedRowIndex, setSelectedRowIndex] = useState(null);
