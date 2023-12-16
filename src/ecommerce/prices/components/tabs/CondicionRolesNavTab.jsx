@@ -9,7 +9,6 @@ const CondicionRolesTabs = [
 const CondicionRolesNavTab = ({
     CurrentRowInCondicionRolesTab,
     CurrentTabInCondicionRolesTab,
-    setCurrentNameTabInPrincipalTabIsSelected,
 }) => {
     const [CurrentTabIndex, setCurrentTabIndex] = useState(0);
 

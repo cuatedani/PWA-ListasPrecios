@@ -2,7 +2,7 @@ import { Box, Tabs, Tab } from "@mui/material";
 import React, { useState } from "react";
 
 const CondicionProductoTabs = [
-    "COND_PRODUCTOS",
+    "COND_PRODUCTO",
     "COND_PROD_CONDICION"
 ];
 
