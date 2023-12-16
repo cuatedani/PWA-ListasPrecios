@@ -11,7 +11,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { PriceListValues } from "../../helpers/PriceListValues";
-import { PatchOnePriceList } from "../../../prices/services/remote/patch/PatchOnePriceList";
+import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
 //import getAllInstitutes from "../../../../security/institutes/services/remote/get/getInstitutesAll";
 import GetAllLabels from "../../services/remote/get/getAllLabels";
 
