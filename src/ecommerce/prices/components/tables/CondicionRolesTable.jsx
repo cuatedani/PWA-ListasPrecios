@@ -183,23 +183,29 @@ const CondicionRolesTable = () => {
                                 <Box>
                                     <Tooltip title="Agregar">
                                         <IconButton
-                                            //onClick={() => setAddCondicionRolesShowModal(true)}
+                                            onClick={() => setAddCondicionRolesShowModal(true)}
                                         >
                                             <AddCircleIcon />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Editar">
-                                        <IconButton>
+                                        <IconButton
+                                            onClick={() => Edit()}
+                                        >
                                             <EditIcon />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Eliminar">
-                                        <IconButton>
+                                        <IconButton
+                                            onClick={() => Delete()}
+                                        >
                                             <DeleteIcon />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Detalles ">
-                                        <IconButton>
+                                        <IconButton
+                                            onClick={() => Details()}
+                                        >
                                             <InfoIcon />
                                         </IconButton>
                                     </Tooltip>
@@ -221,7 +227,7 @@ const CondicionRolesTable = () => {
                 />
             </Box>
             {/* M O D A L E S */}
-            {/* ADD MODAL 
+            {/* ADD MODAL */}
             <Dialog open={AddCondicionRolesShowModal}>
                 <AddCondicionRolesModal
                     AddCondicionRolesShowModal={AddCondicionRolesShowModal}
@@ -232,8 +238,7 @@ const CondicionRolesTable = () => {
                     }}
                 />
             </Dialog>
-            */}
-            {/* EDIT MODAL 
+            {/* EDIT MODAL  */}
             <Dialog open={EditCondicionRolesShowModal}>
                 <EditCondicionRolesModal
                     EditCondicionRolesShowModal={EditCondicionRolesShowModal}
@@ -245,7 +250,6 @@ const CondicionRolesTable = () => {
                     }}
                 />
             </Dialog>
-            */}
         </Box>
     );
 };

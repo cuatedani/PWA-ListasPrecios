@@ -1,8 +1,8 @@
 //Equipo 2: React
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 //Equipo 2: Material UI
 import { MaterialReactTable } from 'material-react-table';
-import { Box, Stack, Tooltip, Button, IconButton, Dialog } from "@mui/material";
+import { Box, Stack, Tooltip, IconButton, Dialog } from "@mui/material";
 import { MRT_Localization_ES } from "material-react-table/locales/es";
 import { darken } from '@mui/system';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -141,14 +141,11 @@ const PresentaPreciosTable = () => {
     };
 
     //Equipo 2: Metodo para editar una Presentacion de Precios
-    const Edit = async () => {
+    const handleEditClick = async () => {
         if (RowData) {
             setEditPresentaPreciosShowModal(true);
-            Console.log(EditPresentaPreciosShowModal)
         } else {
-            await showMensajeConfirm(
-                `Primero Seleccione una Fila`
-            );
+            await showMensajeConfirm(`Primero Seleccione una Fila`);
         }
     };
 
@@ -197,7 +194,7 @@ const PresentaPreciosTable = () => {
                                     {/* ------- EDITAR ------ */}
                                     <Tooltip title="Editar">
                                         <IconButton
-                                            onClick={() => Edit()}
+                                            onClick={() => setEditPresentaPreciosShowModal(true)}
                                         >
                                             <EditIcon />
                                         </IconButton>
@@ -249,12 +246,13 @@ const PresentaPreciosTable = () => {
                     />
                 )}
             </Dialog>
+        
             {/* EDIT MODAL */}
             <Dialog open={EditPresentaPreciosShowModal}>
                 {EditPresentaPreciosShowModal && (
                     <EditPresentaPreciosModal
                         EditPresentaPreciosShowModal={EditPresentaPreciosShowModal}
-                        setEditPresentaPreciosShowModal={EditPresentaPreciosShowModal}
+                        setEditPresentaPreciosShowModal={setEditPresentaPreciosShowModal}
                         RowData={RowData}
                         onClose={() => {
                             setEditPresentaPreciosShowModal(false);

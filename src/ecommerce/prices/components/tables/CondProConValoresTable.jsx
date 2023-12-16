@@ -208,23 +208,29 @@ const CondProConValoresTable = () => {
                                 <Box>
                                     <Tooltip title="Agregar">
                                         <IconButton
-                                        //onClick={() => setAddCondProConValoresShowModal(true)}
+                                        onClick={() => setAddCondProConValoresShowModal(true)}
                                         >
                                             <AddCircleIcon />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Editar">
-                                        <IconButton>
+                                        <IconButton
+                                        onClick={() => Edit()}
+                                        >
                                             <EditIcon />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Eliminar">
-                                        <IconButton>
+                                        <IconButton
+                                        onClick={() => Delete()}
+                                        >
                                             <DeleteIcon />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Detalles ">
-                                        <IconButton>
+                                        <IconButton
+                                        onClick={() => Details()}
+                                        >
                                             <InfoIcon />
                                         </IconButton>
                                     </Tooltip>
@@ -246,7 +252,7 @@ const CondProConValoresTable = () => {
                 />
             </Box>
             {/* M O D A L E S */}
-            {/* ADD MODAL 
+            {/* ADD MODAL */}
             <Dialog open={AddCondProConValoresShowModal}>
                 <AddCondRolCondicionModal
                     AddCondProConValoresShowModal={AddCondProConValoresShowModal}
@@ -257,8 +263,7 @@ const CondProConValoresTable = () => {
                     }}
                 />
             </Dialog>
-            */}
-            {/* EDIT MODAL 
+            {/* EDIT MODAL */}
             <Dialog open={EditCondProConValoresShowModal}>
                 <EditCondRolCondicionModal
                     EditCondProConValoresShowModal={EditCondProConValoresShowModal}
@@ -270,7 +275,6 @@ const CondProConValoresTable = () => {
                     }}
                 />
             </Dialog>
-            */}
         </Box>
     );
 };

@@ -5,7 +5,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { v4 as genID } from "uuid";
 //Equipo 2: DB
 import { PatchOnePriceList } from "../../services/remote/patch/PatchOnePriceList";
 //Equipo 2: Helpers
@@ -16,7 +15,7 @@ import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice"
 import { useSelector } from "react-redux";
 
 
-const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal, rowData }) => {
+const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal, RowData }) => {
     //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
@@ -192,7 +191,7 @@ const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaP
                     >
                         <span>CERRAR</span>
                     </LoadingButton>
-                    {/* Equipo 2: Boton de Guardar. */}
+                    {/* Equipo 2: Boton de EDITAR. */}
                     <LoadingButton
                         color="primary"
                         loadingPosition="start"
@@ -201,7 +200,7 @@ const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaP
                         type="submit"
                         disabled={!!mensajeExitoAlert}
                     >
-                        <span>GUARDAR</span>
+                        <span>EDITAR</span>
                     </LoadingButton>
                 </DialogActions>
             </form>

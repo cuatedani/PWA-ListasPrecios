@@ -197,23 +197,27 @@ const CondRolCondicionTable = () => {
                                 <Box>
                                     <Tooltip title="Agregar">
                                         <IconButton
-                                            //onClick={() => setAddCondRolCondicionShowModal(true)}
+                                            onClick={() => setAddCondRolCondicionShowModal(true)}
                                         >
                                             <AddCircleIcon />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Editar">
-                                        <IconButton>
+                                        <IconButton
+                                            onClick={() => Edit()}>
                                             <EditIcon />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Eliminar">
-                                        <IconButton>
+                                        <IconButton
+                                            onClick={() => Delete()}>
                                             <DeleteIcon />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Detalles ">
-                                        <IconButton>
+                                        <IconButton
+                                            onClick={() => Details()}
+                                        >
                                             <InfoIcon />
                                         </IconButton>
                                     </Tooltip>
@@ -235,7 +239,7 @@ const CondRolCondicionTable = () => {
                 />
             </Box>
             {/* M O D A L E S */}
-            {/* ADD MODAL 
+            {/* ADD MODAL */}
             <Dialog open={AddCondRolCondicionShowModal}>
                 <AddCondRolCondicionModal
                     AddCondRolCondicionShowModal={AddCondRolCondicionShowModal}
@@ -246,8 +250,7 @@ const CondRolCondicionTable = () => {
                     }}
                 />
             </Dialog>
-            */}
-            {/* EDIT MODAL 
+            {/* EDIT MODAL */}
             <Dialog open={EditCondRolCondicionShowModal}>
                 <EditCondRolCondicionModal
                     EditCondRolCondicionShowModal={EditCondRolCondicionShowModal}
@@ -259,7 +262,6 @@ const CondRolCondicionTable = () => {
                     }}
                 />
             </Dialog>
-            */}
         </Box>
     );
 };

@@ -163,7 +163,7 @@ const NegociosTable = () => {
                                     {/* ------- AGREGAR ------ */}
                                     <Tooltip title="Agregar">
                                         <IconButton
-                                        //onClick={() => setAddPresentaPreciosShowModal(true)}
+                                        onClick={() => setAddPresentaPreciosShowModal(true)}
                                         >
                                             <AddCircleIcon />
                                         </IconButton>
@@ -171,7 +171,7 @@ const NegociosTable = () => {
                                     {/* ------- EDITAR ------ */}
                                     <Tooltip title="Editar">
                                         <IconButton
-                                        //onClick={() => Edit()}
+                                        onClick={() => Edit()}
                                         >
                                             <EditIcon />
                                         </IconButton>
@@ -179,7 +179,7 @@ const NegociosTable = () => {
                                     {/* ------- ELIMINAR ------ */}
                                     <Tooltip title="Eliminar">
                                         <IconButton
-                                        //onClick={() => Delete()}
+                                        onClick={() => Delete()}
                                         >
                                             <DeleteIcon />
                                         </IconButton>
@@ -187,7 +187,7 @@ const NegociosTable = () => {
                                     {/* ------- DETALLES ------ */}
                                     <Tooltip title="Detalles ">
                                         <IconButton
-                                        //onClick={() => Details()}
+                                        onClick={() => Details()}
                                         >
                                             <InfoIcon />
                                         </IconButton>
@@ -209,7 +209,7 @@ const NegociosTable = () => {
                     })}
                 />
             </Box>
-            {/* ADD MODAL 
+            {/* ADD MODAL */}
             <Dialog open={AddNegociosShowModal}>
                 <AddNegociosModal
                     AddPriceListShowModal={AddNegociosShowModal}
@@ -220,8 +220,7 @@ const NegociosTable = () => {
                     }}
                 />
             </Dialog>
-            */}
-            {/* EDIT MODAL 
+            {/* EDIT MODAL */}
             <Dialog open={EditNegociosShowModal}>
                 <EditNegociosModal
                     EditNegociosShowModal={EditNegociosShowModal}
@@ -233,7 +232,6 @@ const NegociosTable = () => {
                     }}
                 />
             </Dialog>
-            */}
         </Box>
     );
 };

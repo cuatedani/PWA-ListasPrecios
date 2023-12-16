@@ -1,9 +1,9 @@
 //Equipo 2: React
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 //Equipo 2: Material UI
 import { MaterialReactTable } from 'material-react-table';
 import { MRT_Localization_ES } from "material-react-table/locales/es";
-import { Box, Stack, Tooltip, Button, IconButton, Dialog } from "@mui/material";
+import { Box, Stack, Tooltip, IconButton, Dialog } from "@mui/material";
 import { darken } from '@mui/system';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";

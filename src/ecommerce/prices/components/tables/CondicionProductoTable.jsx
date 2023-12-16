@@ -179,7 +179,7 @@ const CondicionProductoTable = () => {
                                     {/* ------- AGREGAR ------ */}
                                     <Tooltip title="Agregar">
                                         <IconButton
-                                            //onClick={() => setAddCondicionProductoShowModal(true)}
+                                            onClick={() => setAddCondicionProductoShowModal(true)}
                                         >
                                             <AddCircleIcon />
                                         </IconButton>
@@ -187,7 +187,7 @@ const CondicionProductoTable = () => {
                                     {/* ------- EDITAR ------ */}
                                     <Tooltip title="Editar">
                                         <IconButton
-                                            //onClick={() => Edit()}
+                                            onClick={() => Edit()}
                                         >
                                             <EditIcon />
                                         </IconButton>
@@ -195,7 +195,7 @@ const CondicionProductoTable = () => {
                                     {/* ------- ELIMINAR ------ */}
                                     <Tooltip title="Eliminar">
                                         <IconButton
-                                            //onClick={() => Delete()}
+                                            onClick={() => Delete()}
                                         >
                                             <DeleteIcon />
                                         </IconButton>
@@ -203,7 +203,7 @@ const CondicionProductoTable = () => {
                                     {/* ------- DETALLES ------ */}
                                     <Tooltip title="Detalles ">
                                         <IconButton
-                                            //onClick={() => Details()}
+                                            onClick={() => Details()}
                                         >
                                             <InfoIcon />
                                         </IconButton>
@@ -226,7 +226,7 @@ const CondicionProductoTable = () => {
                 />
             </Box>
             {/* M O D A L E S */}
-            {/* ADD MODAL 
+            {/* ADD MODAL */}
             <Dialog open={AddCondicionProductoShowModal}>
                 <AddCondicionProductoModal
                     AddCondicionProductoShowModal={AddCondicionProductoShowModal}
@@ -237,8 +237,7 @@ const CondicionProductoTable = () => {
                     }}
                 />
             </Dialog>
-            */}
-            {/* EDIT MODAL 
+            {/* EDIT MODAL */}
             <Dialog open={EditCondicionProductoShowModal}>
                 <EditCondicionProductoModal
                     EditCondicionProductoShowModal={EditCondicionProductoShowModal}
@@ -250,7 +249,6 @@ const CondicionProductoTable = () => {
                     }}
                 />
             </Dialog>
-            */}
         </Box>
     );
 };
