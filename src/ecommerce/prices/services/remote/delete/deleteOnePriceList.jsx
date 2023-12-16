@@ -4,7 +4,7 @@ export default function deleteOnePriceList(pricelist) {
 
   console.log("<<EJECUTA>> API <<DeleteOnePriceList>> Requiere:")
   return new Promise((resolve, reject) => {
-    axios.delete(`http://localhost:3020/api/pwa/precio/`, pricelist)
+    axios.delete(`http://localhost:3020/api/pwa/precio/`, pricelist.IdInstituteOK, pricelist.IdListaOK)
       .then((response) => {
         console.log("<<RESPONSE>> DeleteOnePriceList", pricelist)
         const data = response.data;

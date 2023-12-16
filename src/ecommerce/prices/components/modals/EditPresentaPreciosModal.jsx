@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
-import SaveIcon from "@mui/icons-material/Save";
+import EditIcon from "@mui/icons-material/Edit";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { v4 as genID } from "uuid";
@@ -171,8 +171,6 @@ const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaP
                     sx={{ display: 'flex', flexDirection: 'row' }}
                 >
                     <Box m="auto">
-                        {console.log("mensajeExitoAlert", mensajeExitoAlert)}
-                        {console.log("mensajeErrorAlert", mensajeErrorAlert)}
                         {mensajeErrorAlert && (
                             <Alert severity="error">
                                 <b>¡ERROR!</b> ─ {mensajeErrorAlert}
@@ -198,7 +196,7 @@ const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaP
                     <LoadingButton
                         color="primary"
                         loadingPosition="start"
-                        startIcon={<SaveIcon />}
+                        startIcon={<EditIcon />}
                         variant="contained"
                         type="submit"
                         disabled={!!mensajeExitoAlert}

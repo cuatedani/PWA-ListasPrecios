@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
@@ -16,7 +16,7 @@ import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice"
 import { useSelector } from "react-redux";
 
 
-const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal }) => {
+const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal}) => {
     //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
@@ -32,7 +32,7 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
             try {
                 setPresentaPreciosData(selectedPriceListData.cat_listas_presenta_precios);
             } catch (error) {
-                console.error("Error al cargar las Presentaciondes de Precios en useEffect de AddPresentaPreciosModla:", error);
+                console.error("Error al cargar las Presentaciondes de Precios en useEffect de AddPresentaPreciosModal:", error);
             }
         }
         fetchData();
@@ -171,8 +171,6 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
                     sx={{ display: 'flex', flexDirection: 'row' }}
                 >
                     <Box m="auto">
-                        {console.log("mensajeExitoAlert", mensajeExitoAlert)}
-                        {console.log("mensajeErrorAlert", mensajeErrorAlert)}
                         {mensajeErrorAlert && (
                             <Alert severity="error">
                                 <b>¡ERROR!</b> ─ {mensajeErrorAlert}

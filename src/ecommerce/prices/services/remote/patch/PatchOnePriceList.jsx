@@ -3,7 +3,7 @@ import axios from 'axios';
 export function PatchOnePriceList(id, pricelist) {
   console.log("<<EJECUTA>> API <<PatchOnePriceList>> Requiere:", pricelist);
   return new Promise((resolve, reject) => {
-    axios.patch(`http://localhost:3020/api/pwa/precio/`, pricelist)
+    axios.patch(`http://localhost:3020/api/pwa/precio/one`, pricelist)
       .then((response) => {
         console.log("<<RESPONSE>> PatchOnePriceList", pricelist);
         const data = response.data;

@@ -18,7 +18,7 @@ import getAllPricesList from '../../services/remote/get/getAllPricesList';
 import deleteOnePriceList from '../../services/remote/delete/deleteOnePriceList';
 //Equipo 2: Modals
 import AddPriceListModal from "../modals/AddPriceListModal";
-import EditPriceListModal from "../modals/UpdatePriceListModal";
+import EditPriceListModal from "../modals/EditPriceListModal";
 //Equipo 2: Redux
 import { useDispatch } from "react-redux";
 import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";

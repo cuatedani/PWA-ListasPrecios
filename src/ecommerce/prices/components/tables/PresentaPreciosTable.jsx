@@ -12,12 +12,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import {
     showMensajeConfirm,
     showMensajeError,
-  } from "../../../../share/components/elements/messages/MySwalAlerts";
+} from "../../../../share/components/elements/messages/MySwalAlerts";
 //Equipo 2: DB
 import { PatchOnePriceList } from '../../services/remote/patch/PatchOnePriceList';
 //Equipo 2: Modals
 import AddPresentaPreciosModal from "../modals/AddPresentaPreciosModal";
-import EditPresentaPreciosModal from "../modals/UpdatePresentaPreciosModal";
+import EditPresentaPreciosModal from "../modals/EditPresentaPreciosModal";
 //REDUX
 import { useSelector } from "react-redux";
 
@@ -66,6 +66,7 @@ const PresentaPreciosTable = () => {
     const [idRowSel, setIdRowSel] = useState(null);
     const [RowData, setRowData] = useState(null);
     const [SelectedPriceListData, setSelectedPriceListData] = useState(null);
+    let Opening = false;
 
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const priceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
@@ -111,25 +112,25 @@ const PresentaPreciosTable = () => {
         const res = await showMensajeConfirm(
             `¿Estás seguro de eliminar el documento: ${idRowSel}? No podrás revertir esta acción. ¿Deseas continuar?`
         );
-    
+
         if (res) {
             try {
                 // Filtrar los elementos distintos al que queremos eliminar
                 const updatedPresentaPreciosData = PresentaPreciosData.filter(
                     presenta_precios => presenta_precios.IdPresentaBK !== idRowSel
                 );
-    
+
                 // Crear un nuevo objeto con las actualizaciones
                 const updatedPriceListData = {
                     ...SelectedPriceListData,
                     cat_listas_presenta_precios: updatedPresentaPreciosData,
                 };
-    
+
                 // Actualizar el documento PriceList
                 await PatchOnePriceList(updatedPriceListData.IdListaOK, updatedPriceListData);
-    
+
                 setPresentaPreciosData(updatedPresentaPreciosData);
-    
+
                 showMensajeConfirm("Documento Eliminado");
                 fetchData();
             } catch (e) {
@@ -142,7 +143,8 @@ const PresentaPreciosTable = () => {
     //Equipo 2: Metodo para editar una Presentacion de Precios
     const Edit = async () => {
         if (RowData) {
-            setEditPresentaPreciosShowModal(true)
+            setEditPresentaPreciosShowModal(true);
+            Console.log(EditPresentaPreciosShowModal)
         } else {
             await showMensajeConfirm(
                 `Primero Seleccione una Fila`
@@ -236,26 +238,30 @@ const PresentaPreciosTable = () => {
             {/* M O D A L E S */}
             {/* ADD MODAL */}
             <Dialog open={AddPresentaPreciosShowModal}>
-                <AddPresentaPreciosModal
-                    AddPriceListShowModal={AddPresentaPreciosShowModal}
-                    setAddPriceListShowModal={setAddPresentaPreciosShowModal}
-                    onClose={() => {
-                        setAddPresentaPreciosShowModal(false);
-                        fetchData();
-                    }}
-                />
+                {AddPresentaPreciosShowModal && (
+                    <AddPresentaPreciosModal
+                        AddPresentaPreciosShowModal={AddPresentaPreciosShowModal}
+                        setAddPresentaPreciosShowModal={setAddPresentaPreciosShowModal}
+                        onClose={() => {
+                            setAddPresentaPreciosShowModal(false);
+                            fetchData();
+                        }}
+                    />
+                )}
             </Dialog>
             {/* EDIT MODAL */}
             <Dialog open={EditPresentaPreciosShowModal}>
-                <EditPresentaPreciosModal
-                    EditPresentaPreciosShowModal={EditPresentaPreciosShowModal}
-                    setEditPresentaPreciosShowModal={setEditPresentaPreciosShowModal}
-                    RowData={RowData}
-                    onClose={() => {
-                        setEditPresentaPreciosShowModal(false);
-                        fetchData();
-                    }}
-                />
+                {EditPresentaPreciosShowModal && (
+                    <EditPresentaPreciosModal
+                        EditPresentaPreciosShowModal={EditPresentaPreciosShowModal}
+                        setEditPresentaPreciosShowModal={EditPresentaPreciosShowModal}
+                        RowData={RowData}
+                        onClose={() => {
+                            setEditPresentaPreciosShowModal(false);
+                            fetchData();
+                        }}
+                    />
+                )}
             </Dialog>
         </Box>
     );
