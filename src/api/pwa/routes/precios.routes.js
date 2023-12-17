@@ -6,13 +6,13 @@ const router = Router();
 
 //-------------------APIS FUNCIONALES---------------------------------------------------------
 router.get('/',pricesListController.GetAllPricesList); //Pruebas
-router.get('/one',pricesListController.GetOnePricesList);//Pruebas
+router.get('/one',pricesListController.GetOnePricesListByID);//Pruebas
 router.post('/',pricesListController.AddOnePricesList);//Pruebas
 router.put('/', pricesListController.UpdateOnePricesList);//Pruebas
 router.delete('/',pricesListController.DeleteOnePricesList);//Pruebas
 
 //-------------------VERSIONES EN PRUEBAS (PATCH)-------------------------------------
-router.patch('/', pricesListController.UpdatePatchPricesList);
+router.patch('/one', pricesListController.updatePricesList);
 
 export default router;
 

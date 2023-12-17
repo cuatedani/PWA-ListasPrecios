@@ -9,10 +9,10 @@ const preciosSchema = new mongoose.Schema({
   IdListaBK: {type : String}, 
   DesLista: {type : String}, 
   FechaExpiraIni: {
-    $date: {type : Date},
+    date: {type : String},
   },
   FechaExpiraFin: {
-    $date: {type : Date},
+    date: {type : String},
   },
   IdTipoListaOK: {type : String}, 
   IdTipoGeneraListaOK: {type : String}, 
@@ -32,7 +32,7 @@ const preciosSchema = new mongoose.Schema({
         detail_row_reg: [
           {
             FechaReg: {
-              $date: {type : Date}, 
+              date: {type : String}, 
             },
             UsuarioReg: {type : String},
           }
@@ -44,10 +44,10 @@ const preciosSchema = new mongoose.Schema({
       _id: false,
       DesCondicion: {type : String}, 
       FechaExpiraIni: {
-        $date: {type : Date}, 
+        date: {type : String}, 
       },
       FechaExpiraFin: {
-        $date: {type : Date}, 
+        date: {type : String}, 
       },
       Condicion: {type : String}, 
       condicion: [
@@ -67,7 +67,7 @@ const preciosSchema = new mongoose.Schema({
               {
                 _id: false,
                 FechaReg: {
-                  $date: {type : Date}, 
+                  date: {type : String}, 
                 },
                 UsuarioReg: {type : String}, 
               }
@@ -106,7 +106,7 @@ const preciosSchema = new mongoose.Schema({
           {
             _id: false,
             FechaReg: {
-              $date: {type : Date}, 
+              date: {type : String}, 
             },
             UsuarioReg: {type : String}, 
           }
@@ -125,7 +125,7 @@ const preciosSchema = new mongoose.Schema({
           {
             _id: false,
             FechaReg: {
-              $date: {type : Date}, 
+              date: {type : String}, 
             },
             UsuarioReg: {type : String}, 
           }
@@ -140,7 +140,7 @@ const preciosSchema = new mongoose.Schema({
       {
         _id: false,
         FechaReg: {
-          $date: {type : Date}, 
+          date: {type : String}, 
         },
         UsuarioReg: {type : String}, 
       }
@@ -154,7 +154,7 @@ const dbCluster = config.CLUSTER;
   
 const conn =  obtenerConexion(dbName, dbCluster);
 	
-const model = obtenerModelo('cat_precios', 
+const model = obtenerModelo('cat_listas', 
 						  preciosSchema,
 						  conn, 
 						  dbName, 

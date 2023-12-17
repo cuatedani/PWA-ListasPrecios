@@ -1,282 +1,282 @@
 import PricesList from '../models/precios';
-import {OK, FAIL, BITACORA, AddMSG, DATA} from '../../../middlewares/respPWA.handler';
+import Institutes from '../models/Institutes'
+import { OK, FAIL, BITACORA, AddMSG, DATA } from '../../../middlewares/respPWA.handler';
 
 //--------------------------------GET ALL--------------------------Modificada---------------------------
-export const getPricesListAll = async() => { 
-    let bitacora = BITACORA();
-    let data = DATA();
+export const GetAllPricesList = async () => {
+  let bitacora = BITACORA();
+  let data = DATA();
 
-    try{
-        bitacora.process = "Extraer todas las listas de precios";
-        data.method = "GET";
-        data.api = "/prices-list/"; //AJCG: no afecta a las apis lo que se escriba aquí
-        data.process = "Extraer todas las listas de precios en la colección: cat_precios";
+  try {
+    bitacora.process = "Extraer todas las listas de precios";
+    data.method = "GET";
+    data.api = "/priceslist/"; //AJCG: no afecta a las apis lo que se escriba aquí
+    data.process = "Extraer todas las listas de precios en la colección: cat_precios";
 
-        const PricesListAll = await PricesList.find()               
-        .then((PricesList) => {                                 
-            if(!PricesList){                                    
-                data.status = 404;
-                data.message = "La base de datos NO tiene Listas de precios configurados";
-                throw Error(data.messageDEV);
-            }
-            return PricesList;
-        });
+    const priceslist = await PricesList.find()
 
-        data.status = 200; //codigo cuando se encuentran los documentos
-        data.messageUSR = "La extracción de las listas de precios fue exitosa";
-        data.dataRes = PricesListAll;                                
-        bitacora = AddMSG(bitacora, data, 'OK', 200, true);
-
-        return OK(bitacora);
-
-    }catch(error){
-
-        if(!data.status) data.status = error.statusCode;
-        let {message} = error;
-        if (!data.messageDEV) data.messageDEV = message;
-        if(!data.dataRes.length === 0) data.dataRes = error; 
-        data.messageUSR = "La extracción de las listas de precios en la API getOnePricesList NO tuvo exito";
-
-        bitacora = AddMSG(bitacora,data,'FAIL');
-
-        return FAIL(bitacora);
-
-    } 
-    finally{
-        //await localSession.endSession();
+    if (priceslist.length === 0) {
+      data.status = 404;
+      data.messageDEV = "La base de datos no tiene listas configurados";
+      throw new Error(data.messageDEV);
     }
 
-}
+    data.status = 200;
+    data.messageUSR = "Listado de listas obtenido con éxito";
+    data.dataRes = priceslist;
+    bitacora = AddMSG(bitacora, data, 'OK', 200, true);
 
-export const getPricesListgByIdService = async (id, IdInstitutoOK) => {
-    let bitacora=BITACORA();
-    let data=DATA();
+    return OK(bitacora);
 
-    try{
-        bitacora.process=`Obtener Lista de Precios por ID: ${id}`;
-        data.method="GET";
-        data.api=`/priceslist/${id}`;
-        data.process=`Obtener Lista de Precios especifica de la colección Listas`
-        const PricesList = await PricesList.findOne({IdInstitutoOK:IdInstitutoOK, IdListaOK:id});
+  } catch (error) {
+    if (!data.status) data.status = 500;
+    data.messageDEV = error.message;
+    data.messageUSR = "No se pudieron listar las listas";
 
-        if(!PricesList){
-            data.status=404;
-            data.messageDEV=`No se encontró una lista con ID ${id}`;
-            throw Error(data.messageDEV);
-        }
-        data.status=200;
-        data.messageUSR="La obtención de la Lista tuvo exito";
-        data.dataRes=PricesList;
-        bitacora=AddMSG(bitacora,data,'OK',200,true);
-        return OK(bitacora);
-    }catch(error){
-        if (!data.status) data.status = error.statusCode; 
-        let { message } = error; 
-        if (!data.messageDEV) data.messageDEV = message; 
-        if (!data.dataRes.length === 0) data.dataRes = error;
-        data.messageUSR = "La obtención de la Lista no tuvo éxito";
-
-        // Agrega un mensaje de fallo a la bitácora
-        bitacora = AddMSG(bitacora, data, 'FAIL');
-
-        // Devuelve una respuesta de error
-        return FAIL(bitacora);
-    } finally {
-        // Aqui se ejecuta independientemente de si se produce un error o no
-    }
+    bitacora = AddMSG(bitacora, data, 'FAIL');
+    return FAIL(bitacora);
+  }
 };
 
-//---------------------------------------POST PRODUCT------------------Modificada---------------------
+// API GET listas por id
 
-export const addPricesList = async(newPriceList) => {
-    let bitacora = BITACORA();
-    let data = DATA();
+export const GetOnePricesListByID = async (IdInstitutoOK, IdListaOK) => {
+  let bitacora = BITACORA();
+  let data = DATA();
 
-    try {
-        bitacora.process = "Agregar una nueva lista de precios";
-        data.method = "POST";
-        data.api = "/priceslist/";
-        data.process = "Agregar una nueva lista de precios a la colección cat_precios";
+  try {
+    bitacora.process = "Traer una Lista especifica";
+    data.method = "GET";
+    data.api = `/priceslist/${IdInstitutoOK}`;
+    data.process = "Traer una Lista especifica en la base de datos";
 
-        const PricesListAdded = await PricesList.insertMany(
-            newPriceList,
-            { order: true }
-        )
-        .then((pricesList) => {
-            if(!pricesList) {
-                data.status = 400; //400 indica que no se pudo insertar
-                data.messageDEV = "La inserción de la lista de precios <<NO>> fue exitosa";
-                throw Error(data.messageDEV);
-            }
+    const priceslist = await PricesList.findOne({
+      IdInstitutoOK: IdInstitutoOK,
+      IdListaOK: IdListaOK
+    });
+    if (!priceslist) {
+      data.status = 404;
+      data.messageDEV = "La lista no se encontró en la base de datos";
+      throw new Error(data.messageDEV);
+    } else {
+      const detallesPricesList = priceslist;
+      data.status = 200;
+      data.messageUSR = "Lista obtenida con éxito";
+      data.dataRes = detallesPricesList;
 
-            return pricesList;
-        });
+      bitacora = AddMSG(bitacora, data, 'OK', 200, true);
 
-        data.status = 201; //201 = codigo cuando se inserta exitosamente SIUU
-        data.messageUSR = "La inserción de la lista de precios <<SI>> fue exitosa";
-        data.dataRes = PricesListAdded;
-
-        bitacora = AddMSG(bitacora, data, 'OK', 201, true);
-
-        return OK(bitacora);
-
-    }catch (error) {
-        if(!data.status) data.status = error.statusCode;
-        let {message} = error;
-        if(!data.messageDEV) data.messageDEV = message;
-        if(!data.dataRes.length === 0) data.dataRes = error;
-        data.messageUSR = "La inserción de la lista de precios <<NO>> fue exitosa";
-
-        bitacora = AddMSG(bitacora, data, 'FAIL');
-
-        return FAIL(bitacora);
+      return OK(bitacora);
     }
-    finally {
-        //Haya o no error siempre ejecuta aqui
+
+  } catch (error) {
+    if (!data.status) data.status = 500;
+    data.messageDEV = error.message;
+    data.messageUSR = "No se pudo obtener la lista";
+
+    bitacora = AddMSG(bitacora, data, 'FAIL');
+    return FAIL(bitacora);
+  }
+};
+
+// API para Crear una Lista
+export const AddOnePricesList = async (datosPricesList) => {
+  let bitacora = BITACORA();
+  let data = DATA();
+
+  try {
+    bitacora.process = "Crear un nuevo Pago";
+    data.method = "POST";
+    data.api = "/priceslist/add";
+    data.process = "Crear un nuevo registro de listas en la base de datos";
+
+    const nuevoPricesList = new PricesList(datosPricesList);
+
+    await nuevoPricesList.save();
+
+    data.status = 201;
+    data.messageUSR = "La lista se ha creado con éxito";
+
+    bitacora = AddMSG(bitacora, data, 'OK', 201, true);
+
+    return OK(bitacora);
+  } catch (error) {
+    if (!data.status) data.status = 500;
+    data.messageDEV = error.message;
+    data.messageUSR = "No se pudo crear la lista";
+
+    bitacora = AddMSG(bitacora, data, 'FAIL');
+    return FAIL(bitacora);
+  }
+};
+
+//---------------------------------------UPDATE LISTA----------------FUNCIONANDO-----------------
+// API para Actualizar 
+export const UpdateOnePricesList = async (IdInstitutoOK, IdListaOK, nuevosDatos) => {
+  let bitacora = BITACORA();
+  let data = DATA();
+
+  try {
+    bitacora.process = "Actualizar una Lista";
+    data.method = "PUT";
+    data.api = `/actualizar/${IdInstitutoOK}`;
+    data.process = "Actualizar los detalles de una lista en la base de datos";
+
+    const pricesListActualizado = await PricesList.findOneAndUpdate({
+      IdInstitutoOK: IdInstitutoOK,
+      IdListaOK: IdListaOK
+    }, nuevosDatos, { new: true });
+
+
+    if (!pricesListActualizado) {
+      data.status = 404;
+      data.messageDEV = "La lista no se encontró en la base de datos";
+      throw new Error(data.messageDEV);
     }
-}
 
-//---------------------------------------UPDATE PRODUCT----------------FUNCIONANDO-----------------
-export const UpdatePricesListService = async (IdInstitutoOK, IdListaOK, newData) => {
-    let bitacora = BITACORA();
-    let data = DATA();
+    data.status = 200;
+    data.messageUSR = "La lista se ha actualizado con éxito";
+    data.dataRes = pricesListActualizado;
 
-    try {
-        bitacora.process = `Actualizar la lista de precios con ID ${IdListaOK}`; //Mensaje del proceso con el id del producto a actualizar
-        data.method = "PUT"; //Metodo que se esta empleando
-        data.api = `/priceslist`; //URL de la API que se esta utilizando 
-        data.process = `Actualizar la lista de precios en la colección de cat_precios`; //Mensaje del proceso que se esta llevando a cabo más especifico
+    bitacora = AddMSG(bitacora, data, 'OK', 200, true);
 
-        // Aqui se realiza la actualización del producto
-        const UpdatedPricesList = await prices.findOneAndUpdate({ IdInstitutoOK:IdInstitutoOK, IdListaOK: IdListaOK }, newData, {
-            new: true, // Esto devolverá el documento actualizado en lugar del anterior
-        });
+    return OK(bitacora);
+  } catch (error) {
+    if (!data.status) data.status = 500;
+    data.messageDEV = error.message;
+    data.messageUSR = "No se pudo actualizar la lista";
 
-        if (!UpdatedPricesList) {
-            data.status = 404; //404 indica que no encontro el producto que se quiere actualizar
-            data.messageDEV = `No se encontró ninguna lista de precios con el ID ${idListaOK}`;
-            throw Error(data.messageDEV);
-        }
+    bitacora = AddMSG(bitacora, data, 'FAIL');
+    return FAIL(bitacora);
+  }
+};
 
-        data.status = 200;
-        data.messageUSR = `La lista de precio con ID ${IdListaOK} se actualizó con éxito`;
-        data.dataRes = UpdatedPricesList;
 
-        bitacora = AddMSG(bitacora, data, 'OK', 200, true);
+//Eliminar lista
+export const DeleteOnePricesList = async (IdInstitutoOK, IdListaOK) => {
+  let bitacora = BITACORA();
+  let data = DATA();
+  let query = {};
 
-        return OK(bitacora);
-    } catch (error) {
-        if (!data.status) data.status = error.statusCode;
-        let { message } = error;
-        if (!data.messageDEV) data.messageDEV = message;
-        if (!data.dataRes.length === 0) data.dataRes = error;
-        data.messageUSR = `La actualización de la lista de precio con ID ${idListaOK} falló`;
+  try {
 
-        bitacora = AddMSG(bitacora, data, 'FAIL');
 
-        return FAIL(bitacora);
+    const pricesListAEliminar = await PricesList.findOne({
+      IdInstitutoOK: IdInstitutoOK,
+      IdListaOK: IdListaOK
+    });
+
+    if (!pricesListAEliminar) {
+      data.status = 404;
+      data.messageDEV = "La lista no se encontró en la base de datos";
+      throw new Error(data.messageDEV);
     }
-    finally {
-        // Haya o no error siempre ejecuta aquí
+
+    const pricesListEliminado = await PricesList.findOneAndDelete({
+      IdInstitutoOK: IdInstitutoOK,
+      IdListaOK: IdListaOK
+    });
+
+    if (!pricesListEliminado) {
+      data.status = 404;
+      data.messageDEV = "La lista no se encontró en la base de datos";
+      throw new Error(data.messageDEV);
     }
-}
 
-//--------------------------------------DELETE PRODUCTO-------------------FUNCIONANDO-----------------------
-export const deletePricesListByValueService = async (IdInstitutoOK, IdListaOK) => {
-    
-    let bitacora = BITACORA();
-    let data = DATA();
+    data.status = 200;
+    data.messageUSR = "La lista se ha eliminado con éxito";
+    data.dataRes = pricesListEliminado;
 
-    try {
-        
-        //PROCESO DONDE SE ACTUALIZA TANTO LA BITACORA COMO LA DATA PARA GUARDAR LOS REGISTROS DE LAS OPREACIONES QUE SE ESTAN HACIENDO***********
-        bitacora.process = `Borrar la lista de precio con ID ${ID}`; //Mensaje del proceso con el id del precio a actualizar
-        data.method = "Delete"; //Metodo que se esta empleando
-        data.api = `/priceslist`; //URL de la API que se esta utilizando 
-        data.process = `Borrar la lista de precios de la colección de cat_precios`; //Mensaje del proceso que se esta llevando a cabo más especifico
+    bitacora = AddMSG(bitacora, data, 'OK', 200, true);
 
+    return OK(bitacora);
+  } catch (error) {
+    if (!data.status) data.status = 500;
+    data.messageDEV = error.message;
+    data.messageUSR = "No se pudo eliminar la lista";
 
-        // Realiza la eliminación del documento en función del valor proporcionado <<CONSULTA>>
-        const result = await prices.deleteOne({ IdInstitutoOK:IdInstitutoOK, IdListaOK:IdListaOK });
-        // FIN <<CONSULTA>>
-
-        //VALIDA SI SE ENCONTRO EL PRODUCTO QUE SE DESEA BORRAR******************************************************************************
-        if (result.deletedCount === 0) {
-        // SI NO ENCONTRO UN DOCUMENTO CON EL ID PROPORCIONADO ACTUALIZA LA DATA CON EL ERROR Y SALE DEL METODO
-            data.status = 404; //404 indica que no encontro el producto que se quiere actualizar
-            data.messageDEV = `No se encontró un producto para borrar con el ID ${ID}`;
-            throw Error(data.messageDEV);
-        }
-
-        //EN CASO DE QUE SI ENCONTRO EL DOCUMETO ACTUALIZA LA DATA CON UN STATUS 200 INDICANDO QUE TODO ESTA OK******************************
-        data.status = 200;
-        data.messageUSR = `Producto se borro con éxito`;
-
-        //ACTUALIZACION DE LA BITACORA DONDE SE REGISTRA EL MOVIMIENTO QUE SE ESTA HACIENDO
-        bitacora = AddMSG(bitacora, data,'OK',200, true);
-        
-        //MANDA UN OK A LA BITACORA INDICANDO QUE LA OPERACION FUE EXITOSA
-        return OK(bitacora);
-
-    } catch (error) { //AQUI ENTRA CUANDO NO SE ENCONTRO EL PRODUCTO QUE SE DESEA BORRAR, COSULTA LA DATA BUSCANDO EL STATUS DE LA COSULTA
-                      //Y ACTUALIZA LA DATA INDICANDO QUE HUBO UN ERROR Y CUAL ES ESE ERROR.
-        if (!data.status) data.status = error.statusCode;
-        let { message } = error;
-        if (!data.messageDEV) data.messageDEV = message;
-        if (!data.dataRes.length === 0) data.dataRes = error;
-        data.messageUSR = `La eliminacion de la lista de precios con ID ${IdInstitutoOK} falló`;
-
-        bitacora = AddMSG(bitacora, data, 'FAIL');
-
-        return FAIL(bitacora);
-    }
-    finally {
-        // Haya o no error siempre ejecuta aquí
-    }
-  };
+    bitacora = AddMSG(bitacora, data, 'FAIL');
+    return FAIL(bitacora);
+  }
+};
 
 //----------------------------------APIS DE SUBDOCUMENTOS------------------------------------------------------
-export const UpdatePatchOnePricesList = async (IdInstitutoOK, IdListaOK, updateData) => {
-    let bitacora = BITACORA();
-    let data = DATA();
-    try {
-        bitacora.process = 'Modificar una lista.';
-        data.process = 'Modificar una sola lista';
-        data.method = 'PATCH';
-        data.api = '/priceslist';
-
-        const currentPricesList = await PricesList.findOne({IdInstitutoOK:IdInstitutoOK, IdListaOK:IdListaOK});
-
-        if(!currentPricesList){
-            data.status=404;
-            data.messageDEV=`No se encontró una lista con el ID ${IdListaOK} `;
-            throw new Error(data.messageDEV);
-        }
-
-        for (const key in updateData){
-            if(updateData.hasOwnProperty(key)){
-                currentPricesList[key]=updateData[key];
-            }
-        }
-
-        const result = await currentPricesList.save();
-
-        data.dataRes=Object.keys(updateData).reduce((acc,key)=>{
-            acc[key]=result[key];
-            return acc;
-        },{});
-
-        data.status=200;
-        data.messageUSR='Modificación de subdocumentos de Listas de Precios fue Exitoso';
-        bitacora=AddMSG(bitacora,data,'OK',201,true);
-
-        return OK(bitacora);
-    } catch (error) {
-        if (!data.status) data.status = error.statusCode;
-        if (!data.messageDEV) data.messageDEV = error.message;
-        if (data.dataRes === undefined) data.dataRes = error;
-        data.messageUSR = `La actualizacion de la lista con ID ${IdListaOK} NO tuvo exito`;
-        bitacora = AddMSG(bitacora, data, 'FAIL');
-        return FAIL(bitacora);
-    }
+//---------- Metodos PATCH de la API Listas------------------//
+export const updatePricesList = async (IdInstitutoOK, IdListaOK, updateData) => {
+  let bitacora = BITACORA();
+  let response = updatePricesListMethod(bitacora, IdInstitutoOK, IdListaOK, updateData);
+  return response;
 };
+
+export const updatePricesListMethod = async (bitacora, IdInstitutoOK, IdListaOK, updateData) => {
+  let data = DATA();
+  try {
+    bitacora.process = 'Modificar una lista.';
+    data.process = 'Modificar una lista';
+    data.method = 'PATCH';
+    data.api = '/precios/one';
+
+    // Verifica si updateData es un objeto
+    if (typeof updateData !== 'object' || updateData === null) {
+      data.status = 400;
+      data.messageDEV = 'El parámetro updateData debe ser un objeto no nulo.';
+      throw new Error(data.messageDEV);
+    }
+
+    let productoUpdated = null;
+
+    // Encuentra el documento principal usando IdInstitutoOK, IdListaOK
+    const filter = {
+      IdInstitutoOK: IdInstitutoOK,
+      IdListaOK: IdListaOK
+    };
+
+    for (const key in updateData) {
+      if (Object.prototype.hasOwnProperty.call(updateData, key)) {
+        const value = updateData[key];
+
+        const updateQuery = { $set: { [key]: value } };
+
+        try {
+          productoUpdated = await PricesList.findOneAndUpdate(
+            filter,
+            updateQuery,
+            { new: true }
+          );
+
+          if (!productoUpdated) {
+            console.error("No se encontró un documento para actualizar con ese ID,", IdListaOK);
+            data.status = 400;
+            data.messageDEV = 'La Actualización de un Subdocumento del producto NO fue exitoso.';
+            throw new Error(data.messageDEV);
+          }
+        } catch (error) {
+          console.error(error);
+          data.status = 400;
+          data.messageDEV = 'La Actualizacion de un Subdocumento de la lista de precios NO fue exitoso.';
+          throw Error(data.messageDEV);
+        }
+      }
+    }
+
+    data.messageUSR = 'La Modificacion de los subdocumentos de la lista de precios SI fue exitoso.';
+    data.dataRes = productoUpdated;
+    bitacora = AddMSG(bitacora, data, 'OK', 201, true);
+    return OK(bitacora);
+  } catch (error) {
+    console.error(error);
+    if (!data.status) data.status = error.statusCode;
+    let { message } = error;
+    if (!data.messageDEV) data.messageDEV = message;
+    if (data.dataRes.length === 0) data.dataRes = error;
+    data.messageUSR =
+      'La Modificacionión de la lista de precios NO fue exitosa.' +
+      '\n' +
+      'Any operations that already occurred as part of this transaction will be rolled back.';
+    bitacora = AddMSG(bitacora, data, 'FAIL');
+    return FAIL(bitacora);
+  }
+};
+
+
+//---------------------------------------------------------------------------------------------------------------

@@ -1,105 +1,95 @@
-import * as PricesListServices from '../services/precios.services';
+import * as pricesListServices from '../services/precios.services';
 
-//------------------- GET ------------------------Modificada-----------------------
+//------------------- GET ------------------------Modificada Funcionando-----------------------
 export const GetAllPricesList = async (req, res, next) => {
-    try {
-        const PricesListAll = await PricesListServices.getPricesListAll();
+  try {
+    const resultado = await pricesListServices.GetAllPricesList();
 
-        if (PricesListAll) {
-            return res.status(PricesListAll.status).json(PricesListAll);
-        }
-
-    } catch (error) {
-        next(error);
-        console.log("---------Error en getAllPricesList CONTROLLER----------");
+    if (resultado) {
+      return res.status(resultado.status).json(resultado);
     }
+  } catch (error) {
+    next(error);
+  }
 };
 
-//-----------------------------API GET ONE----------------Modificado----------------------------
-export const GetOnePricesList = async (req, res, next) => {
-    try {
-        const { IdInstitutoOK, IdListaOK } = req.query; // Obtén los valores de los query parameters
+//-----------------------------API GET ONE----------------Modificado Funcionando----------------------------
+export const GetOnePricesListByID = async (req, res, next) => {
+  try {
+    const { IdInstitutoOK, IdListaOK } = req.query;
+    const preciosItem = await pricesListServices.GetOnePricesListByID(IdInstitutoOK, IdListaOK);
 
-        // Llamar a la función para buscar y pasa los valores
-        const result = await PricesListServices.getPricesListgByIdService(IdListaOK, IdInstitutoOK);
-
-        if (result) {
-            return res.status(result.status).json(result);
-        }
-    } catch (error) {
-        next(error);
+    if (preciosItem) {
+      return res.status(preciosItem.status).json(preciosItem);
     }
+  } catch (error) {
+    next(error);
+  }
 };
 
-//-------------------- POST ----------------------Modificada--------------------
-// AGREGA UN PRODUCTO A LA COLECCION
+//-------------------- POST ----------------------Modificada Funcionando--------------------
+// AGREGA UN LISTA
 export const AddOnePricesList = async (req, res, next) => {
-    try {
-        const PricesListAdded = await PricesListServices.addPricesList(req.body);
+  try {
+    const datosPrecios = req.body;
+    const resultado = await pricesListServices.AddOnePricesList(datosPrecios);
 
-        if (PricesListAdded) {
-            return res.status(PricesListAdded.status).json(PricesListAdded);
-        }
-    } catch (error) {
-        next(error);
+    if (resultado) {
+      return res.status(resultado.status).json(resultado);
     }
+  } catch (error) {
+    next(error);
+  }
 };
 
-//-----------------------------API PUT--------------------Modificada----------------------------
+//-----------------------------API PUT--------------------Modificada Funcionando----------------------------
 export const UpdateOnePricesList = async (req, res, next) => {
-    try {
-        const { IdInstitutoOK, IdListaOK } = req.query;
-        const newData = req.body;
+  try {
+    const { IdInstitutoOK, IdListaOK } = req.query;
+    const nuevosDatos = req.body;
 
-        //Se llama al servicio y espera la respuesta para seguir con las demas lineas de codigo
-        const result = await PricesListServices.UpdatePricesListService(IdInstitutoOK, IdListaOK, newData);
+    const resultado = await pricesListServices.UpdateOnePricesList(IdInstitutoOK, IdListaOK, nuevosDatos);
 
-        //Se valida el status de la consulta
-        if (result.status === 200) {
-            return res.status(200).json(result); //Status 200 si todo OK 
-        } else if (result.status === 404) {
-            return res.status(404).json(result); //Status 404 SI fallo
-        }
-    } catch (error) {
-        next(error);
+    if (resultado) {
+      return res.status(resultado.status).json(resultado);
     }
+  } catch (error) {
+    next(error);
+  }
 };
-//------------------------------DELETE API-----------------Modificada--------------------------
+//------------------------------DELETE API-----------------Modificada Funcionando--------------------------
 export const DeleteOnePricesList = async (req, res, next) => {
-    try {
-        // Obtén el valor a eliminar de los parámetros de la solicitud
-        const { IdInstitutoOK, IdListaOK } = req.query;
+  try {
+    const { IdInstitutoOK, IdListaOK } = req.query;
+    const resultado = await pricesListServices.DeleteOnePricesList(IdInstitutoOK, IdListaOK);
 
-        // Llama al servicio de eliminación y pasa el valor a eliminar
-        const result = await PricesListServices.deletePricesListByValueService(IdInstitutoOK, IdListaOK);
-
-        return res.status(result.status).json(result);
-
-    } catch (error) {
-        next(error);
+    if (resultado) {
+      return res.status(resultado.status).json(resultado);
     }
+  } catch (error) {
+    next(error);
+  }
 };
 
-//-------------------------------APIS DE PRUEBA PARA PATCH----------------------------
-export const UpdatePatchPricesList = async (req, res, next) => {
-    try {
-        const { IdInstitutoOK, IdListaOK } = req.query;
-        const newData = req.body;
+//-----------------------------PATCH-----------------------------
+export const updatePricesList = async (req, res, next) => {
+  try {
+    const { IdInstitutoOK, IdListaOK } = req.query;
+    console.log('IdInstitutoOK:', IdInstitutoOK);
+    console.log('IdListaOK:', IdListaOK);
+    console.log( 'Body',req.body);
+    const updateData = req.body;
+    //console.log(updateData);
 
-        const result = await PricesListServices.UpdateOnePricesList(IdInstitutoOK, IdListaOK, newData);
-
-        if (result.status === 200) {
-            return res.status(200).json(result);
-        } else if (result.status === 404) {
-            return res.status(404).json({
-                message: "No se encontró el recurso",
-                queryParameters: req.query,
-                requestBody: req.body,
-            });
-        }
-    } catch (error) {
-        next(error);
+    const pricesListUpdate = await pricesListServices.updatePricesList(IdInstitutoOK, IdListaOK, updateData);
+    if (pricesListUpdate) {
+      pricesListUpdate.session = null;
+      return res.status(pricesListUpdate.status).json(pricesListUpdate);
     }
+  } catch (error) {
+    next(error);
+  }
 };
 
+//---------------------------------------------------------------------------------------------------------------------
 

@@ -179,16 +179,9 @@ const dbCluster = config.CLUSTER;
 const conn =  obtenerConexion(dbName, dbCluster);
 	
 const model = obtenerModelo('cat_institutos', 
-						  config.PLATFORM==='PWA' ? institutesSchemaPWA : institutesSchemaWEB,
+						  institutesSchemaPWA,
 						  conn, 
 						  dbName, 
 						  dbCluster); 
 
 export default model;
-
-/* export default mongoose.model(
-	'cat_institutos',
-	config.PLATFORM==='PWA' ? institutesSchemaPWA : institutesSchemaWEB,
-	'cat_institutos'
-);
- */
