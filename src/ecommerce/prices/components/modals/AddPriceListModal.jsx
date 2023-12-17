@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
     Dialog, DialogContent, DialogTitle, Typography, TextField,
-    DialogActions, Box, Alert, InputLabel, Select, MenuItem, FormHelperText
+    DialogActions, Box, Alert, Select, MenuItem
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -79,6 +79,7 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal, on
             IdTipoFormulaOK: Yup.string().required("Campo requerido"),
         }),
         onSubmit: async (values) => {
+
             //Equipo 2: Mostramos el loading
             setLoading(true);
             console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
@@ -296,7 +297,6 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal, on
                         variant="contained"
                         type="submit"
                         disabled={!!mensajeExitoAlert}
-
                         loading={Loading}
                     >
                         <span>GUARDAR</span>

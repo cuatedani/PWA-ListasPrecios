@@ -161,7 +161,7 @@ const PresentaPreciosTable = () => {
                     showMensajeConfirm("Documento Eliminado");
                 } catch (e) {
                     console.error("Error al Eliminar:", e);
-                    showMensajeError(`No se pudo Eliminar el Documento ${idRowSel}`);
+                    showMensajeError(`No se pudo Eliminar el Documento <<SELECCIONADO>>`);
                 }
             }
         } else {
@@ -170,7 +170,7 @@ const PresentaPreciosTable = () => {
         Reload();
     };
 
-    //Equipo 2: Metodo para editar una Presentacion de Precios
+    //Equipo 2: Metodo para editar una Presentacion de Precio
     const Edit = async () => {
         if (RowData) {
             setEditPresentaPreciosShowModal(true);
@@ -276,7 +276,6 @@ const PresentaPreciosTable = () => {
                     />
                 )}
             </Dialog>
-
             {/* EDIT MODAL */}
             <Dialog open={EditPresentaPreciosShowModal}>
                 {EditPresentaPreciosShowModal && (

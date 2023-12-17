@@ -1,67 +1,120 @@
-import React, { useState } from "react";
+//Equipo 2: React
+import React, { useEffect, useState } from "react";
+//Equipo 2: Material UI
 import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import { DatePicker } from "@mui/x-date-pickers";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { CondicionRolesValues } from "../../helpers/CondicionRolesValues";
+//Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+//Equipo 2: Helpers
+import { CondicionRolesValues } from "../../helpers/CondicionRolesValues";
+//Equipo 2: Redux
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
+import { useSelector, useDispatch } from "react-redux";
 
 const AddCondicionRolesModal = ({ AddCondicionRolesShowModal, setAddCondicionRolesShowModal }) => {
+    //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
+    const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
+    //Equipo 2: controlar el estado de la data de CondicionRoles.
+    const [CondicionRolesData, setCondicionRolesData] = useState([]);
+    const dispatch = useDispatch();
+    //Loader
+    const [Loading, setLoading] = useState(false);
+
+    //Equipo 2: useEffect para cargar datos
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                setCondicionRolesData(selectedPriceListData.cat_listas_condicion_roles);
+            } catch (error) {
+                console.error("Error al cargar las condiciones de rol en useEffect de AddCondicionRolesModal:", error);
+            }
+        }
+        fetchData();
+    }, []);
+
+    //Equipo 2: Definición del Formik
     const formik = useFormik({
+
+        //Equipo 2: Valores Iniciales
         initialValues: {
             DesCondicion: "",
             FechaExpiraIni: "",
             FechaExpiraFin: "",
             Condicion: "",
         },
+
+        //Equipo 2: Restricciones
         validationSchema: Yup.object({
             DesCondicion: Yup.string().required("Campo requerido"),
             FechaExpiraIni: Yup.date().required("Campo requerido"),
-            FechaExpiraFin: Yup.date().required("Campo requerido"),
+            FechaExpiraFin: Yup.date().min(Yup.ref("FechaExpiraIni"), "La fecha final no puede ser antes que la fecha de Inicio").required("Campo requerido"),
             Condicion: Yup.string().required("Campo requerido"),
         }),
+        // Equipo 2: Metodo que acciona el boton
         onSubmit: async (values) => {
 
+            //Equipo 2: Mostramos el loading
+            setLoading(true);
             console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
             //Equipo 2: reiniciamos los estados de las alertas de exito y error.
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
+
             try {
-                //Equipo 2: si fuera necesario meterle valores compuestos o no compuestos
-                //a alguns propiedades de formik por la razon que sea, se muestren o no
-                //estas propiedades en la ventana modal a travez de cualquier control.
-                //La forma de hacerlo seria:
-                //formik.values.IdInstitutoBK = `${formik.values.IdInstitutoOK}-${formik.values.IdCEDI}`;
-                //formik.values.Matriz = autoChecksSelecteds.join(",");
+                // Formatear FechaExpiraIni
+                var fechaDayjs1 = values.FechaExpiraIni;
+                const fechaJS1 = fechaDayjs1.toDate();
+                values.FechaExpiraIni = fechaJS1.toISOString();
+
+                // Formatear FechaExpiraFin
+                var fechaDayjs2 = values.FechaExpiraFin;
+                const fechaJS2 = fechaDayjs2.toDate();
+                values.FechaExpiraFin = fechaJS2.toISOString();
 
                 //Equipo 2: Extraer los datos de los campos de
                 //la ventana modal que ya tiene Formik.
-                const CondicionRoles = CondicionRolesValues(values);
+                const CondicionRol = CondicionRolesValues(values);
 
-                //Equipo 2: mandamos a consola los datos extraidos
-                console.log("<<CondicionRoles>>", CondicionRoles);
+                // Equipo 2: mandamos a consola los datos extraidos
+                console.log("<<CondicionRol>>", CondicionRol);
 
-                //Equipo 2: llamar el metodo que desencadena toda la logica
-                //para ejecutar la API "AddOneCondicionRoles" y que previamente
-                //construye todo el JSON de la coleccion de PricesList para
-                //que pueda enviarse en el "body" de la API y determinar si
-                //la inserción fue o no exitosa.
-                await AddOneCondicionRoles(CondicionRoles);
-                //Equipo 2: si no hubo error en el metodo anterior
-                //entonces lanzamos la alerta de exito.
+                // Equipo 2: Añadir el nuevo valor a la coleccion
+                const updatedCondicionRolesData = [...CondicionRolesData, CondicionRol];
+
+                // Equipo 2: Actualizar el array en el objeto
+                setCondicionRolesData(updatedCondicionRolesData);
+
+                // Equipo 2: Actualizar el documento PriceList
+                const updatedSelectedPriceListData = {
+                    ...selectedPriceListData,
+                    cat_listas_condicion_roles: updatedCondicionRolesData,
+                };
+                //console.log("Nuevo selectedPriceListData: ", updatedSelectedPriceListData);
+
+                // Equipo 2: Agregar una Condicion Rol Mediante Patch
+                await PatchOnePriceList(updatedSelectedPriceListData);
+
+                // Equipo 2: Añadir la informacion actualizada mediante redux
+                dispatch(SET_SELECTED_PRICELIST_DATA(updatedSelectedPriceListData));
+
+                // Equipo 2: si no hubo error en el metodo anterior
+                // entonces lanzamos la alerta de exito.
                 setMensajeExitoAlert("CondicionRoles fue creado y guardado Correctamente");
-                //Equipo 2: falta actualizar el estado actual (documentos/data) para que
-                //despues de insertar el nuevo instituto se visualice en la tabla,
-                //pero esto se hara en la siguiente nota.
-                //fetchDataCondicionRoles();
             } catch (e) {
+                console.log("Error al Crear: ", e);
                 setMensajeExitoAlert(null);
                 setMensajeErrorAlert("No se pudo crear la CondicionRoles");
             }
+            //Equipo 2: Ocultamos el loading
+            setLoading(false);
         },
     });
 
@@ -96,26 +149,38 @@ const AddCondicionRolesModal = ({ AddCondicionRolesShowModal, setAddCondicionRol
                         id="DesCondicion"
                         label="DesCondicion*"
                         value={formik.values.DesCondicion}
-                        /* onChange={formik.handleChange} */
                         {...commonTextFieldProps}
                         error={formik.touched.DesCondicion && Boolean(formik.errors.DesCondicion)}
                         helperText={formik.touched.DesCondicion && formik.errors.DesCondicion}
                     />
-                    <TextField
+                    <DatePicker
                         id="FechaExpiraIni"
                         label="FechaExpiraIni*"
                         value={formik.values.FechaExpiraIni}
-                        {...commonTextFieldProps}
-                        error={formik.touched.FechaExpiraIni && Boolean(formik.errors.FechaExpiraIni)}
-                        helperText={formik.touched.FechaExpiraIni && formik.errors.FechaExpiraIni}
+                        onChange={(date) => formik.setFieldValue("FechaExpiraIni", date)}
+                        TextFieldComponent={(props) => (
+                            <TextField
+                                {...props}
+                                {...commonTextFieldProps}
+                                error={formik.touched.FechaExpiraIni && Boolean(formik.errors.FechaExpiraIni)}
+                                helperText={formik.touched.FechaExpiraIni && formik.errors.FechaExpiraIni}
+                            />
+                        )}
                     />
-                    <TextField
+                    <DatePicker
                         id="FechaExpiraFin"
                         label="FechaExpiraFin*"
                         value={formik.values.FechaExpiraFin}
-                        {...commonTextFieldProps}
-                        error={formik.touched.FechaExpiraFin && Boolean(formik.errors.FechaExpiraFin)}
-                        helperText={formik.touched.IdLisFechaExpiraFintaBK && formik.errors.FechaExpiraFin}
+                        minDate={formik.values.FechaExpiraIni}
+                        onChange={(date) => formik.setFieldValue("FechaExpiraFin", date)}
+                        TextFieldComponent={(props) => (
+                            <TextField
+                                {...props}
+                                {...commonTextFieldProps}
+                                error={formik.touched.FechaExpiraFin && Boolean(formik.errors.FechaExpiraFin)}
+                                helperText={formik.touched.FechaExpiraFin && formik.errors.FechaExpiraFin}
+                            />
+                        )}
                     />
                     <TextField
                         id="Condicion"
@@ -131,8 +196,6 @@ const AddCondicionRolesModal = ({ AddCondicionRolesShowModal, setAddCondicionRol
                     sx={{ display: 'flex', flexDirection: 'row' }}
                 >
                     <Box m="auto">
-                        {console.log("mensajeExitoAlert", mensajeExitoAlert)}
-                        {console.log("mensajeErrorAlert", mensajeErrorAlert)}
                         {mensajeErrorAlert && (
                             <Alert severity="error">
                                 <b>¡ERROR!</b> ─ {mensajeErrorAlert}
@@ -162,6 +225,7 @@ const AddCondicionRolesModal = ({ AddCondicionRolesShowModal, setAddCondicionRol
                         variant="contained"
                         type="submit"
                         disabled={!!mensajeExitoAlert}
+                        loading={Loading}
                     >
                         <span>GUARDAR</span>
                     </LoadingButton>

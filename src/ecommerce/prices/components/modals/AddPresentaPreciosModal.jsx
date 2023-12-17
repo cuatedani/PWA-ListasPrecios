@@ -1,31 +1,32 @@
+//Equipo 2: React
 import React, { useState, useEffect } from "react";
+//Equipo 2: Material UI
 import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { v4 as genID } from "uuid";
-//Equipo 2: DB
+//Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
 //Equipo 2: Helpers
 import { PresentaPreciosValues } from "../../helpers/PresentaPreciosValues";
-//Equipo 2: Services
 //Equipo 2: Redux
 import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
 import { useSelector, useDispatch } from "react-redux";
 
 
-const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal }) => {
+const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal}) => {
     //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
-    const [TipoFormulaValues, setTipoFormulaValues] = useState([]);
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //Equipo 2: controlar el estado de la data de PresentaPrecios.
     const [PresentaPreciosData, setPresentaPreciosData] = useState([]);
     const dispatch = useDispatch();
+    //Loader
+    const [Loading, setLoading] = useState(false);
 
     //Equipo 2: useEffect para cargar datos
     useEffect(() => {
@@ -61,12 +62,15 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
         }),
 
         //Equipo 2: Metodo que acciona el boton
-        // Equipo 2: Metodo que acciona el boton
         onSubmit: async (values) => {
+
+            //Equipo 2: Mostramos el loading
+            setLoading(true);
             console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
             // Equipo 2: reiniciamos los estados de las alertas de exito y error.
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
+
             try {
                 //Equipo 2: Extraer los datos de los campos de
                 //la ventana modal que ya tiene Formik.
@@ -102,6 +106,8 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
                 setMensajeExitoAlert(null);
                 setMensajeErrorAlert("No se pudo crear la PresentaPrecios");
             }
+            //Equipo 2: Ocultamos el loading
+            setLoading(false);
         },
     });
 
@@ -136,7 +142,6 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
                         id="IdProdServOK"
                         label="IdProdServOK*"
                         value={formik.values.IdProdServOK}
-                        /* onChange={formik.handleChange} */
                         {...commonTextFieldProps}
                         error={formik.touched.IdProdServOK && Boolean(formik.errors.IdProdServOK)}
                         helperText={formik.touched.IdProdServOK && formik.errors.IdProdServOK}
@@ -208,6 +213,7 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
                         variant="contained"
                         type="submit"
                         disabled={!!mensajeExitoAlert}
+                        loading={Loading}
                     >
                         <span>GUARDAR</span>
                     </LoadingButton>

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 //Equipo 2: Material UI
 import { MaterialReactTable } from 'material-react-table';
-import { Box, Stack, Tooltip, Button, IconButton, Dialog } from "@mui/material";
+import { Box, Stack, Tooltip, IconButton, Dialog } from "@mui/material";
 import { MRT_Localization_ES } from "material-react-table/locales/es";
 import { darken } from '@mui/system';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -21,6 +21,7 @@ import EditCondicionRolesModal from "../modals/EditCondicionRolesModal";
 //Equipo 2: Redux+
 import { useSelector, useDispatch } from "react-redux";
 import { SET_SELECTED_CONDICIONROLES_DATA } from "../../redux/slices/CondicionRolesSlice";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
 
 //Equipo 2: Columns Table Definition.
 const CondicionRolesColumns = [
@@ -62,6 +63,8 @@ const CondicionRolesTable = () => {
     const [idRowSel, setIdRowSel] = useState(null);
     const [RowData, setRowData] = useState(null);
     const [SelectedPriceListData, setSelectedPriceListData] = useState(null);
+    //Equipo 2: Dispatch para actualizar la data local
+    const dispatch = useDispatch();
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const priceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
@@ -82,8 +85,15 @@ const CondicionRolesTable = () => {
         fetchData();
     }, [priceListData]);
 
-    //Equipo 2: Para eviar data mediante redux
-    const dispatch = useDispatch();
+    //Metodo Para Actualizar Data
+    const Reload = async () => {
+        setSelectedPriceListData(priceListData);
+        setCondicionRolesData(priceListData.cat_listas_condicion_roles);
+        setLoadingTable(false);
+        setSelectedRowIndex(null);
+        setIdRowSel(null);
+        setRowData(null);
+    };
 
     //Equipo 2: Metodo para seleccionar la data de una fila
     //Este es el metodo para seleccionar la orden de la tabla
@@ -106,34 +116,56 @@ const CondicionRolesTable = () => {
         });
     }, [CondicionRolesData]);
 
-    //Equipo 2: Metodo para eliminar un Negocios
+    //Equipo 2: Metodo para eliminar un Condicion Rol
     const Delete = async () => {
-        const res = await showMensajeConfirm(
-            `¿Estás seguro de eliminar el documento: ${idRowSel}? No podrás revertir esta acción. ¿Deseas continuar?`
-        );
+        if (RowData) {
+            const res = await showMensajeConfirm(
+                `¿Estás seguro de eliminar el documento <<SELECCIONADO>>? No podrás revertir esta acción. ¿Deseas continuar?`
+            );
 
-        if (res) {
-            try {
-                // Filtrar los elementos distintos al que queremos eliminar
-                const updatedCondicionRolesData = CondicionRolesData.filter(
-                    Roles => Roles.DesCondicion !== idRowSel
-                );
+            if (res) {
+                try {
+                    // Equipo 2: Encuentra el índice del elemento en CondicionRolesData que coincide con RowData
+                    const indexToUpdate = CondicionRolesData.findIndex(item => (
+                        item.DesCondicion === RowData.DesCondicion
+                        && item.FechaExpiraIni === RowData.FechaExpiraIni
+                        && item.FechaExpiraFin === RowData.FechaExpiraFin
+                        && item.Condicion === RowData.Condicion
+                    ));
 
-                // Actualizar el array en el objeto
-                setCondicionRolesData(updatedCondicionRolesData);
+                    // Equipo 2: Si se encuentra el índice, elimina ese elemento
+                    const updatedCondicionRolesData = [...CondicionRolesData];
+                    if (indexToUpdate !== -1) {
+                        updatedCondicionRolesData.splice(indexToUpdate, 1); // Elimina el elemento en el índice encontrado
+                    }
+                    //console.log("Eliminado: ", updatedCondicionRolesData);
 
-                SelectedPriceListData.cat_listas_condicion_roles = CondicionRolesData;
+                    // Equipo 2: Actualizar el array en el objeto
+                    setCondicionRolesData(updatedCondicionRolesData);
 
-                // Actualizar el documento PriceList
-                await PatchOnePriceList(SelectedPriceListData.IdListaOK, SelectedPriceListData);
+                    // Crear un nuevo objeto con las actualizaciones
+                    const updatedPriceListData = {
+                        ...SelectedPriceListData,
+                        cat_listas_condicion_roles: updatedCondicionRolesData,
+                    };
+                    //console.log("Nuevo selectedPriceListData: ", updatedPriceListData);
 
-                showMensajeConfirm("Documento Eliminado");
-                fetchData();
-            } catch (e) {
-                console.error("Error al Eliminar:", e);
-                showMensajeError(`No se pudo Eliminar el Documento ${idRowSel}`);
+                    // Actualizar el documento PriceList
+                    await PatchOnePriceList(updatedPriceListData);
+
+                    // Equipo 2: Añadir la informacion actualizada mediante redux
+                    dispatch(SET_SELECTED_PRICELIST_DATA(updatedPriceListData));
+
+                    showMensajeConfirm("Documento Eliminado");
+                } catch (e) {
+                    console.error("Error al Eliminar:", e);
+                    showMensajeError(`No se pudo Eliminar el Documento <<SELECCIONADO>>`);
+                }
             }
+        } else {
+            await showMensajeConfirm(`Primero Seleccione una Fila`);
         }
+        Reload();
     };
 
     //Equipo 2: Metodo para editar un Negocio
@@ -141,9 +173,7 @@ const CondicionRolesTable = () => {
         if (RowData) {
             setEditCondicionRolesShowModal(true)
         } else {
-            await showMensajeConfirm(
-                `Primero Seleccione una Fila`
-            );
+            await showMensajeConfirm(`Primero Seleccione una Fila`);
         }
     };
 
@@ -229,26 +259,30 @@ const CondicionRolesTable = () => {
             {/* M O D A L E S */}
             {/* ADD MODAL */}
             <Dialog open={AddCondicionRolesShowModal}>
-                <AddCondicionRolesModal
-                    AddCondicionRolesShowModal={AddCondicionRolesShowModal}
-                    setAddCondicionRolesShowModal={setAddCondicionRolesShowModal}
-                    onClose={() => {
-                        setAddCondicionRolesShowModal(false);
-                        fetchData();
-                    }}
-                />
+                {AddCondicionRolesShowModal && (
+                    <AddCondicionRolesModal
+                        AddCondicionRolesShowModal={AddCondicionRolesShowModal}
+                        setAddCondicionRolesShowModal={setAddCondicionRolesShowModal}
+                        onClose={() => {
+                            setAddCondicionRolesShowModal(false);
+                            Reload();
+                        }}
+                    />
+                )}
             </Dialog>
             {/* EDIT MODAL  */}
             <Dialog open={EditCondicionRolesShowModal}>
-                <EditCondicionRolesModal
-                    EditCondicionRolesShowModal={EditCondicionRolesShowModal}
-                    setEditCondicionRolesShowModal={setEditCondicionRolesShowModal}
-                    RowData={RowData}
-                    onClose={() => {
-                        setEditCondicionRolesShowModal(false);
-                        fetchData();
-                    }}
-                />
+                {EditCondicionRolesModal && (
+                    <EditCondicionRolesModal
+                        EditCondicionRolesShowModal={EditCondicionRolesShowModal}
+                        setEditCondicionRolesShowModal={setEditCondicionRolesShowModal}
+                        RowData={RowData}
+                        onClose={() => {
+                            setEditCondicionRolesShowModal(false);
+                            Reload();
+                        }}
+                    />
+                )}
             </Dialog>
         </Box>
     );

@@ -303,7 +303,6 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
                         variant="contained"
                         type="submit"
                         disabled={!!mensajeExitoAlert}
-
                         loading={Loading}
                     >
                         <span>MODIFICAR</span>
