@@ -1,16 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+
 import { CondProCondicionValues } from "../../helpers/CondProCondicionValues";
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
+import { useSelector, useDispatch } from "react-redux";
 
 const EditCondProCondicionModal = ({ EditCondProCondicionShowModal, setEditCondProCondicionShowModal, RowData }) => {
+    
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    const dispatch = useDispatch();
+    const [Loading, setLoading] = useState(false);
+    const [PriceListData, setPriceListData] = useState(null);
+    const [CondicionProductoData, setCondicionProductoData] = useState(null);
+    const [CondProCondicionData, setCondProCondicionData] = useState(null);
+    const SelectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
+    const SelectedCondicionProductoData = useSelector((state) => state.CondicionProductoReducer.SelCondicionProductoData);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                setCondicionProductoData(SelectedPriceListData.cat_listas_condicion_prod_serv);
+                setCondProCondicionData(SelectedCondicionProductoData.condicion);
+            } catch (error) {
+                console.error("Error al cargar los datos en useEffect de CondProCondicionModal:", error);
+            }
+        }
+        fetchData();
+    }, []);
+
     const formik = useFormik({
         initialValues: {
             IdEtiqueta: RowData.IdEtiqueta,
@@ -27,15 +51,39 @@ const EditCondProCondicionModal = ({ EditCondProCondicionShowModal, setEditCondP
         onSubmit: async (values) => {
 
             console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
-            //Equipo 2: reiniciamos los estados de las alertas de exito y error.
+            setLoading(true);
+
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
             try {
-                const CondRolCondicion = CondProCondicionValues(values);
+                
+                const CondProCon = CondProCondicionValues(values);
 
-                //Equipo 2: mandamos a consola los datos extraidos
-                console.log("<<CondProCondicion>>", CondProCondicion);
-                await EditOneCondProCondicion(CondProCondicion);
+                const indexToUpdate = CondProCondicionData.findIndex(item => (
+                    item.IdEtiqueta === RowData.IdEtiqueta
+                    && item.Etiqueta === RowData.Etiqueta
+                    && item.IdOpComparaValores === RowData.IdOpComparaValores
+                    && item.IdOpLogicoEtiqueta === RowData.IdOpLogicoEtiqueta
+                ));
+
+                const updatedConProCondicionData = [...CondProCondicionData];
+                if (indexToUpdate !== -1) {
+                    updatedConProCondicionData[indexToUpdate] = CondProCon;
+                } else {
+                    updatedConProCondicionData.push(CondProCon);
+                }
+
+                setCondProCondicionData(updatedConProCondicionData);
+
+                const updatedPriceListData = {
+                    ...SelectedPriceListData,
+                    cat_listas_condicion_prod_serv: updatedConProCondicionData,
+                };
+
+                console.log("<<CondProCondicion>>", updatedPriceListData);
+
+                await PatchOnePriceList(updatedPriceListData);
+                dispatch(SET_SELECTED_PRICELIST_DATA(updatedPriceListData));
 
                 setMensajeExitoAlert("CondProCondicion fue creado y guardado Correctamente");
 
