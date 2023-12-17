@@ -66,8 +66,6 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
             try {
-                //Equipo 2: Extraer los datos de los campos de
-                //la ventana modal que ya tiene Formik.
                 const PresentaPrecios = PresentaPreciosValues(values);
 
                 //Equipo 2: mandamos a consola los datos extraidos
@@ -83,7 +81,8 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
                 selectedPriceListData.cat_listas_presenta_precios = PresentaPreciosData;
 
                 //Equipo 2: Actualizar el documento PriceList
-                await PatchOnePriceList(selectedPriceListData.IdListaOK, selectedPriceListData);
+                console.log("Nuevo selectedPriceListData: ", selectedPriceListData)
+                await PatchOnePriceList(selectedPriceListData);
                 //Equipo 2: Añadir la informacion actualizada mediante redux
                 dispatch(SET_SELECTED_PRICELIST_DATA(selectedPriceListData));
 

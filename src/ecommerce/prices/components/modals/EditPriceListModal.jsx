@@ -21,7 +21,7 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
     const [InstitutesValues, setInstitutesValues] = useState([]);
     const [TipoListaValues, setTipoListaValues] = useState([]);
-    const [SelectedTipoLista, setSelectedTipoLista] = useState([]);
+    const [SelectedTipoLista, setSelectedTipoLista] = useState(RowData.IdTipoListaOK);
     const [Loading, setLoading] = useState(false);
     const [IdGen, setIdGen] = useState(
         genID().replace(/-/g, "").substring(0, 12)
@@ -94,7 +94,7 @@ const EditPriceListModal = ({ EditPriceListShowModal, setEditPriceListShowModal,
             try {
                 const PriceList = PriceListValues(values);
                 console.log("<<PriceList>>", PriceList);
-                await PatchOnePriceList(PriceList.IdListaOK, PriceList);
+                await PatchOnePriceList(PriceList);
 
                 setMensajeExitoAlert("PriceList fue Actualizado Correctamente");
             } catch (e) {
