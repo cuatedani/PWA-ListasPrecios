@@ -13,10 +13,10 @@ import { PresentaPreciosValues } from "../../helpers/PresentaPreciosValues";
 //Equipo 2: Services
 //Equipo 2: Redux
 import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 
-const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal}) => {
+const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal }) => {
     //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
@@ -25,7 +25,8 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
     const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //Equipo 2: controlar el estado de la data de PresentaPrecios.
     const [PresentaPreciosData, setPresentaPreciosData] = useState([]);
-
+    const dispatch = useDispatch();
+    
     //Equipo 2: useEffect para cargar datos
     useEffect(() => {
         async function fetchData() {
@@ -60,36 +61,43 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
         }),
 
         //Equipo 2: Metodo que acciona el boton
+        // Equipo 2: Metodo que acciona el boton
         onSubmit: async (values) => {
             console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
-            //Equipo 2: reiniciamos los estados de las alertas de exito y error.
+            // Equipo 2: reiniciamos los estados de las alertas de exito y error.
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
             try {
-                const PresentaPrecios = PresentaPreciosValues(values);
+                const PresentaPrecio = PresentaPreciosValues(values);
 
-                //Equipo 2: mandamos a consola los datos extraidos
-                console.log("<<PresentaPrecios>>", PresentaPrecios);
+                // Equipo 2: mandamos a consola los datos extraidos
+                console.log("<<PresentaPrecio>>", PresentaPrecio);
 
-                //Equipo 2: Agregar una Presentacion de Precios Mediante Patch
-                //Equipo 2: Añadir el nuevo valor a la coleccion
-                const updatedPresentaPreciosData = PresentaPreciosData.add(PresentaPrecios);
+                // Equipo 2: Agregar una Presentacion de Precios Mediante Patch
+                // Equipo 2: Añadir el nuevo valor a la coleccion
+                const updatedPresentaPreciosData = [...PresentaPreciosData, PresentaPrecio];
+                console.log("paso el updated: ", updatedPresentaPreciosData);
 
-                //Equipo 2: Actualizar el array en el objeto
+                // Equipo 2: Actualizar el array en el objeto
                 setPresentaPreciosData(updatedPresentaPreciosData);
 
-                selectedPriceListData.cat_listas_presenta_precios = PresentaPreciosData;
+                // Equipo 2: Actualizar el documento PriceList
+                const updatedSelectedPriceListData = {
+                    ...selectedPriceListData,
+                    cat_listas_presenta_precios: updatedPresentaPreciosData,
+                };
+                console.log("Nuevo selectedPriceListData: ", updatedSelectedPriceListData);
 
-                //Equipo 2: Actualizar el documento PriceList
-                console.log("Nuevo selectedPriceListData: ", selectedPriceListData)
-                await PatchOnePriceList(selectedPriceListData);
-                //Equipo 2: Añadir la informacion actualizada mediante redux
-                dispatch(SET_SELECTED_PRICELIST_DATA(selectedPriceListData));
+                await PatchOnePriceList(updatedSelectedPriceListData);
 
-                //Equipo 2: si no hubo error en el metodo anterior
-                //entonces lanzamos la alerta de exito.
+                // Equipo 2: Añadir la informacion actualizada mediante redux
+                dispatch(SET_SELECTED_PRICELIST_DATA(updatedSelectedPriceListData));
+
+                // Equipo 2: si no hubo error en el metodo anterior
+                // entonces lanzamos la alerta de exito.
                 setMensajeExitoAlert("PresentaPrecios fue creado y guardado Correctamente");
             } catch (e) {
+                console.log("Error al Crear: ", e);
                 setMensajeExitoAlert(null);
                 setMensajeErrorAlert("No se pudo crear la PresentaPrecios");
             }
