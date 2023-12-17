@@ -19,8 +19,8 @@ import PatchOnePriceList from '../../services/remote/patch/PatchOnePriceList';
 import AddPresentaPreciosModal from "../modals/AddPresentaPreciosModal";
 import EditPresentaPreciosModal from "../modals/EditPresentaPreciosModal";
 //REDUX
-import { useSelector } from "react-redux";
-
+import { useSelector, useDispatch } from "react-redux";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
 
 //Equipo 2: Columns Table Definition.
 const PresentaPreciosColumns = [
@@ -50,6 +50,7 @@ const PresentaPreciosColumns = [
         size: 150, //small column
     }
 ];
+
 //Equipo 2: Table - FrontEnd.
 const PresentaPreciosTable = () => {
     //Equipo 2: controlar el estado del indicador (loading).
@@ -66,8 +67,8 @@ const PresentaPreciosTable = () => {
     const [idRowSel, setIdRowSel] = useState(null);
     const [RowData, setRowData] = useState(null);
     const [SelectedPriceListData, setSelectedPriceListData] = useState(null);
-    let Opening = false;
-
+    //Equipo 2: Dispatch para actualizar la data local
+    const dispatch = useDispatch();
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const priceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
@@ -87,6 +88,16 @@ const PresentaPreciosTable = () => {
         }
         fetchData();
     }, [priceListData]);
+
+    //Metodo Para Actualizar Data
+    const Reload = async () => {
+        setSelectedPriceListData(priceListData);
+        setPresentaPreciosData(priceListData.cat_listas_presenta_precios);
+        setLoadingTable(false);
+        setSelectedRowIndex(null);
+        setIdRowSel(null);
+        setRowData(null);
+    };
 
     //Equipo 2: Metodo para seleccionar la data de una fila
     //Este es el metodo para seleccionar la orden de la tabla
@@ -109,39 +120,58 @@ const PresentaPreciosTable = () => {
 
     //Equipo 2: Metodo para eliminar una Presentacion de Precios
     const Delete = async () => {
-        const res = await showMensajeConfirm(
-            `¿Estás seguro de eliminar el documento: ${idRowSel}? No podrás revertir esta acción. ¿Deseas continuar?`
-        );
+        if (RowData) {
+            const res = await showMensajeConfirm(
+                `¿Estás seguro de eliminar el documento <<SELECCIONADO>>? No podrás revertir esta acción. ¿Deseas continuar?`
+            );
 
-        if (res) {
-            try {
-                // Filtrar los elementos distintos al que queremos eliminar
-                const updatedPresentaPreciosData = PresentaPreciosData.filter(
-                    presenta_precios => presenta_precios.IdPresentaBK !== idRowSel
-                );
+            if (res) {
+                try {
+                    // Equipo 2: Encuentra el índice del elemento en PresentaPreciosData que coincide con RowData
+                    const indexToUpdate = PresentaPreciosData.findIndex(item => (
+                        item.IdProdServOK === RowData.IdProdServOK
+                        && item.IdPresentaBK === RowData.IdPresentaBK
+                        && item.IdTipoFormulaOK === RowData.IdTipoFormulaOK
+                        && item.Formula === RowData.Formula
+                        && item.Precio === RowData.Precio
+                    ));
 
-                // Crear un nuevo objeto con las actualizaciones
-                const updatedPriceListData = {
-                    ...SelectedPriceListData,
-                    cat_listas_presenta_precios: updatedPresentaPreciosData,
-                };
+                    // Equipo 2: Si se encuentra el índice, elimina ese elementoo
+                    const updatedPresentaPreciosData = [...PresentaPreciosData];
+                    if (indexToUpdate !== -1) {
+                        updatedPresentaPreciosData.splice(indexToUpdate, 1); // Elimina el elemento en el índice encontrado
+                    }
 
-                // Actualizar el documento PriceList
-                await PatchOnePriceList(updatedPriceListData.IdListaOK, updatedPriceListData);
+                    // Equipo 2: Actualizar el array en el objeto
+                    setPresentaPreciosData(updatedPresentaPreciosData);
 
-                setPresentaPreciosData(updatedPresentaPreciosData);
+                    // Crear un nuevo objeto con las actualizaciones
+                    const updatedPriceListData = {
+                        ...SelectedPriceListData,
+                        cat_listas_presenta_precios: updatedPresentaPreciosData,
+                    };
+                    //console.log("Nuevo selectedPriceListData: ", updatedSelectedPriceListData);
 
-                showMensajeConfirm("Documento Eliminado");
-                fetchData();
-            } catch (e) {
-                console.error("Error al Eliminar:", e);
-                showMensajeError(`No se pudo Eliminar el Documento ${idRowSel}`);
+                    // Actualizar el documento PriceList
+                    await PatchOnePriceList(updatedPriceListData);
+
+                    // Equipo 2: Añadir la informacion actualizada mediante redux
+                    dispatch(SET_SELECTED_PRICELIST_DATA(updatedPriceListData));
+
+                    showMensajeConfirm("Documento Eliminado");
+                } catch (e) {
+                    console.error("Error al Eliminar:", e);
+                    showMensajeError(`No se pudo Eliminar el Documento ${idRowSel}`);
+                }
             }
+        } else {
+            await showMensajeConfirm(`Primero Seleccione una Fila`);
         }
+        Reload();
     };
 
     //Equipo 2: Metodo para editar una Presentacion de Precios
-    const handleEditClick = async () => {
+    const Edit = async () => {
         if (RowData) {
             setEditPresentaPreciosShowModal(true);
         } else {
@@ -194,7 +224,7 @@ const PresentaPreciosTable = () => {
                                     {/* ------- EDITAR ------ */}
                                     <Tooltip title="Editar">
                                         <IconButton
-                                            onClick={() => setEditPresentaPreciosShowModal(true)}
+                                            onClick={() => Edit()}
                                         >
                                             <EditIcon />
                                         </IconButton>
@@ -241,12 +271,12 @@ const PresentaPreciosTable = () => {
                         setAddPresentaPreciosShowModal={setAddPresentaPreciosShowModal}
                         onClose={() => {
                             setAddPresentaPreciosShowModal(false);
-                            fetchData();
+                            Reload();
                         }}
                     />
                 )}
             </Dialog>
-        
+
             {/* EDIT MODAL */}
             <Dialog open={EditPresentaPreciosShowModal}>
                 {EditPresentaPreciosShowModal && (
@@ -256,7 +286,7 @@ const PresentaPreciosTable = () => {
                         RowData={RowData}
                         onClose={() => {
                             setEditPresentaPreciosShowModal(false);
-                            fetchData();
+                            Reload();
                         }}
                     />
                 )}

@@ -151,6 +151,7 @@ const PricesListTable = () => {
         }
     };
 
+    //Metodo Para Actualizar Data
     const Reload = async () => {
         const AllPricesListData = await getAllPricesList();
         setPricesListData(AllPricesListData);
@@ -158,7 +159,6 @@ const PricesListTable = () => {
         setSelectedRowIndex(null);
         setIdRowSel(null);
     };
-
 
     //Equipo 2: Metodo para editar una Lista de Precios
     const Edit = async () => {

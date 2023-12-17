@@ -12,10 +12,10 @@ import { PresentaPreciosValues } from "../../helpers/PresentaPreciosValues";
 //Equipo 2: Services
 //Equipo 2: Redux
 import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 
-const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal, RowData }) => {
+const EditPresentaPreciosModal = ({ EditPresentaPreciosShowModal, setEditPresentaPreciosShowModal, RowData }) => {
     //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
@@ -24,6 +24,8 @@ const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaP
     const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //Equipo 2: controlar el estado de la data de PresentaPrecios.
     const [PresentaPreciosData, setPresentaPreciosData] = useState([]);
+    //Equipo 2: Dispatch para actualizar la data local
+    const dispatch = useDispatch();
 
     //Equipo 2: useEffect para cargar datos
     useEffect(() => {
@@ -42,11 +44,11 @@ const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaP
 
         //Equipo 2: Valores Iniciales
         initialValues: {
-            IdProdServOK: "",
-            IdPresentaBK: "",
-            IdTipoFormulaOK: "",
-            Formula: "",
-            Precio: "",
+            IdProdServOK: RowData.IdProdServOK,
+            IdPresentaBK: RowData.IdPresentaBK,
+            IdTipoFormulaOK: RowData.IdTipoFormulaOK,
+            Formula: RowData.Formula,
+            Precio: RowData.Precio,
         },
 
         //Equipo 2: Restricciones
@@ -67,29 +69,49 @@ const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaP
             try {
                 //Equipo 2: Extraer los datos de los campos de
                 //la ventana modal que ya tiene Formik.
-                const PresentaPrecios = PresentaPreciosValues(values);
+                const PresentaPrecio = PresentaPreciosValues(values);
 
                 //Equipo 2: mandamos a consola los datos extraidos
-                console.log("<<PresentaPrecios>>", PresentaPrecios);
+                console.log("<<PresentaPrecios>>", PresentaPrecio);
 
-                //Equipo 2: Agregar una Presentacion de Precios Mediante Patch
-                //Equipo 2: Añadir el nuevo valor a la coleccion
-                const updatedPresentaPreciosData = PresentaPreciosData.add(PresentaPrecios);
+                // Equipo 2: Encuentra el índice del elemento en PresentaPreciosData que coincide con RowData
+                const indexToUpdate = PresentaPreciosData.findIndex(item => (
+                    item.IdProdServOK === RowData.IdProdServOK
+                    && item.IdPresentaBK === RowData.IdPresentaBK
+                    && item.IdTipoFormulaOK === RowData.IdTipoFormulaOK
+                    && item.Formula === RowData.Formula
+                    && item.Precio === RowData.Precio
+                ));
 
-                //Equipo 2: Actualizar el array en el objeto
+                // Equipo 2: Si se encuentra el índice, actualiza ese elemento, si no, agrega uno nuevo
+                const updatedPresentaPreciosData = [...PresentaPreciosData];
+                if (indexToUpdate !== -1) {
+                    updatedPresentaPreciosData[indexToUpdate] = PresentaPrecio;
+                } else {
+                    updatedPresentaPreciosData.push(PresentaPrecio);
+                }
+
+                // Equipo 2: Actualizar el array en el objeto
                 setPresentaPreciosData(updatedPresentaPreciosData);
 
-                selectedPriceListData.cat_listas_presenta_precios = PresentaPreciosData;
+                // Equipo 2: Actualizar el documento PriceList
+                const updatedSelectedPriceListData = {
+                    ...selectedPriceListData,
+                    cat_listas_presenta_precios: updatedPresentaPreciosData,
+                };
+                //console.log("Nuevo selectedPriceListData: ", updatedSelectedPriceListData);
 
-                //Equipo 2: Actualizar el documento PriceList
-                await PatchOnePriceList(selectedPriceListData.IdListaOK, selectedPriceListData);
-                //Equipo 2: Añadir la informacion actualizada mediante redux
-                dispatch(SET_SELECTED_PRICELIST_DATA(selectedPriceListData));
+                // Equipo 2: Modifica una Presentacion de Precios Mediante Patch
+                await PatchOnePriceList(updatedSelectedPriceListData);
+
+                // Equipo 2: Añadir la informacion actualizada mediante redux
+                dispatch(SET_SELECTED_PRICELIST_DATA(updatedSelectedPriceListData));
 
                 //Equipo 2: si no hubo error en el metodo anterior
                 //entonces lanzamos la alerta de exito.
-                setMensajeExitoAlert("PresentaPrecios fue creado y guardado Correctamente");
+                setMensajeExitoAlert("PresentaPrecios fue Actualizado Correctamente");
             } catch (e) {
+                console.log("Error al Modificar: ", e);
                 setMensajeExitoAlert(null);
                 setMensajeErrorAlert("No se pudo crear la PresentaPrecios");
             }
@@ -106,15 +128,15 @@ const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaP
 
     return (
         <Dialog
-            open={AddPresentaPreciosShowModal}
-            onClose={() => setAddPresentaPreciosShowModal(false)}
+            open={EditPresentaPreciosShowModal}
+            onClose={() => setEditPresentaPreciosShowModal(false)}
             fullWidth
         >
             <form onSubmit={formik.handleSubmit}>
                 {/* Equipo 2: Aqui va el Titulo de la Modal */}
                 <DialogTitle>
                     <Typography>
-                        <strong>Agregar Nueva Presentacion de Precios</strong>
+                        <strong>Modificar Presentacion Precio</strong>
                     </Typography>
                 </DialogTitle>
                 {/* Equipo 2: Aqui va un tipo de control por cada Propiedad de la Lista de Precios*/}
@@ -187,7 +209,7 @@ const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaP
                         loadingPosition="start"
                         startIcon={<CloseIcon />}
                         variant="outlined"
-                        onClick={() => setAddPresentaPreciosShowModal(false)}
+                        onClick={() => setEditPresentaPreciosShowModal(false)}
                     >
                         <span>CERRAR</span>
                     </LoadingButton>
@@ -200,7 +222,7 @@ const EditPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaP
                         type="submit"
                         disabled={!!mensajeExitoAlert}
                     >
-                        <span>EDITAR</span>
+                        <span>MODIFICAR</span>
                     </LoadingButton>
                 </DialogActions>
             </form>

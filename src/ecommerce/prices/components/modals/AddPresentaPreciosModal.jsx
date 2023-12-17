@@ -26,7 +26,7 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
     //Equipo 2: controlar el estado de la data de PresentaPrecios.
     const [PresentaPreciosData, setPresentaPreciosData] = useState([]);
     const dispatch = useDispatch();
-    
+
     //Equipo 2: useEffect para cargar datos
     useEffect(() => {
         async function fetchData() {
@@ -68,15 +68,15 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
             try {
+                //Equipo 2: Extraer los datos de los campos de
+                //la ventana modal que ya tiene Formik.
                 const PresentaPrecio = PresentaPreciosValues(values);
 
                 // Equipo 2: mandamos a consola los datos extraidos
-                console.log("<<PresentaPrecio>>", PresentaPrecio);
+                //console.log("<<PresentaPrecio>>", PresentaPrecio);
 
-                // Equipo 2: Agregar una Presentacion de Precios Mediante Patch
                 // Equipo 2: Añadir el nuevo valor a la coleccion
                 const updatedPresentaPreciosData = [...PresentaPreciosData, PresentaPrecio];
-                console.log("paso el updated: ", updatedPresentaPreciosData);
 
                 // Equipo 2: Actualizar el array en el objeto
                 setPresentaPreciosData(updatedPresentaPreciosData);
@@ -86,8 +86,9 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
                     ...selectedPriceListData,
                     cat_listas_presenta_precios: updatedPresentaPreciosData,
                 };
-                console.log("Nuevo selectedPriceListData: ", updatedSelectedPriceListData);
+                //console.log("Nuevo selectedPriceListData: ", updatedSelectedPriceListData);
 
+                // Equipo 2: Agregar una Presentacion de Precios Mediante Patch
                 await PatchOnePriceList(updatedSelectedPriceListData);
 
                 // Equipo 2: Añadir la informacion actualizada mediante redux
