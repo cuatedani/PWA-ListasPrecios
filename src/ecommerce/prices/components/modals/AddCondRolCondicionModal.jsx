@@ -1,29 +1,76 @@
-import React, { useState } from "react";
+//Equipo 2: React
+import React, { useState, useEffect } from "react";
+//Equipo 2: Material UI
 import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { CondRolCondicionValues } from "../../helpers/CondRolCondicionValues";
+import {
+    showMensajeConfirm,
+    showMensajeError,
+} from "../../../../share/components/elements/messages/MySwalAlerts";
+//Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+//Equipo 2: Helpers
+import { CondRolCondicionValues } from "../../helpers/CondRolCondicionValues";
+//Equipo 2: Redux
+import { useSelector, useDispatch } from "react-redux";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
+import { SET_SELECTED_CONDICIONROLES_DATA } from "../../redux/slices/CondicionRolesSlice";
 
 const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolCondicionShowModal }) => {
+    //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    //Equipo 2: Dispatch para actualizar la data local
+    const dispatch = useDispatch();
+    //Equipo 2: Loader
+    const [Loading, setLoading] = useState(false);
+    //Equipo 2: Constantes Para Almacenar la Data de los Documentos Superiores
+    const [CondicionRolesData, setCondicionRolesData] = useState(null);
+    const [CondRolCondicionData, setCondRolCondicionData] = useState(null);
+    //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
+    const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
+    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
+    //Equipo 2: Mediante redux obtener la data que se envió de CondicionRolesTable
+    const selectedCondicionRolesData = useSelector((state) => state.CondicionRolesReducer.SelCondicionRolesData);
+    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", condicionRolesData);
+
+    //Equipo 2: useEffect para cargar datos
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                setCondicionRolesData(selectedPriceListData.cat_listas_condicion_roles);
+                setCondRolCondicionData(selectedCondicionRolesData.condicion);
+            } catch (error) {
+                console.error("Error al cargar las Presentaciondes de Precios en useEffect de AddPresentaPreciosModal:", error);
+            }
+        }
+        fetchData();
+    }, []);
+
+    //Equipo 2: Definición del Formik
     const formik = useFormik({
+
+        //Equipo 2: Valores Iniciales
         initialValues: {
             IdTipoCondicionOK: "",
             IdTipoOperadorOK: "",
             Valor: "",
             Secuecia: "",
         },
+
+        //Equipo 2: Restricciones
         validationSchema: Yup.object({
             IdTipoCondicionOK: Yup.string().required("Campo requerido"),
             IdTipoOperadorOK: Yup.string().required("Campo requerido"),
             Valor: Yup.string().required("Campo requerido"),
             Secuecia: Yup.string().required("Campo requerido"),
         }),
+
+        //Equipo 2: Metodo que acciona el boton
         onSubmit: async (values) => {
 
             console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
@@ -31,37 +78,52 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
             try {
-                //Equipo 2: si fuera necesario meterle valores compuestos o no compuestos
-                //a alguns propiedades de formik por la razon que sea, se muestren o no
-                //estas propiedades en la ventana modal a travez de cualquier control.
-                //La forma de hacerlo seria:
-                //formik.values.IdInstitutoBK = `${formik.values.IdInstitutoOK}-${formik.values.IdCEDI}`;
-                //formik.values.Matriz = autoChecksSelecteds.join(",");
-
                 //Equipo 2: Extraer los datos de los campos de
                 //la ventana modal que ya tiene Formik.
-                const CondRolSecuecia = CondRolCondicionValues(values);
+                const CondRolCon = CondRolCondicionValues(values);
 
-                //Equipo 2: mandamos a consola los datos extraidos
-                console.log("<<CondRolCondicion>>", CondRolCondicion);
+                // Equipo 2: mandamos a consola los datos extraidos
+                //console.log("<<PresentaPrecio>>", PresentaPrecio);
 
-                //Equipo 2: llamar el metodo que desencadena toda la logica
-                //para ejecutar la API "AddOneCondRolCondicion" y que previamente
-                //construye todo el JSON de la coleccion de PricesList para
-                //que pueda enviarse en el "body" de la API y determinar si
-                //la inserción fue o no exitosa.
-                await AddOneCondRolCondicion(CondRolCondicion);
-                //Equipo 2: si no hubo error en el metodo anterior
-                //entonces lanzamos la alerta de exito.
-                setMensajeExitoAlert("CondRolCondicion fue creado y guardado Correctamente");
-                //Equipo 2: falta actualizar el estado actual (documentos/data) para que
-                //despues de insertar el nuevo instituto se visualice en la tabla,
-                //pero esto se hara en la siguiente nota.
-                //fetchDataCondRolCondicion();
+                // Equipo 2: Añadir el nuevo valor a la coleccion
+                const updatedCondRolCondicionData = [...CondRolCondicionData, CondRolCon];
+
+                // Actualizar el array en el sub-sub-documento
+                setCondRolCondicionData(updatedCondRolCondicionData);
+
+                // Crear un nuevo objeto con las actualizaciones del sub-documento
+                const updatedCondicionRolesData = {
+                    ...selectedCondicionRolesData,
+                    condicion: updatedCondRolCondicionData,
+                };
+                console.log("Nuevo selectedPriceListData: ", updatedCondicionRolesData);
+
+                // Equipo 2: Añadir la informacion actualizada del sub-documento mediante redux
+                dispatch(SET_SELECTED_CONDICIONROLES_DATA(updatedCondicionRolesData));
+
+                // Equipo 2: Actualizar el array del sub-documento
+                setCondicionRolesData(updatedCondicionRolesData);
+
+                // Crear un nuevo objeto con los cambios en el PriceList
+                const updatedPriceListData = {
+                    ...selectedPriceListData,
+                    cat_listas_condicion_roles: updatedCondicionRolesData,
+                };
+                console.log("Nuevo selectedPriceListData: ", updatedPriceListData);
+
+                // Actualizar el documento PriceList en BD
+                await PatchOnePriceList(updatedPriceListData);
+
+                // Equipo 2: Añadir la informacion actualizada mediante redux
+                dispatch(SET_SELECTED_PRICELIST_DATA(updatedPriceListData));
+
+                setMensajeExitoAlert("Documento Creado Exitosamente");
             } catch (e) {
-                setMensajeExitoAlert(null);
-                setMensajeErrorAlert("No se pudo crear la CondRolCondicion");
+                console.error("Error al Crear:", e);
+                setMensajeErrorAlert(`No se pudo crear ConRolCondicion`);
             }
+            //Equipo 2: Ocultamos el loading
+            setLoading(false);
         },
     });
 
@@ -96,7 +158,6 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
                         id="IdTipoCondicionOK"
                         label="IdTipoCondicionOK*"
                         value={formik.values.IdTipoCondicionOK}
-                        /* onChange={formik.handleChange} */
                         {...commonTextFieldProps}
                         error={formik.touched.IdTipoCondicionOK && Boolean(formik.errors.IdTipoCondicionOK)}
                         helperText={formik.touched.IdTipoCondicionOK && formik.errors.IdTipoCondicionOK}
@@ -131,8 +192,6 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
                     sx={{ display: 'flex', flexDirection: 'row' }}
                 >
                     <Box m="auto">
-                        {console.log("mensajeExitoAlert", mensajeExitoAlert)}
-                        {console.log("mensajeErrorAlert", mensajeErrorAlert)}
                         {mensajeErrorAlert && (
                             <Alert severity="error">
                                 <b>¡ERROR!</b> ─ {mensajeErrorAlert}
@@ -162,6 +221,7 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
                         variant="contained"
                         type="submit"
                         disabled={!!mensajeExitoAlert}
+                        loading={Loading}
                     >
                         <span>GUARDAR</span>
                     </LoadingButton>

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 //Equipo 2: Material UI
 import { MaterialReactTable } from 'material-react-table';
-import { Box, Stack, Tooltip, Button, IconButton, Dialog } from "@mui/material";
+import { Box, Stack, Tooltip, IconButton, Dialog } from "@mui/material";
 import { MRT_Localization_ES } from "material-react-table/locales/es";
 import { darken } from '@mui/system';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -13,13 +13,14 @@ import {
     showMensajeConfirm,
     showMensajeError,
 } from "../../../../share/components/elements/messages/MySwalAlerts";
-//Equipo 2: DB
+//Equipo 2: Services
 import PatchOnePriceList from '../../services/remote/patch/PatchOnePriceList';
 //Equipo 2: Modals
 import AddCondicionProductoModal from "../modals/AddCondicionProductoModal";
 import EditCondicionProductoModal from "../modals/EditCondicionProductoModal";
 //Equipo 2: Redux
 import { useSelector, useDispatch } from "react-redux";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
 import { SET_SELECTED_CONDICIONPRODUCTO_DATA } from "../../redux/slices/CondicionProductoSlice";
 
 //Equipo 2: Columns Table Definition.
@@ -57,6 +58,8 @@ const CondicionProductoTable = () => {
     const [idRowSel, setIdRowSel] = useState(null);
     const [RowData, setRowData] = useState(null);
     const [SelectedPriceListData, setSelectedPriceListData] = useState(null);
+    //Equipo 2: Para eviar data mediante redux
+    const dispatch = useDispatch();
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const priceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
@@ -65,8 +68,12 @@ const CondicionProductoTable = () => {
     useEffect(() => {
         async function fetchData() {
             try {
+                //Asignamos el PriceList obtenido mediante el Redux
                 setSelectedPriceListData(priceListData);
+                //Obtenemos los ProductosServ de PriceList
                 setCondicionProductoData(priceListData.cat_listas_condicion_prod_serv);
+
+                //Reseteamos Indices
                 setLoadingTable(false);
                 setSelectedRowIndex(null);
                 setIdRowSel(null);
@@ -77,8 +84,19 @@ const CondicionProductoTable = () => {
         fetchData();
     }, [priceListData]);
 
-     //Equipo 2: Para eviar data mediante redux
-     const dispatch = useDispatch();
+    //Metodo Para Actualizar Data
+    const Reload = async () => {
+        //Asignamos el PriceList obtenido mediante el Redux
+        setSelectedPriceListData(priceListData);
+        //Obtenemos los PresentaPrecios de PriceList
+        setCondicionProductoData(priceListData.cat_listas_condicion_prod_serv);
+
+        //Reseteamos Indices
+        setLoadingTable(false);
+        setSelectedRowIndex(null);
+        setIdRowSel(null);
+        setRowData(null);
+    };
 
     //Equipo 2: Metodo para seleccionar la data de una fila
     //Este es el metodo para seleccionar la orden de la tabla
@@ -86,8 +104,8 @@ const CondicionProductoTable = () => {
         const handleRowClick = (index) => {
             const clickedRow = CondicionProductoData[index];
             if (clickedRow) {
-                console.log("<<ID DEL DOCUMENTO SELECCIONADO>>:", clickedRow.DesCondicion);
-                setIdRowSel(clickedRow.DesCondicion);
+                console.log("<<ID DEL DOCUMENTO SELECCIONADO>>:", clickedRow.DesPromo);
+                setIdRowSel(clickedRow.DesPromo);
                 setSelectedRowIndex(index);
                 setRowData(clickedRow);
                 //console.log("<<DATA DEL DOCUMENTO SELECCIONADO>>:", clickedRow);
@@ -103,32 +121,53 @@ const CondicionProductoTable = () => {
 
     //Equipo 2: Metodo para eliminar un Negocios
     const Delete = async () => {
-        const res = await showMensajeConfirm(
-            `¿Estás seguro de eliminar el documento: ${idRowSel}? No podrás revertir esta acción. ¿Deseas continuar?`
-        );
+        if (RowData) {
+            const res = await showMensajeConfirm(
+                `¿Estás seguro de eliminar el documento <<SELECCIONADO>>? No podrás revertir esta acción. ¿Deseas continuar?`
+            );
 
-        if (res) {
-            try {
-                // Filtrar los elementos distintos al que queremos eliminar
-                const updatedCondicionProductoData = CondicionProductoData.filter(
-                    Producto => Producto.DesCondicion !== idRowSel
-                );
+            if (res) {
+                try {
+                    // Equipo 2: Encuentra el índice del elemento en CondicionProductoData que coincide con RowData
+                    const indexToUpdate = CondicionProductoData.findIndex(item => (
+                        item.DesPromo === RowData.DesPromo
+                        && item.IdTipoPromoOK === RowData.IdTipoPromoOK
+                        && item.Formula === RowData.Formula
+                    ));
 
-                // Actualizar el array en el objeto
-                setCondicionProductoData(updatedCondicionProductoData);
+                    // Equipo 2: Si se encuentra el índice, elimina ese elementoo
+                    const updatedCondicionProductoData = [...CondicionProductoData];
+                    if (indexToUpdate !== -1) {
+                        updatedCondicionProductoData.splice(indexToUpdate, 1); // Elimina el elemento en el índice encontrado
+                    }
 
-                SelectedPriceListData.cat_listas_condicion_prod_serv = CondicionProductoData;
+                    // Equipo 2: Actualizar el array en el objeto
+                    setCondicionProductoData(updatedCondicionProductoData);
 
-                // Actualizar el documento PriceList
-                await PatchOnePriceList(SelectedPriceListData.IdListaOK, SelectedPriceListData);
+                    // Crear un nuevo objeto con las actualizaciones
+                    const updatedPriceListData = {
+                        ...SelectedPriceListData,
+                        cat_listas_condicion_prod_serv: updatedCondicionProductoData,
+                    };
+                    //console.log("Nuevo selectedPriceListData: ", updatedSelectedPriceListData);
 
-                showMensajeConfirm("Documento Eliminado");
-                fetchData();
-            } catch (e) {
-                console.error("Error al Eliminar:", e);
-                showMensajeError(`No se pudo Eliminar el Documento ${idRowSel}`);
+                    // Actualizar el documento PriceList
+                    await PatchOnePriceList(updatedPriceListData);
+
+                    // Equipo 2: Añadir la informacion actualizada mediante redux
+                    dispatch(SET_SELECTED_PRICELIST_DATA(updatedPriceListData));
+
+                    showMensajeConfirm("Documento Eliminado");
+                } catch (e) {
+                    console.error("Error al Eliminar:", e);
+                    showMensajeError(`No se pudo Eliminar el Documento <<SELECCIONADO>>`);
+                }
             }
         }
+        else {
+            await showMensajeConfirm(`Primero Seleccione una Fila`);
+        }
+        Reload();
     };
 
     //Equipo 2: Metodo para editar un Negocio
@@ -136,9 +175,7 @@ const CondicionProductoTable = () => {
         if (RowData) {
             setEditCondicionProductoShowModal(true)
         } else {
-            await showMensajeConfirm(
-                `Primero Seleccione una Fila`
-            );
+            await showMensajeConfirm(`Primero Seleccione una Fila`);
         }
     };
 
@@ -149,7 +186,7 @@ const CondicionProductoTable = () => {
         );
     };
 
-     //Equipo 2: Estructura de la Tabla
+    //Equipo 2: Estructura de la Tabla
     return (
         <Box>
             <Box>
@@ -228,26 +265,30 @@ const CondicionProductoTable = () => {
             {/* M O D A L E S */}
             {/* ADD MODAL */}
             <Dialog open={AddCondicionProductoShowModal}>
-                <AddCondicionProductoModal
-                    AddCondicionProductoShowModal={AddCondicionProductoShowModal}
-                    setAddCondicionProductoShowModal={setAddCondicionProductoShowModal}
-                    onClose={() => {
-                        setAddCondicionProductoShowModal(false);
-                        fetchData();
-                    }}
-                />
+                {AddCondicionProductoShowModal && (
+                    <AddCondicionProductoModal
+                        AddCondicionProductoShowModal={AddCondicionProductoShowModal}
+                        setAddCondicionProductoShowModal={setAddCondicionProductoShowModal}
+                        onClose={() => {
+                            setAddCondicionProductoShowModal(false);
+                            Reload();
+                        }}
+                    />
+                )}
             </Dialog>
             {/* EDIT MODAL */}
             <Dialog open={EditCondicionProductoShowModal}>
-                <EditCondicionProductoModal
-                    EditCondicionProductoShowModal={EditCondicionProductoShowModal}
-                    setEditCondicionProductoShowModal={setEditCondicionProductoShowModal}
-                    RowData={RowData}
-                    onClose={() => {
-                        setEditCondicionProductoShowModal(false);
-                        fetchData();
-                    }}
-                />
+                {EditCondicionProductoShowModal && (
+                    <EditCondicionProductoModal
+                        EditCondicionProductoShowModal={EditCondicionProductoShowModal}
+                        setEditCondicionProductoShowModal={setEditCondicionProductoShowModal}
+                        RowData={RowData}
+                        onClose={() => {
+                            setEditCondicionProductoShowModal(false);
+                            Reload();
+                        }}
+                    />
+                )}
             </Dialog>
         </Box>
     );

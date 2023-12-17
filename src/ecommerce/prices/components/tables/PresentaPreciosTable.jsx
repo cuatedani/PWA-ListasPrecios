@@ -13,7 +13,7 @@ import {
     showMensajeConfirm,
     showMensajeError,
 } from "../../../../share/components/elements/messages/MySwalAlerts";
-//Equipo 2: DB
+//Equipo 2: Services
 import PatchOnePriceList from '../../services/remote/patch/PatchOnePriceList';
 //Equipo 2: Modals
 import AddPresentaPreciosModal from "../modals/AddPresentaPreciosModal";
@@ -77,8 +77,12 @@ const PresentaPreciosTable = () => {
     useEffect(() => {
         async function fetchData() {
             try {
+                //Asignamos el PriceList obtenido mediante el Redux
                 setSelectedPriceListData(priceListData);
-                setPresentaPreciosData(priceListData.cat_listas_presenta_precios);
+                //Obtenemos los PresentaPrecios de PriceList
+                setPresentaPreciosData(priceListData?.cat_listas_presenta_precios || []);
+
+                //Reseteamos Indices
                 setLoadingTable(false);
                 setSelectedRowIndex(null);
                 setIdRowSel(null);
@@ -91,8 +95,12 @@ const PresentaPreciosTable = () => {
 
     //Metodo Para Actualizar Data
     const Reload = async () => {
+        //Asignamos el PriceList obtenido mediante el Redux
         setSelectedPriceListData(priceListData);
-        setPresentaPreciosData(priceListData.cat_listas_presenta_precios);
+        //Obtenemos los PresentaPrecios de PriceList
+        setCondicionRolesData(priceListData.cat_listas_presenta_precios);
+
+        //Reseteamos Indices
         setLoadingTable(false);
         setSelectedRowIndex(null);
         setIdRowSel(null);
@@ -164,7 +172,8 @@ const PresentaPreciosTable = () => {
                     showMensajeError(`No se pudo Eliminar el Documento <<SELECCIONADO>>`);
                 }
             }
-        } else {
+        }
+        else {
             await showMensajeConfirm(`Primero Seleccione una Fila`);
         }
         Reload();

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 //Equipo 2: Material UI
 import { MaterialReactTable } from 'material-react-table';
-import { Box, Stack, Tooltip, Button, IconButton, Dialog } from "@mui/material";
+import { Box, Stack, Tooltip, IconButton, Dialog } from "@mui/material";
 import { MRT_Localization_ES } from "material-react-table/locales/es";
 import { darken } from '@mui/system';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -19,7 +19,9 @@ import PatchOnePriceList from '../../services/remote/patch/PatchOnePriceList';
 import AddCondRolCondicionModal from "../modals/AddCondRolCondicionModal";
 import EditCondRolCondicionModal from "../modals/EditCondRolCondicionModal";
 //Equipo 2: Redux
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
+import { SET_SELECTED_CONDICIONROLES_DATA } from "../../redux/slices/CondicionRolesSlice";
 
 //Equipo 2: Columns Table Definition.
 const CondRolCondicionColumns = [
@@ -62,6 +64,8 @@ const CondRolCondicionTable = () => {
     const [selectedRowIndex, setSelectedRowIndex] = useState(null);
     const [idRowSel, setIdRowSel] = useState(null);
     const [RowData, setRowData] = useState(null);
+    //Equipo 2: Dispatch para actualizar la data local
+    const dispatch = useDispatch();
     //Equipo 2: Constantes Para Almacenar la Data de los Documentos Superiores
     const [SelectedPriceListData, setSelectedPriceListData] = useState(null);
     const [SelectedCondicionRolesData, setSelectedCondicionRolesData] = useState(null);
@@ -70,7 +74,7 @@ const CondRolCondicionTable = () => {
     //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
     //Equipo 2: Mediante redux obtener la data que se envió de CondicionRolesTable
     const condicionRolesData = useSelector((state) => state.CondicionRolesReducer.SelCondicionRolesData);
-    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
+    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", condicionRolesData);
 
     //Equipo 2: useEffect para cargar datos en la tabla
     useEffect(() => {
@@ -79,13 +83,14 @@ const CondRolCondicionTable = () => {
                 //Asignamos el PriceList obtenido mediante el Redux
                 setSelectedPriceListData(priceListData);
                 //Obtenemos los CondicionRoles de PriceList
-                setCondicionRolesData(priceListData.cat_listas_condicion_roles);
+                setCondicionRolesData(priceListData?.cat_listas_condicion_roles|| []);
 
                 //Asignamos el CondicionRol obtenido mediante el Redux
                 setSelectedCondicionRolesData(condicionRolesData);
                 //Obtenemos los CondRolCondicion del CondicionRol
-                setCondRolCondicionData(condicionRolesData.condicion);
+                setCondRolCondicionData(condicionRolesData?.condicion|| []);
 
+                //Reseteamos Indices
                 setLoadingTable(false);
                 setSelectedRowIndex(null);
                 setIdRowSel(null);
@@ -95,6 +100,25 @@ const CondRolCondicionTable = () => {
         }
         fetchData();
     }, [priceListData, condicionRolesData]);
+
+    //Metodo Para Actualizar Data
+    const Reload = async () => {
+        //Asignamos el PriceList obtenido mediante el Redux
+        setSelectedPriceListData(priceListData);
+        //Obtenemos los CondicionRoles de PriceList
+        setCondicionRolesData(priceListData.cat_listas_condicion_roles);
+
+        //Asignamos el CondicionRol obtenido mediante el Redux
+        setSelectedCondicionRolesData(condicionRolesData);
+        //Obtenemos los CondRolCondicion del CondicionRol
+        setCondRolCondicionData(condicionRolesData.condicion);
+
+        //Reseteamos Indices
+        setLoadingTable(false);
+        setSelectedRowIndex(null);
+        setIdRowSel(null);
+        setRowData(null);
+    };
 
     //Equipo 2: Metodo para seleccionar la data de una fila
     //Este es el metodo para seleccionar la orden de la tabla
@@ -117,47 +141,76 @@ const CondRolCondicionTable = () => {
 
     //Equipo 2: Metodo para eliminar un Negocios
     const Delete = async () => {
-        const res = await showMensajeConfirm(
-            `¿Estás seguro de eliminar el documento: ${idRowSel}? No podrás revertir esta acción. ¿Deseas continuar?`
-        );
+        if (RowData) {
+            const res = await showMensajeConfirm(
+                `¿Estás seguro de eliminar el documento <<SELECCIONADO>>? No podrás revertir esta acción. ¿Deseas continuar?`
+            );
 
-        if (res) {
-            try {
-                // Filtrar los elementos distintos al que queremos eliminar
-                const updatedCondRolCondicionData = CondRolCondicionData.filter(
-                    Roles => Roles.IdTipoCondicionOK !== idRowSel
-                );
+            if (res) {
+                try {
+                    // Equipo 2: Encuentra el índice del elemento en CondRolCondicionData que coincide con RowData
+                    const indexToUpdate = CondRolCondicionData.findIndex(item => (
+                        item.IdTipoCondicionOK === RowData.IdTipoCondicionOK
+                        && item.IdTipoOperadorOK === RowData.IdTipoOperadorOK
+                        && item.Valor === RowData.Valor
+                        && item.Secuencia === RowData.Secuencia
+                    ));
 
-                // Actualizar el array en el objeto
-                setCondRolCondicionData(updatedCondRolCondicionData);
+                    // Equipo 2: Si se encuentra el índice, elimina ese elemento
+                    const updatedCondRolCondicionData = [...CondicionRolesData];
+                    if (indexToUpdate !== -1) {
+                        // Elimina el elemento en el índice encontrado
+                        updatedCondRolCondicionData.splice(indexToUpdate, 1);
+                    }
 
-                SelectedCondicionRolesData.condicion = CondRolCondicionData;
+                    // Actualizar el array en el sub-sub-documento
+                    setCondRolCondicionData(updatedCondRolCondicionData);
 
-                // Actualizar el array en el objeto
-                setCondicionRolesData(updatedCondicionRolesData);
+                    // Crear un nuevo objeto con las actualizaciones del sub-documento
+                    const updatedCondicionRolesData = {
+                        ...SelectedCondicionRolesData,
+                        condicion: updatedCondRolCondicionData,
+                    };
+                    console.log("Nuevo selectedPriceListData: ", updatedCondicionRolesData);
 
-                SelectedPriceListData.cat_listas_condicion_roles = CondicionRolesData;
+                    // Equipo 2: Añadir la informacion actualizada del sub-documento mediante redux
+                    dispatch(SET_SELECTED_CONDICIONROLES_DATA(updatedCondicionRolesData));
 
-                // Actualizar el documento PriceList
-                await PatchOnePriceList(SelectedPriceListData.IdListaOK, SelectedPriceListData);
+                    // Equipo 2: Actualizar el array del sub-documento
+                    setCondicionRolesData(updatedCondicionRolesData);
 
-                showMensajeConfirm("Documento Eliminado");
-                fetchData();
-            } catch (e) {
-                console.error("Error al Eliminar:", e);
-                showMensajeError(`No se pudo Eliminar el Documento ${idRowSel}`);
+                    // Crear un nuevo objeto con los cambios en el PriceList
+                    const updatedPriceListData = {
+                        ...SelectedPriceListData,
+                        cat_listas_condicion_roles: updatedCondicionRolesData,
+                    };
+                    console.log("Nuevo selectedPriceListData: ", updatedPriceListData);
+
+                    // Actualizar el documento PriceList en BD
+                    await PatchOnePriceList(updatedPriceListData);
+
+                    // Equipo 2: Añadir la informacion actualizada mediante redux
+                    dispatch(SET_SELECTED_PRICELIST_DATA(updatedPriceListData));
+
+                    showMensajeConfirm("Documento Eliminado");
+                } catch (e) {
+                    console.error("Error al Eliminar:", e);
+                    showMensajeError(`No se pudo Eliminar el Documento <<SELECCIONADO>>`);
+                }
             }
         }
+        else {
+            await showMensajeConfirm(`Primero Seleccione una Fila`);
+        }
+        Reload();
     };
 
-    //Equipo 2: Metodo para editar un Negocio
+    //Equipo 2: Metodo para editar un CondRolCondicion
     const Edit = async () => {
         if (RowData) {
             setEditCondRolCondicionShowModal(true)
         } else {
-            await showMensajeConfirm(
-                `Primero Seleccione una Fila`
-            );
+            await showMensajeConfirm(`Primero Seleccione una Fila`);
         }
     };
 
@@ -195,6 +248,7 @@ const CondRolCondicionTable = () => {
                             {/* ------- BARRA DE ACCIONES ------ */}
                             <Stack direction="row" sx={{ m: 1 }}>
                                 <Box>
+                                    {/* ------- AGREGAR ------ */}
                                     <Tooltip title="Agregar">
                                         <IconButton
                                             onClick={() => setAddCondRolCondicionShowModal(true)}
@@ -202,18 +256,21 @@ const CondRolCondicionTable = () => {
                                             <AddCircleIcon />
                                         </IconButton>
                                     </Tooltip>
+                                    {/* ------- EDITAR ------ */}
                                     <Tooltip title="Editar">
                                         <IconButton
                                             onClick={() => Edit()}>
                                             <EditIcon />
                                         </IconButton>
                                     </Tooltip>
+                                    {/* ------- ELIMINAR ------ */}
                                     <Tooltip title="Eliminar">
                                         <IconButton
                                             onClick={() => Delete()}>
                                             <DeleteIcon />
                                         </IconButton>
                                     </Tooltip>
+                                    {/* ------- DETALLES ------ */}
                                     <Tooltip title="Detalles ">
                                         <IconButton
                                             onClick={() => Details()}
@@ -241,26 +298,30 @@ const CondRolCondicionTable = () => {
             {/* M O D A L E S */}
             {/* ADD MODAL */}
             <Dialog open={AddCondRolCondicionShowModal}>
-                <AddCondRolCondicionModal
-                    AddCondRolCondicionShowModal={AddCondRolCondicionShowModal}
-                    setAddCondRolCondicionShowModal={setAddCondRolCondicionShowModal}
-                    onClose={() => {
-                        setAddCondRolCondicionShowModal(false);
-                        fetchData();
-                    }}
-                />
+                {AddCondRolCondicionModal && (
+                    <AddCondRolCondicionModal
+                        AddCondRolCondicionShowModal={AddCondRolCondicionShowModal}
+                        setAddCondRolCondicionShowModal={setAddCondRolCondicionShowModal}
+                        onClose={() => {
+                            setAddCondRolCondicionShowModal(false);
+                            Reload();
+                        }}
+                    />
+                )}
             </Dialog>
             {/* EDIT MODAL */}
             <Dialog open={EditCondRolCondicionShowModal}>
-                <EditCondRolCondicionModal
-                    EditCondRolCondicionShowModal={EditCondRolCondicionShowModal}
-                    setEditCondRolCondicionShowModal={setEditCondRolCondicionShowModal}
-                    RowData={RowData}
-                    onClose={() => {
-                        setEditCondRolCondicionShowModal(false);
-                        fetchData();
-                    }}
-                />
+                {EditCondRolCondicionModal && (
+                    <EditCondRolCondicionModal
+                        EditCondRolCondicionShowModal={EditCondRolCondicionShowModal}
+                        setEditCondRolCondicionShowModal={setEditCondRolCondicionShowModal}
+                        RowData={RowData}
+                        onClose={() => {
+                            setEditCondRolCondicionShowModal(false);
+                            Reload();
+                        }}
+                    />
+                )}
             </Dialog>
         </Box>
     );

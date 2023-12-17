@@ -1,16 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+//import del Helper
 import { NegociosValues } from "../../helpers/NegociosValues";
+// BD API
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+//REDUX
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
+import { useSelector, useDispatch } from "react-redux";
 
-const AddNegociosModal = ({AddNegociosShowModal, setAddNegociosShowModal}) => {
+const AddNegociosModal = ({AddNegociosShowModal, setAddNegociosShowModal, onClose}) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    const [Loading, setLoading] = useState(false);
+    const dispatch = useDispatch();
+    //Recuperacion de la data
+    const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
+    //Equipo 2: controlar el estado de la data de PresentaPrecios.
+    const [NegociosData, setNegociosData] = useState([]);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                setNegociosData(selectedPriceListData.cat_listas_negocios);
+            } catch (error) {
+                console.error("Error al cargar las Presentaciondes de Precios en useEffect de AddNegociosModal:", error);
+            }
+        }
+        fetchData();
+    }, []);
+
     const formik = useFormik({
         initialValues: {
             IdNegocioOK: "",
@@ -24,38 +47,27 @@ const AddNegociosModal = ({AddNegociosShowModal, setAddNegociosShowModal}) => {
             //Equipo 2: reiniciamos los estados de las alertas de exito y error.
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
+            setLoading(true);
             try {
-                //Equipo 2: si fuera necesario meterle valores compuestos o no compuestos
-                //a alguns propiedades de formik por la razon que sea, se muestren o no
-                //estas propiedades en la ventana modal a travez de cualquier control.
-                //La forma de hacerlo seria:
-                //formik.values.IdInstitutoBK = `${formik.values.IdInstitutoOK}-${formik.values.IdCEDI}`;
-                //formik.values.Matriz = autoChecksSelecteds.join(",");
                
-                //Equipo 2: Extraer los datos de los campos de
-                //la ventana modal que ya tiene Formik.
                 const Negocios = NegociosValues(values);
+                const updatedNegociosData = [...NegociosData, Negocios];  
 
-                //Equipo 2: mandamos a consola los datos extraidos
-                console.log("<<Negocios>>", Negocios);
+                setNegociosData(updatedNegociosData);
 
-                //Equipo 2: llamar el metodo que desencadena toda la logica
-                //para ejecutar la API "AddOneNegocios" y que previamente
-                //construye todo el JSON de la coleccion de PricesList para
-                //que pueda enviarse en el "body" de la API y determinar si
-                //la inserción fue o no exitosa.
-                await AddOneNegocios(Negocios);
-                //Equipo 2: si no hubo error en el metodo anterior
-                //entonces lanzamos la alerta de exito.
+                const updatedNegociostData = {
+                    ...selectedPriceListData,
+                    cat_listas_negocios: updatedNegociosData,
+                };
+                await PatchOnePriceList(updatedNegociostData);
+                dispatch(SET_SELECTED_PRICELIST_DATA(updatedNegociostData));
                 setMensajeExitoAlert("Negocios fue creado y guardado Correctamente");
-                //Equipo 2: falta actualizar el estado actual (documentos/data) para que
-                //despues de insertar el nuevo instituto se visualice en la tabla,
-                //pero esto se hara en la siguiente nota.
-                //fetchDataNegocios();
+
               } catch (e) {
                 setMensajeExitoAlert(null);
                 setMensajeErrorAlert("No se pudo crear la Negocios");
               }
+              setLoading(false);
         },
     });
     
@@ -67,7 +79,7 @@ const AddNegociosModal = ({AddNegociosShowModal, setAddNegociosShowModal}) => {
         disabled: !!mensajeExitoAlert,
     };
 
-    return(
+    return (
         <Dialog
             open={AddNegociosShowModal}
             onClose={() => setAddNegociosShowModal(false)}
@@ -80,11 +92,11 @@ const AddNegociosModal = ({AddNegociosShowModal, setAddNegociosShowModal}) => {
                         <strong>Agregar Nuevo Negocio</strong>
                     </Typography>
                 </DialogTitle>
-                {/* Equipo 2: Aqui va un tipo de control por cada Propiedad de la Lista de Precios*/}
+                {/* Equipo 2: Aqui va un tipo de control por cada Propiedad de Negocios*/}
                 <DialogContent
                     sx={{ display: 'flex', flexDirection: 'column' }}
                     dividers
-                    >
+                >
                     {/* Equipo 2: Campos de captura o selección */}
                     <TextField
                         id="IdNegocioOK"
@@ -92,35 +104,36 @@ const AddNegociosModal = ({AddNegociosShowModal, setAddNegociosShowModal}) => {
                         value={formik.values.IdNegocioOK}
                         /* onChange={formik.handleChange} */
                         {...commonTextFieldProps}
-                        error={ formik.touched.IdNegocioOK && Boolean(formik.errors.IdNegocioOK) }
-                        helperText={ formik.touched.IdNegocioOK && formik.errors.IdNegocioOK }
+                        error={formik.touched.IdNegocioOK && Boolean(formik.errors.IdNegocioOK)}
+                        helperText={formik.touched.IdNegocioOK && formik.errors.IdNegocioOK}
                     />
-                        </DialogContent>
+                </DialogContent>
                 {/* Equipo 2: Aqui van las acciones del usuario como son las alertas o botones */}
                 <DialogActions
                     sx={{ display: 'flex', flexDirection: 'row' }}
                 >
-                <Box m="auto">
-                    {console.log("mensajeExitoAlert", mensajeExitoAlert)}
-                    {console.log("mensajeErrorAlert", mensajeErrorAlert)}
-                    {mensajeErrorAlert && (
-                        <Alert severity="error">
-                            <b>¡ERROR!</b> ─ {mensajeErrorAlert}
-                        </Alert>
-                    )}
-                    {mensajeExitoAlert && (
-                        <Alert severity="success">
-                            <b>¡ÉXITO!</b> ─ {mensajeExitoAlert}
-                        </Alert>
-                    )}
-                </Box>
+                    <Box m="auto">
+                        {mensajeErrorAlert && (
+                            <Alert severity="error">
+                                <b>¡ERROR!</b> ─ {mensajeErrorAlert}
+                            </Alert>
+                        )}
+                        {mensajeExitoAlert && (
+                            <Alert severity="success">
+                                <b>¡ÉXITO!</b> ─ {mensajeExitoAlert}
+                            </Alert>
+                        )}
+                    </Box>
                     {/* Equipo 2: Boton de Cerrar. */}
                     <LoadingButton
                         color="secondary"
                         loadingPosition="start"
                         startIcon={<CloseIcon />}
                         variant="outlined"
-                        onClick={() => setAddNegociosShowModal(false)}
+                        onClick={() => {
+                            setAddNegociosShowModal(false);
+                            onClose();
+                        }}
                     >
                         <span>CERRAR</span>
                     </LoadingButton>
@@ -133,7 +146,7 @@ const AddNegociosModal = ({AddNegociosShowModal, setAddNegociosShowModal}) => {
                         type="submit"
                         disabled={!!mensajeExitoAlert}
                     >
-                    <span>GUARDAR</span>
+                        <span>MODIFICAR</span>
                     </LoadingButton>
                 </DialogActions>
             </form>

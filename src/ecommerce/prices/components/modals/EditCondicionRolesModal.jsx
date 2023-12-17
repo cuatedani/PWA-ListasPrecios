@@ -69,15 +69,18 @@ const EditCondicionRolesModal = ({ EditCondicionRolesShowModal, setEditCondicion
             setMensajeExitoAlert(null);
 
             try {
+                console.log("<<FechaExpiraIni>>", values.FechaExpiraIni);
                 // Formatear FechaExpiraIni
-                const fechaDayjs1 = dayjs(values.FechaExpiraIni);
-                const fechaJS1 = fechaDayjs1.isValid() ? fechaDayjs1.toDate() : null;
-                values.FechaExpiraIni = fechaJS1 ? fechaJS1.toISOString() : null;
+                var fechaDayjs1 = dayjs(values.FechaExpiraIni);
+                const fechaJS1 = fechaDayjs1.toDate();
+                values.FechaExpiraIni = fechaJS1.toISOString();
 
+
+                console.log("<<FechaExpiraFin>>", values.FechaExpiraFin);
                 // Formatear FechaExpiraFin
-                const fechaDayjs2 = dayjs(values.FechaExpiraFin);
-                const fechaJS2 = fechaDayjs2.isValid() ? fechaDayjs2.toDate() : null;
-                values.FechaExpiraFin = fechaJS2 ? fechaJS2.toISOString() : null;
+                var fechaDayjs2 = dayjs(values.FechaExpiraFin);
+                const fechaJS2 = fechaDayjs2.toDate();
+                values.FechaExpiraFin = fechaJS2.toISOString();
 
                 //Equipo 2: Extraer los datos de los campos de
                 //la ventana modal que ya tiene Formik.

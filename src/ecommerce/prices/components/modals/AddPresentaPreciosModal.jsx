@@ -7,6 +7,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import {
+    showMensajeConfirm,
+    showMensajeError,
+} from "../../../../share/components/elements/messages/MySwalAlerts";
 //Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
 //Equipo 2: Helpers
@@ -103,7 +107,6 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
                 setMensajeExitoAlert("PresentaPrecios fue creado y guardado Correctamente");
             } catch (e) {
                 console.log("Error al Crear: ", e);
-                setMensajeExitoAlert(null);
                 setMensajeErrorAlert("No se pudo crear la PresentaPrecios");
             }
             //Equipo 2: Ocultamos el loading
@@ -129,7 +132,7 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
                 {/* Equipo 2: Aqui va el Titulo de la Modal */}
                 <DialogTitle>
                     <Typography>
-                        <strong>Agregar Nueva Presentacion de Precios</strong>
+                        <strong>Agregar Presentacion de Precios</strong>
                     </Typography>
                 </DialogTitle>
                 {/* Equipo 2: Aqui va un tipo de control por cada Propiedad de la Lista de Precios*/}

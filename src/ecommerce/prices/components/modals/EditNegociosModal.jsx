@@ -1,16 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { NegociosValues } from "../../helpers/NegociosValues";
+
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { NegociosValues } from "../../helpers/NegociosValues";
+
 
 const EditNegociosModal = ({ EditNegociosShowModal, setEditNegociosShowModal, RowData }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    const [Loading, setLoading] = useState(false);
+    const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
+    const [NegociosData, setNegociosData] = useState([]);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                setNegociosData(selectedPriceListData.cat_listas_negocios);
+            } catch (error) {
+                console.error("Error al cargar las Presentaciondes de Precios en useEffect de AddPresentaPreciosModla:", error);
+            }
+        }
+        fetchData();
+    }, []);
+
     const formik = useFormik({
         initialValues: {
             IdNegocioOK: RowData.IdNegocioOK,
@@ -20,19 +40,45 @@ const EditNegociosModal = ({ EditNegociosShowModal, setEditNegociosShowModal, Ro
         }),
         onSubmit: async (values) => {
 
+            setLoading(true);
             console.log("Equipo 2: Entro al onSubmit despues de hacer click en boton Editar");
+
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
+
             try {
 
                 const Negocios = NegociosValues(values);
                 console.log("<<Negocios>>", Negocios);
-                await EditOneNegocios(Negocios);
+
+                const indexToUpdate = NegociosData.findIndex(item => (
+                    item.IdNegocioOK === RowData.IdNegocioOK
+                ));
+
+                const updatedNegociosData = [...NegociosData];
+                if (indexToUpdate !== -1) {
+                    updatedNegociosData[indexToUpdate] = Negocios;
+                } else {
+                    updatedNegociosData.push(Negocios);
+                }
+
+                setNegociosData(updatedNegociosData);
+
+                const updatedSelectedPriceListData = {
+                    ...selectedPriceListData,
+                    cat_listas_negocios: updatedNegociosData,
+                };
+
+                await PatchOnePriceList(updatedSelectedPriceListData);
+
+                dispatch(SET_SELECTED_PRICELIST_DATA(updatedSelectedPriceListData));
+
                 setMensajeExitoAlert("Negocio fue editato Correctamente");
             } catch (e) {
                 setMensajeExitoAlert(null);
                 setMensajeErrorAlert("No se pudo actualizar negocio");
             }
+            setLoading(false);
         },
     });
 
@@ -95,7 +141,9 @@ const EditNegociosModal = ({ EditNegociosShowModal, setEditNegociosShowModal, Ro
                         loadingPosition="start"
                         startIcon={<CloseIcon />}
                         variant="outlined"
-                        onClick={() => setEditNegociosShowModal(false)}
+                        onClick={() => {
+                            setEditNegociosShowModal(false);
+                        }}
                     >
                         <span>CERRAR</span>
                     </LoadingButton>

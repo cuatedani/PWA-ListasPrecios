@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+//Equipo 2: React
+import React, { useState, useEffect } from "react";
+//Equipo 2: Material UI
 import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from 'dayjs';
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { CondRolCondicionValues } from "../../helpers/CondRolCondicionValues";
+//Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+//Equipo 2: Helpers
+import { CondRolCondicionValues } from "../../helpers/CondRolCondicionValues";
+//Equipo 2: Redux
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
+import { useSelector, useDispatch } from "react-redux";
 
 const EditCondRolCondicionModal = ({ EditCondRolCondicionShowModal, setEditCondRolCondicionShowModal, RowData }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");

@@ -19,7 +19,8 @@ import PatchOnePriceList from '../../services/remote/patch/PatchOnePriceList';
 import AddNegociosModal from "../modals/AddNegociosModal";
 import EditNegociosModal from "../modals/EditNegociosModal";
 //Equipo 2: Redux
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
 
 //Equipo 2: Columns Table Definition.
 const NegociosColumns = [
@@ -47,6 +48,7 @@ const NegociosTable = () => {
     const [RowData, setRowData] = useState(null);
     const [SelectedPriceListData, setSelectedPriceListData] = useState(null);
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
+    const dispatch = useDispatch();
     const priceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
 
@@ -65,6 +67,16 @@ const NegociosTable = () => {
         }
         fetchData();
     }, [priceListData]);
+
+    //Metodo Para Actualizar Data
+    const Reload = async () => {
+        setSelectedPriceListData(priceListData);
+        setNegociosData(priceListData.cat_listas_presenta_precios);
+        setLoadingTable(false);
+        setSelectedRowIndex(null);
+        setIdRowSel(null);
+        setRowData(null);
+    };
 
     //Equipo 2: Metodo para seleccionar la data de una fila
     //Este es el metodo para seleccionar la orden de la tabla
@@ -94,20 +106,27 @@ const NegociosTable = () => {
         if (res) {
             try {
                 // Filtrar los elementos distintos al que queremos eliminar
-                const updatedNegociosData = NegociosData.filter(
-                    Negocios => Negocios.IdNegocioOK !== idRowSel
-                );
+                const indexToUpdate = NegociosData.findIndex(item => (
+                    item.IdNegocioOK === RowData.IdNegocioOK
+                ));
 
-                // Actualizar el array en el objeto
+                const updatedNegociosData = [...NegociosData];
+                if (indexToUpdate !== -1) {
+                    updatedNegociosData.splice(indexToUpdate, 1); // Elimina el elemento en el índice encontrado
+                }
+
                 setNegociosData(updatedNegociosData);
 
-                SelectedPriceListData.cat_listas_negocios = NegociosData;
+                const updatedPriceListData = {
+                    ...SelectedPriceListData,
+                    cat_listas_negocios: updatedNegociosData,
+                };
 
                 // Actualizar el documento PriceList
-                await PatchOnePriceList(SelectedPriceListData.IdListaOK, SelectedPriceListData);
+                await PatchOnePriceList(updatedPriceListData);
+                dispatch(SET_SELECTED_PRICELIST_DATA(updatedPriceListData));
 
                 showMensajeConfirm("Documento Eliminado");
-                fetchData();
             } catch (e) {
                 console.error("Error al Eliminar:", e);
                 showMensajeError(`No se pudo Eliminar el Documento ${idRowSel}`);
@@ -171,7 +190,7 @@ const NegociosTable = () => {
                                     {/* ------- EDITAR ------ */}
                                     <Tooltip title="Editar">
                                         <IconButton
-                                        onClick={() => Edit()}
+                                        onClick={() => Edit(true)}
                                         >
                                             <EditIcon />
                                         </IconButton>
@@ -211,26 +230,30 @@ const NegociosTable = () => {
             </Box>
             {/* ADD MODAL */}
             <Dialog open={AddNegociosShowModal}>
-                <AddNegociosModal
+                {AddNegociosShowModal && (
+                    <AddNegociosModal
                     AddNegociosShowModal={AddNegociosShowModal}
-                    setAddNegociosShowShowModal={setAddNegociosShowModal}
-                    onClose={() => {
-                        setAddNegociosShowModal(false);
-                        fetchData();
-                    }}
-                />
+                        setAddNegociosShowModal={setAddNegociosShowModal}
+                        onClose={() => {
+                            setAddNegociosShowModal(false);
+                            Reload();
+                        }}
+                    />
+                )}
             </Dialog>
             {/* EDIT MODAL */}
             <Dialog open={EditNegociosShowModal}>
-                <EditNegociosModal
+                {EditNegociosShowModal && (
+                    <EditNegociosModal
                     EditNegociosShowModal={EditNegociosShowModal}
-                    setEditNegociosShowModal={setEditNegociosShowModal}
-                    RowData={RowData}
-                    onClose={() => {
-                        setEditNegociosShowModal(false);
-                        fetchData();
-                    }}
-                />
+                        setEditNegociosShowModal={setEditNegociosShowModal}
+                        RowData={RowData}
+                        onClose={() => {
+                            setEditNegociosShowModal(false);
+                            Reload();
+                        }}
+                    />
+                )}
             </Dialog>
         </Box>
     );

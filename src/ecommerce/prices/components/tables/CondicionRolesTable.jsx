@@ -73,8 +73,12 @@ const CondicionRolesTable = () => {
     useEffect(() => {
         async function fetchData() {
             try {
+                //Asignamos el PriceList obtenido mediante el Redux
                 setSelectedPriceListData(priceListData);
-                setCondicionRolesData(priceListData.cat_listas_condicion_roles);
+                //Obtenemos los PresentaPrecios de PriceList
+                setCondicionRolesData(priceListData?.cat_listas_condicion_roles || []);
+                
+                //Reseteamos Indices
                 setLoadingTable(false);
                 setSelectedRowIndex(null);
                 setIdRowSel(null);
@@ -87,8 +91,12 @@ const CondicionRolesTable = () => {
 
     //Metodo Para Actualizar Data
     const Reload = async () => {
+        //Asignamos el PriceList obtenido mediante el Redux
         setSelectedPriceListData(priceListData);
-        setCondicionRolesData(priceListData.cat_listas_condicion_roles);
+        //Obtenemos los PresentaPrecios de PriceList
+        setCondicionRolesData(priceListData?.cat_listas_condicion_roles || []);
+        
+        //Reseteamos Indices
         setLoadingTable(false);
         setSelectedRowIndex(null);
         setIdRowSel(null);
