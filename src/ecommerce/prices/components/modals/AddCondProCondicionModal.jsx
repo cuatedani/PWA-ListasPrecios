@@ -1,16 +1,58 @@
-import React, { useState } from "react";
+//Equipo 2: React
+import React, { useState, useEffect } from "react";
+//Equipo 2: Material UI
 import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { CondProCondicionValues } from "../../helpers/CondProCondicionValues";
+import {
+    showMensajeConfirm,
+    showMensajeError,
+} from "../../../../share/components/elements/messages/MySwalAlerts";
+//Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+//Equipo 2: Helpers
+import { CondProCondicionValues } from "../../helpers/CondProCondicionValues";
+//Equipo 2: Redux
+import { useSelector, useDispatch } from "react-redux";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
+import { SET_SELECTED_CONDICIONPRODUCTO_DATA } from "../../redux/slices/CondicionProductoSlice";
 
 const AddCondProCondicionModal = ({ AddCondProCondicionShowModal, setAddCondProCondicionShowModal }) => {
+    //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    //Equipo 2: Dispatch para actualizar la data local
+    const dispatch = useDispatch();
+    //Equipo 2: Loader
+    const [Loading, setLoading] = useState(false);
+    //Equipo2: Constantes Para Almacenar la Data de los Documentos Superiores
+    const [PriceListData, setPriceListData] = useState(null);
+    const [CondicionProductoData, setCondicionProductoData] = useState(null);
+    const [CondProCondicionData, setCondProCondicionData] = useState(null);
+    //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
+    const SelectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
+    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
+    //Equipo 2: Mediante redux obtener la data que se envió de CondicionProductoTable
+    const SelectedCondicionProductoData = useSelector((state) => state.CondicionProductoReducer.SelCondicionProductoData);
+    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", condicionProductoData);
+
+    //Equipo 2: useEffect para cargar datos
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                setCondicionProductoData(SelectedPriceListData.cat_listas_condicion_prod_serv);
+                setCondProCondicionData(SelectedCondicionProductoData.condicion);
+            } catch (error) {
+                console.error("Error al cargar los datos en useEffect de CondProCondicionModal:", error);
+            }
+        }
+        fetchData();
+    }, []);
+
+    //Equipo 2: Definición del Formik
     const formik = useFormik({
         initialValues: {
             IdEtiqueta: "",
@@ -24,6 +66,8 @@ const AddCondProCondicionModal = ({ AddCondProCondicionShowModal, setAddCondProC
             IdOpComparaValores: Yup.string().required("Campo requerido"),
             IdOpLogicoEtiqueta: Yup.string().required("Campo requerido"),
         }),
+
+        //Equipo 2: Metodo que acciona el boton
         onSubmit: async (values) => {
 
             console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
@@ -31,37 +75,52 @@ const AddCondProCondicionModal = ({ AddCondProCondicionShowModal, setAddCondProC
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
             try {
-                //Equipo 2: si fuera necesario meterle valores compuestos o no compuestos
-                //a alguns propiedades de formik por la razon que sea, se muestren o no
-                //estas propiedades en la ventana modal a travez de cualquier control.
-                //La forma de hacerlo seria:
-                //formik.values.IdInstitutoBK = `${formik.values.IdInstitutoOK}-${formik.values.IdCEDI}`;
-                //formik.values.Matriz = autoChecksSelecteds.join(",");
-
                 //Equipo 2: Extraer los datos de los campos de
                 //la ventana modal que ya tiene Formik.
-                const CondRolCondicion = CondProCondicionValues(values);
+                const CondProCon = CondProCondicionValues(values);
 
-                //Equipo 2: mandamos a consola los datos extraidos
-                console.log("<<CondProCondicion>>", CondProCondicion);
+                // Equipo 2: mandamos a consola los datos extraidos
+                //console.log("<<CondProCondicion>>", CondProCon);
 
-                //Equipo 2: llamar el metodo que desencadena toda la logica
-                //para ejecutar la API "AddOneCondProCondicion" y que previamente
-                //construye todo el JSON de la coleccion de PricesList para
-                //que pueda enviarse en el "body" de la API y determinar si
-                //la inserción fue o no exitosa.
-                await AddOneCondProCondicion(CondProCondicion);
-                //Equipo 2: si no hubo error en el metodo anterior
-                //entonces lanzamos la alerta de exito.
-                setMensajeExitoAlert("CondProCondicion fue creado y guardado Correctamente");
-                //Equipo 2: falta actualizar el estado actual (documentos/data) para que
-                //despues de insertar el nuevo instituto se visualice en la tabla,
-                //pero esto se hara en la siguiente nota.
-                //fetchDataCondProCondicion();
+                // Equipo 2: Añadir el nuevo valor a la coleccion
+                const updatedCondProCondicionData = [...CondProCondicionData, CondProCon];
+
+                // Actualizar el array en el sub-sub-documento
+                setCondProCondicionData(updatedCondProCondicionData);
+
+                // Crear un nuevo objeto con las actualizaciones del sub-documento
+                const updatedCondicionProductoData = {
+                    ...selectedCondicionProductoData,
+                    condicion: updatedCondProCondicionData,
+                };
+                console.log("Nuevo selectedCondicionProductoData: ", updatedCondicionProductoData);
+
+                // Equipo 2: Añadir la informacion actualizada del sub-documento mediante redux
+                dispatch(SET_SELECTED_CONDICIONPRODUCTO_DATA(updatedCondicionProductoData));
+
+                // Equipo 2: Actualizar el array del sub-documento
+                setCondicionProductoData(updatedCondicionProductoData);
+
+                // Crear un nuevo objeto con los cambios en el PriceList
+                const updatedPriceListData = {
+                    ...selectedPriceListData,
+                    cat_listas_condicion_prod_serv: updatedCondicionProductoData,
+                };
+                console.log("Nuevo selectedPriceListData: ", updatedPriceListData);
+
+                // Actualizar el documento PriceList en BD
+                await PatchOnePriceList(updatedPriceListData);
+
+                // Equipo 2: Añadir la informacion actualizada mediante redux
+                dispatch(SET_SELECTED_PRICELIST_DATA(updatedPriceListData));
+
+                setMensajeExitoAlert("Documento Creado Exitosamente");
             } catch (e) {
-                setMensajeExitoAlert(null);
-                setMensajeErrorAlert("No se pudo crear la CondProCondicion");
+                console.error("Error al Crear:", e);
+                setMensajeErrorAlert(`No se pudo crear CondProCondicion`);
             }
+            //Equipo 2: Ocultamos el loading
+            setLoading(false);
         },
     });
 
@@ -131,8 +190,6 @@ const AddCondProCondicionModal = ({ AddCondProCondicionShowModal, setAddCondProC
                     sx={{ display: 'flex', flexDirection: 'row' }}
                 >
                     <Box m="auto">
-                        {console.log("mensajeExitoAlert", mensajeExitoAlert)}
-                        {console.log("mensajeErrorAlert", mensajeErrorAlert)}
                         {mensajeErrorAlert && (
                             <Alert severity="error">
                                 <b>¡ERROR!</b> ─ {mensajeErrorAlert}
@@ -162,6 +219,7 @@ const AddCondProCondicionModal = ({ AddCondProCondicionShowModal, setAddCondProC
                         variant="contained"
                         type="submit"
                         disabled={!!mensajeExitoAlert}
+                        loading={Loading}
                     >
                         <span>GUARDAR</span>
                     </LoadingButton>

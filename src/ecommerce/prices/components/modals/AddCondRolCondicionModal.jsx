@@ -30,7 +30,7 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
     const [Loading, setLoading] = useState(false);
     //Equipo 2: Constantes Para Almacenar la Data de los Documentos Superiores
     const [CondicionRolesData, setCondicionRolesData] = useState(null);
-    const [CondRolCondicionData, setCondRolCondicionData] = useState(null);
+    const [CondProCondicionData, setCondProCondicionData] = useState(null);
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
@@ -43,7 +43,7 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
         async function fetchData() {
             try {
                 setCondicionRolesData(selectedPriceListData.cat_listas_condicion_roles);
-                setCondRolCondicionData(selectedCondicionRolesData.condicion);
+                setCondProCondicionData(condicionProductoData.condicion);
             } catch (error) {
                 console.error("Error al cargar las Presentaciondes de Precios en useEffect de AddPresentaPreciosModal:", error);
             }
