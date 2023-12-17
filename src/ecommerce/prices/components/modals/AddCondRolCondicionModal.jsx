@@ -7,10 +7,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import {
-    showMensajeConfirm,
-    showMensajeError,
-} from "../../../../share/components/elements/messages/MySwalAlerts";
 //Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
 //Equipo 2: Helpers
@@ -30,7 +26,7 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
     const [Loading, setLoading] = useState(false);
     //Equipo 2: Constantes Para Almacenar la Data de los Documentos Superiores
     const [CondicionRolesData, setCondicionRolesData] = useState(null);
-    const [CondProCondicionData, setCondProCondicionData] = useState(null);
+    const [CondRolCondicionData, setCondRolCondicionData] = useState(null);
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
@@ -43,7 +39,7 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
         async function fetchData() {
             try {
                 setCondicionRolesData(selectedPriceListData.cat_listas_condicion_roles);
-                setCondProCondicionData(condicionProductoData.condicion);
+                setCondRolCondicionData(selectedCondicionRolesData.condicion);
             } catch (error) {
                 console.error("Error al cargar las Presentaciondes de Precios en useEffect de AddPresentaPreciosModal:", error);
             }

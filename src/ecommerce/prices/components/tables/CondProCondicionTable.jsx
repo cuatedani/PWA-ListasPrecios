@@ -174,7 +174,7 @@ const CondProCondicionTable = () => {
                     // Crear un nuevo objeto con las actualizaciones del sub-documento
                     const updatedCondicionProductoData = {
                         ...SelectedCondicionProductoData,
-                        condicion: updatedCondRolCondicionData,
+                        condicion: updatedCondProCondicionData,
                     };
                     console.log("Nuevo CondicionProductoData: ", updatedCondicionProductoData);
 
@@ -200,7 +200,7 @@ const CondProCondicionTable = () => {
                     showMensajeConfirm("Documento Eliminado");
                 } catch (e) {
                     console.error("Error al Eliminar:", e);
-                    showMensajeError(`No se pudo Eliminar el Documento ${idRowSel}`);
+                    showMensajeError(`No se pudo Eliminar el Documento <<SELECCIONADO>>`);
                 }
             }
         }

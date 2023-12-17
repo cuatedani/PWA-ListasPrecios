@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 //Equipo 2: Material UI
 import { MaterialReactTable } from 'material-react-table';
-import { Box, Stack, Tooltip, Button, IconButton, Dialog } from "@mui/material";
+import { Box, Stack, Tooltip, IconButton, Dialog } from "@mui/material";
 import { MRT_Localization_ES } from "material-react-table/locales/es";
 import { darken } from '@mui/system';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -13,13 +13,16 @@ import {
     showMensajeConfirm,
     showMensajeError,
 } from "../../../../share/components/elements/messages/MySwalAlerts";
-//Equipo 2: DB
+//Equipo 2: Services
 import PatchOnePriceList from '../../services/remote/patch/PatchOnePriceList';
 //Equipo 2: Modals
 import AddCondProConValoresModal from "../modals/AddCondProConValoresModal";
 import EditCondProConValoresModal from "../modals/EditCondProConValoresModal";
 //Equipo 2: Redux
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
+import { SET_SELECTED_CONDICIONPRODUCTO_DATA } from "../../redux/slices/CondicionProductoSlice";
+import { SET_SELECTED_CONDPROCONDICION_DATA } from "../../redux/slices/CondProCondicionSlice";
 
 //Equipo 2: Columns Table Definition.
 const CondProConValoresColumns = [
@@ -35,7 +38,6 @@ const CondProConValoresColumns = [
     },
 ];
 
-
 //Equipo 2: Table - FrontEnd.
 const CondProConValoresTable = () => {
     //Equipo 2: controlar el estado del indicador (loading).
@@ -50,6 +52,9 @@ const CondProConValoresTable = () => {
     const [selectedRowIndex, setSelectedRowIndex] = useState(null);
     const [idRowSel, setIdRowSel] = useState(null);
     const [RowData, setRowData] = useState(null);
+
+    //Equipo 2: Dispatch para actualizar la data local
+    const dispatch = useDispatch();
 
     //Equipo 2: controlar el estado de la data de CondicionProducto.
     const [CondicionProductoData, setCondicionProductoData] = useState([]);
@@ -104,6 +109,29 @@ const CondProConValoresTable = () => {
         fetchData();
     }, [priceListData, condicionProductoData, condProCondicionData]);
 
+    //Metodo Para Actualizar Data
+    const Reload = async () => {
+        //Asignamos el PriceList obtenido mediante el Redux
+        setSelectedPriceListData(priceListData);
+        //Obtenemos los CondicionProducto de PriceList
+        setCondicionProductoData(priceListData.cat_listas_condicion_prod_serv);
+
+        //Asignamos el CondicionProducto obtenido mediante el Redux
+        setSelectedCondicionProductoData(condicionProductoData);
+        //Obtenemos los CondProCondicion del CondicionProducto
+        setCondProCondicionData(condicionProductoData.condicion);
+
+        //Asignamos el CondProCondicion obtenido mediante el Redux
+        setSelectedCondProCondicionData(condProCondicionData);
+        //Obtenemos los CondProConValores del CondProCondicion
+        setCondProConValoresData(condProCondicionData.Valores);
+
+        setLoadingTable(false);
+        setSelectedRowIndex(null);
+        setIdRowSel(null);
+        setRowData(null);
+    };
+
     //Equipo 2: Metodo para seleccionar la data de una fila
     //Este es el metodo para seleccionar la orden de la tabla
     useEffect(() => {
@@ -126,42 +154,83 @@ const CondProConValoresTable = () => {
 
     //Equipo 2: Metodo para eliminar un Negocios
     const Delete = async () => {
-        const res = await showMensajeConfirm(
-            `¿Estás seguro de eliminar el documento: ${idRowSel}? No podrás revertir esta acción. ¿Deseas continuar?`
-        );
+        if (RowData) {
+            const res = await showMensajeConfirm(
+                `¿Estás seguro de eliminar el documento <<SELECCIONADO>>? No podrás revertir esta acción. ¿Deseas continuar?`
+            );
 
-        if (res) {
-            try {
-                // Filtrar los elementos distintos al que queremos eliminar
-                const updatedCondProConValoresData = CondProConValoresData.filter(
-                    Valores => Valores !== RowData
-                );
+            if (res) {
+                try {
+                    //CondProCondicion
+                    // Equipo 2: Encuentra el índice del elemento en CondProCondicionData que coincide con RowData
+                    const indexToUpdate = CondProConValoresData.findIndex(item => (
+                        item.valor === RowData.valor
+                        && item.IdComparaValor === RowData.IdComparaValor
+                    ));
 
-                // Actualizar el array en el objeto
-                setCondProConValoresData(updatedCondProConValoresData);
-                SelectedCondProdCondicionData.Valores = CondProConValoresData;
+                    // Equipo 2: Si se encuentra el índice, elimina ese elemento
+                    const updatedCondProConValoresData = [...CondProCondicionData];
+                    if (indexToUpdate !== -1) {
+                        // Elimina el elemento en el índice encontrado
+                        updatedCondProConValoresData.splice(indexToUpdate, 1);
+                    }
 
-                // Actualizar el array en el objeto
-                setCondProCondicionData(SelectedCondProdCondicionData);
-                SelectedCondicionProductoData.condicion = CondProCondicionData;
+                    // Actualizar el array en el sub-sub-documento
+                    setCondProConValoresData(updatedCondProConValoresData);
 
-                // Actualizar el array en el objeto
-                setCondicionProductoData(SelectedCondicionProductoData);
-                SelectedPriceListData.cat_listas_condicion_prod_serv = CondicionProductoData;
+                    // Crear un nuevo objeto con las actualizaciones del sub-documento
+                    const updatedCondProCondicionData = {
+                        ...SelectedCondicionProductoData,
+                        Valores: updatedCondProConValoresData,
+                    };
+                    console.log("Nuevo CondicionProductoData: ", updatedCondProCondicionData);
 
-                // Actualizar el documento PriceList
-                await PatchOnePriceList(SelectedPriceListData.IdListaOK, SelectedPriceListData);
+                    // Equipo 2: Añadir la informacion actualizada del sub-documento mediante redux
+                    dispatch(SET_SELECTED_CONDPROCONDICION_DATA(updatedCondProCondicionData));
 
-                showMensajeConfirm("Documento Eliminado");
-                fetchData();
-            } catch (e) {
-                console.error("Error al Eliminar:", e);
-                showMensajeError(`No se pudo Eliminar el Documento ${idRowSel}`);
+                    // Actualizar el array en el sub-sub-documento
+                    setCondProCondicionData(updatedCondProCondicionData);
+
+                    // Crear un nuevo objeto con las actualizaciones del sub-documento
+                    const updatedCondicionProductoData = {
+                        ...SelectedCondicionProductoData,
+                        condicion: updatedCondProCondicionData,
+                    };
+                    console.log("Nuevo CondicionProductoData: ", updatedCondicionProductoData);
+
+                    // Equipo 2: Añadir la informacion actualizada del sub-documento mediante redux
+                    dispatch(SET_SELECTED_CONDICIONPRODUCTO_DATA(updatedCondicionProductoData));
+
+                    // Equipo 2: Actualizar el array del sub-documento
+                    setCondicionProductoData(updatedCondicionProductoData);
+
+                    // Crear un nuevo objeto con los cambios en el PriceList
+                    const updatedPriceListData = {
+                        ...SelectedPriceListData,
+                        cat_listas_condicion_prod_serv: updatedCondicionProductoData,
+                    };
+                    console.log("Nuevo selectedPriceListData: ", updatedPriceListData);
+                    
+                    // Actualizar el documento PriceList en BD
+                    await PatchOnePriceList(updatedPriceListData);
+
+                    // Equipo 2: Añadir la informacion actualizada mediante redux
+                    dispatch(SET_SELECTED_PRICELIST_DATA(updatedPriceListData));
+
+                    showMensajeConfirm("Documento Eliminado");
+                } catch (e) {
+                    console.error("Error al Eliminar:", e);
+                    showMensajeError(`No se pudo Eliminar el Documento <<SELECCIONADO>>`);
+                }
             }
         }
+        else {
+            await showMensajeConfirm(`Primero Seleccione una Fila`);
+        }
+        Reload();
     };
 
-    //Equipo 2: Metodo para editar un Negocio
+    //Equipo 2: Metodo para editar un CondProConValores
     const Edit = async () => {
         if (RowData) {
             setEditCondProConValoresShowModal(true)
@@ -206,30 +275,34 @@ const CondProConValoresTable = () => {
                             {/* ------- BARRA DE ACCIONES ------ */}
                             <Stack direction="row" sx={{ m: 1 }}>
                                 <Box>
+                                    {/* ------- AGREGAR ------ */}
                                     <Tooltip title="Agregar">
                                         <IconButton
-                                        onClick={() => setAddCondProConValoresShowModal(true)}
+                                            onClick={() => setAddCondProConValoresShowModal(true)}
                                         >
                                             <AddCircleIcon />
                                         </IconButton>
                                     </Tooltip>
+                                    {/* ------- EDITAR ------ */}
                                     <Tooltip title="Editar">
                                         <IconButton
-                                        onClick={() => Edit()}
+                                            onClick={() => Edit()}
                                         >
                                             <EditIcon />
                                         </IconButton>
                                     </Tooltip>
+                                    {/* ------- ELIMINAR ------ */}
                                     <Tooltip title="Eliminar">
                                         <IconButton
-                                        onClick={() => Delete()}
+                                            onClick={() => Delete()}
                                         >
                                             <DeleteIcon />
                                         </IconButton>
                                     </Tooltip>
+                                    {/* ------- DETALLES ------ */}
                                     <Tooltip title="Detalles ">
                                         <IconButton
-                                        onClick={() => Details()}
+                                            onClick={() => Details()}
                                         >
                                             <InfoIcon />
                                         </IconButton>
@@ -254,26 +327,28 @@ const CondProConValoresTable = () => {
             {/* M O D A L E S */}
             {/* ADD MODAL */}
             <Dialog open={AddCondProConValoresShowModal}>
-                <AddCondProConValoresModal
-                    AddCondProConValoresShowModal={AddCondProConValoresShowModal}
-                    setAddCondProConValoresShowModal={setAddCondProConValoresShowModal}
-                    onClose={() => {
-                        setAddCondProConValoresShowModal(false);
-                        fetchData();
-                    }}
-                />
+                {AddCondProConValoresShowModal && (
+                    <AddCondProConValoresModal
+                        AddCondProConValoresShowModal={AddCondProConValoresShowModal}
+                        setAddCondProConValoresShowModal={setAddCondProConValoresShowModal}
+                        onClose={() => {
+                            setAddCondProConValoresShowModal(false);
+                            Reload();
+                        }}
+                    />)}
             </Dialog>
             {/* EDIT MODAL */}
             <Dialog open={EditCondProConValoresShowModal}>
-                <EditCondProConValoresModal
-                    EditCondProConValoresShowModal={EditCondProConValoresShowModal}
-                    setEditCondProConValoresShowModal={setEditCondProConValoresShowModal}
-                    RowData={RowData}
-                    onClose={() => {
-                        setEditCondProConValoresShowModal(false);
-                        fetchData();
-                    }}
-                />
+                {EditCondProConValoresShowModal(
+                    <EditCondProConValoresModal
+                        EditCondProConValoresShowModal={EditCondProConValoresShowModal}
+                        setEditCondProConValoresShowModal={setEditCondProConValoresShowModal}
+                        RowData={RowData}
+                        onClose={() => {
+                            setEditCondProConValoresShowModal(false);
+                            Reload();
+                        }}
+                    />)}
             </Dialog>
         </Box>
     );

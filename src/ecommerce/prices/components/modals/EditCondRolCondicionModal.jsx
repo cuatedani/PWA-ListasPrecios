@@ -14,12 +14,41 @@ import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
 //Equipo 2: Helpers
 import { CondRolCondicionValues } from "../../helpers/CondRolCondicionValues";
 //Equipo 2: Redux
-import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
 import { useSelector, useDispatch } from "react-redux";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
+import { SET_SELECTED_CONDICIONROLES_DATA } from "../../redux/slices/CondicionRolesSlice";
 
 const EditCondRolCondicionModal = ({ EditCondRolCondicionShowModal, setEditCondRolCondicionShowModal, RowData }) => {
+    //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    //Equipo 2: Dispatch para actualizar la data local
+    const dispatch = useDispatch();
+    //Equipo 2: Loader
+    const [Loading, setLoading] = useState(false);
+    //Equipo 2: Constantes Para Almacenar la Data de los Documentos Superiores
+    const [CondicionRolesData, setCondicionRolesData] = useState(null);
+    const [CondRolCondicionData, setCondRolCondicionData] = useState(null);
+    //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
+    const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
+    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
+    //Equipo 2: Mediante redux obtener la data que se envió de CondicionRolesTable
+    const selectedCondicionRolesData = useSelector((state) => state.CondicionRolesReducer.SelCondicionRolesData);
+    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", condicionRolesData);
+
+    //Equipo 2: useEffect para cargar datos
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                setCondicionRolesData(selectedPriceListData.cat_listas_condicion_roles);
+                setCondRolCondicionData(selectedCondicionRolesData.condicion);
+            } catch (error) {
+                console.error("Error al cargar las Presentaciondes de Precios en useEffect de AddPresentaPreciosModal:", error);
+            }
+        }
+        fetchData();
+    }, []);
+
     const formik = useFormik({
         initialValues: {
             IdTipoCondicionOK: RowData.IdTipoCondicionOK,
@@ -33,6 +62,7 @@ const EditCondRolCondicionModal = ({ EditCondRolCondicionShowModal, setEditCondR
             Valor: Yup.string().required("Campo requerido"),
             Secuecia: Yup.string().required("Campo requerido"),
         }),
+
         onSubmit: async (values) => {
 
             console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
@@ -40,14 +70,65 @@ const EditCondRolCondicionModal = ({ EditCondRolCondicionShowModal, setEditCondR
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
             try {
-                const CondRolSecuecia = CondRolCondicionValues(values);
-                console.log("<<CondRolCondicion>>", CondRolCondicion);
-                await EditOneCondRolCondicion(CondRolCondicion);
-                setMensajeExitoAlert("CondRolCondicion fue creado y guardado Correctamente");
+                //Equipo 2: Extraer los datos de los campos de
+                //la ventana modal que ya tiene Formik.
+                const CondRolCon = CondRolCondicionValues(values);
+
+                // Equipo 2: mandamos a consola los datos extraidos
+                console.log("<<PresentaPrecio>>", PresentaPrecio);
+
+                // Equipo 2: Encuentra el índice del elemento en CondicionRolCondicionData que coincide con RowData
+                const indexToUpdate = CondRolCondicionData.findIndex(item => (
+                    item.IdTipoCondicionOK === RowData.IdTipoCondicionOK
+                    && item.IdTipoOperadorOK === RowData.IdTipoOperadorOK
+                    && item.Valor === RowData.Valor
+                    && item.Secuecia === RowData.Secuecia
+                ));
+
+                // Equipo 2: Si se encuentra el índice, actualiza ese elemento, si no, agrega uno nuevo
+                const updatedCondRolCondicionData = [...CondRolCondicionData];
+                if (indexToUpdate !== -1) {
+                    updatedCondRolCondicionData[indexToUpdate] = CondRolCon;
+                } else {
+                    updatedCondRolCondicionData.push(CondRolCon);
+                }
+
+                // Actualizar el array en el sub-sub-documento
+                setCondRolCondicionData(updatedCondRolCondicionData);
+
+                // Crear un nuevo objeto con las actualizaciones del sub-documento
+                const updatedCondicionRolesData = {
+                    ...selectedCondicionRolesData,
+                    condicion: updatedCondRolCondicionData,
+                };
+                console.log("Nuevo selectedPriceListData: ", updatedCondicionRolesData);
+
+                // Equipo 2: Añadir la informacion actualizada del sub-documento mediante redux
+                dispatch(SET_SELECTED_CONDICIONROLES_DATA(updatedCondicionRolesData));
+
+                // Equipo 2: Actualizar el array del sub-documento
+                setCondicionRolesData(updatedCondicionRolesData);
+
+                // Crear un nuevo objeto con los cambios en el PriceList
+                const updatedPriceListData = {
+                    ...selectedPriceListData,
+                    cat_listas_condicion_roles: updatedCondicionRolesData,
+                };
+                console.log("Nuevo selectedPriceListData: ", updatedPriceListData);
+
+                // Actualizar el documento PriceList en BD
+                await PatchOnePriceList(updatedPriceListData);
+
+                // Equipo 2: Añadir la informacion actualizada mediante redux
+                dispatch(SET_SELECTED_PRICELIST_DATA(updatedPriceListData));
+
+                setMensajeExitoAlert("Documento Modificado Exitosamente");
             } catch (e) {
-                setMensajeExitoAlert(null);
-                setMensajeErrorAlert("No se pudo crear la CondRolCondicion");
+                console.error("Error al Modificar:", e);
+                setMensajeErrorAlert(`No se pudo modificar ConRolCondicion`);
             }
+            //Equipo 2: Ocultamos el loading
+            setLoading(false);
         },
     });
 
@@ -145,6 +226,7 @@ const EditCondRolCondicionModal = ({ EditCondRolCondicionShowModal, setEditCondR
                         variant="contained"
                         type="submit"
                         disabled={!!mensajeExitoAlert}
+                        loading={Loading}
                     >
                         <span>MODIFICAR</span>
                     </LoadingButton>

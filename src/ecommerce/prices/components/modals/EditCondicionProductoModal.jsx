@@ -56,7 +56,7 @@ const EditCondicionProductoModal = ({ EditCondicionProductoShowModal, setEditCon
         //Equipo 2: Metodo que acciona el boton
         onSubmit: async (values) => {
 
-            console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
+            console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Modificar");
             //Equipo 2: reiniciamos los estados de las alertas de exito y error.
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);

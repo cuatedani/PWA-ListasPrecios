@@ -1,16 +1,65 @@
-import React, { useState } from "react";
+//Equipo 2: React
+import React, { useState, useEffect } from "react";
+//Equipo 2: Material UI
 import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { CondProConValoresValues } from "../../helpers/CondProConValoresValues";
+//Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+//Equipo 2: Helpers
+import { CondProConValoresValues } from "../../helpers/CondProConValoresValues";
+//Equipo 2: Redux
+import { useSelector, useDispatch } from "react-redux";
+import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
+import { SET_SELECTED_CONDICIONROLES_DATA } from "../../redux/slices/CondicionRolesSlice";
+import { SET_SELECTED_CONDPROCONDICION_DATA } from "../../redux/slices/CondProCondicionSlice";
 
 const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondProConValoresShowModal }) => {
+    //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    //Equipo 2: Dispatch para actualizar la data local
+    const dispatch = useDispatch();
+    //Equipo 2: Loader
+    const [Loading, setLoading] = useState(false);
+
+    //Equipo 2: controlar el estado de la data de CondicionProducto.
+    const [CondicionProductoData, setCondicionProductoData] = useState([]);
+    //Equipo 2: controlar el estado de la data de CondProCondicion.
+    const [CondProCondicionData, setCondProCondicionData] = useState([]);
+    //Equipo 2: controlar el estado de la data de PriceList.
+    const [CondProConValoresData, setCondProConValoresData] = useState(null);
+    
+    //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
+    const priceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
+    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
+
+    //Equipo 2: Mediante redux obtener la data que se envió de CondicionProductoTable
+    const condicionProductoData = useSelector((state) => state.CondicionProductoReducer.SelCondicionProductoData);
+    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", condicionProductoData);
+
+    //Equipo 2: Mediante redux obtener la data que se envió de CondProCondicionTable
+    const condProCondicionData = useSelector((state) => state.CondProCondicionReducer.SelCondProCondicionData);
+    //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", condProCondicionData);
+
+    //Equipo 2: useEffect para cargar datos
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                setCondicionProductoData(priceListData.cat_listas_condicion_prod_serv);
+                setCondProCondicionData(condicionProductoData.condicion);
+                setCondProConValoresData(condProCondicionData.Valores);
+            } catch (error) {
+                console.error("Error al cargar los datos en useEffect de AddCondProConValoresModal:", error);
+            }
+        }
+        fetchData();
+    }, []);
+
+    //Equipo 2: Definición del Formik
     const formik = useFormik({
         initialValues: {
             valor: "",
@@ -20,6 +69,8 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
             valor: Yup.string().required("Campo requerido"),
             IdComparaValor: Yup.string().required("Campo requerido")
         }),
+        
+        //Equipo 2: Metodo que acciona el boton
         onSubmit: async (values) => {
 
             console.log("Equipo 2: entro al onSubmit despues de hacer click en boton Guardar");
@@ -27,37 +78,65 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
             setMensajeErrorAlert(null);
             setMensajeExitoAlert(null);
             try {
-                //Equipo 2: si fuera necesario meterle valores compuestos o no compuestos
-                //a alguns propiedades de formik por la razon que sea, se muestren o no
-                //estas propiedades en la ventana modal a travez de cualquier control.
-                //La forma de hacerlo seria:
-                //formik.values.IdInstitutoBK = `${formik.values.IdInstitutoOK}-${formik.values.IdCEDI}`;
-                //formik.values.Matriz = autoChecksSelecteds.join(",");
-
                 //Equipo 2: Extraer los datos de los campos de
                 //la ventana modal que ya tiene Formik.
-                const CondProConValores = CondProConValoresValues(values);
+                const CondProConValor = CondRolCondicionValues(values);
 
-                //Equipo 2: mandamos a consola los datos extraidos
-                console.log("<<CondProConValores>>", CondProConValores);
+                // Equipo 2: mandamos a consola los datos extraidos
+                //console.log("<<CondProConValor>>", CondProConValor);
 
-                //Equipo 2: llamar el metodo que desencadena toda la logica
-                //para ejecutar la API "AddOneCondProConValores" y que previamente
-                //construye todo el JSON de la coleccion de PricesList para
-                //que pueda enviarse en el "body" de la API y determinar si
-                //la inserción fue o no exitosa.
-                await AddOneCondProConValores(CondProConValores);
-                //Equipo 2: si no hubo error en el metodo anterior
-                //entonces lanzamos la alerta de exito.
-                setMensajeExitoAlert("CondProConValores fue creado y guardado Correctamente");
-                //Equipo 2: falta actualizar el estado actual (documentos/data) para que
-                //despues de insertar el nuevo instituto se visualice en la tabla,
-                //pero esto se hara en la siguiente nota.
-                //fetchDataCondProConValores();
+                // Equipo 2: Añadir el nuevo valor a la coleccion
+                const updatedCondProConValoresData = [...CondProConValoresData, CondProConValor];
+
+                // Actualizar el array en el sub-sub-documento
+                setCondProConValoresData(updatedCondProConValoresData);
+
+                // Crear un nuevo objeto con las actualizaciones del sub-documento
+                const updatedCondProCondicionData = {
+                    ...SelectedCondicionProductoData,
+                    Valores: updatedCondProConValoresData,
+                };
+                console.log("Nuevo CondicionProductoData: ", updatedCondProCondicionData);
+
+                // Equipo 2: Añadir la informacion actualizada del sub-documento mediante redux
+                dispatch(SET_SELECTED_CONDPROCONDICION_DATA(updatedCondProCondicionData));
+
+                // Actualizar el array en el sub-sub-documento
+                setCondProCondicionData(updatedCondProCondicionData);
+
+                // Crear un nuevo objeto con las actualizaciones del sub-documento
+                const updatedCondicionProductoData = {
+                    ...SelectedCondicionProductoData,
+                    condicion: updatedCondProCondicionData,
+                };
+                console.log("Nuevo CondicionProductoData: ", updatedCondicionProductoData);
+
+                // Equipo 2: Añadir la informacion actualizada del sub-documento mediante redux
+                dispatch(SET_SELECTED_CONDICIONPRODUCTO_DATA(updatedCondicionProductoData));
+
+                // Equipo 2: Actualizar el array del sub-documento
+                setCondicionProductoData(updatedCondicionProductoData);
+
+                // Crear un nuevo objeto con los cambios en el PriceList
+                const updatedPriceListData = {
+                    ...SelectedPriceListData,
+                    cat_listas_condicion_prod_serv: updatedCondicionProductoData,
+                };
+                console.log("Nuevo selectedPriceListData: ", updatedPriceListData);
+                
+                // Actualizar el documento PriceList en BD
+                await PatchOnePriceList(updatedPriceListData);
+
+                // Equipo 2: Añadir la informacion actualizada mediante redux
+                dispatch(SET_SELECTED_PRICELIST_DATA(updatedPriceListData));
+
+                setMensajeExitoAlert("Documento Creado Exitosamente");
             } catch (e) {
-                setMensajeExitoAlert(null);
-                setMensajeErrorAlert("No se pudo crear la CondProConValores");
+                console.error("Error al Crear:", e);
+                setMensajeErrorAlert(`No se pudo crear CondProConValores`);
             }
+            //Equipo 2: Ocultamos el loading
+            setLoading(false);
         },
     });
 
@@ -79,7 +158,7 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
                 {/* Equipo 2: Aqui va el Titulo de la Modal */}
                 <DialogTitle>
                     <Typography>
-                        <strong>Agregar Nuevos Valores</strong>
+                        <strong>Agregar Valor</strong>
                     </Typography>
                 </DialogTitle>
                 {/* Equipo 2: Aqui va un tipo de control por cada Propiedad de la Lista de Precios*/}
@@ -111,8 +190,6 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
                     sx={{ display: 'flex', flexDirection: 'row' }}
                 >
                     <Box m="auto">
-                        {console.log("mensajeExitoAlert", mensajeExitoAlert)}
-                        {console.log("mensajeErrorAlert", mensajeErrorAlert)}
                         {mensajeErrorAlert && (
                             <Alert severity="error">
                                 <b>¡ERROR!</b> ─ {mensajeErrorAlert}
@@ -142,6 +219,7 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
                         variant="contained"
                         type="submit"
                         disabled={!!mensajeExitoAlert}
+                        loading={Loading}
                     >
                         <span>GUARDAR</span>
                     </LoadingButton>
