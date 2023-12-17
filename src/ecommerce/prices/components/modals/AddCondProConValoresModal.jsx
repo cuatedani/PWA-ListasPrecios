@@ -14,7 +14,7 @@ import { CondProConValoresValues } from "../../helpers/CondProConValoresValues";
 //Equipo 2: Redux
 import { useSelector, useDispatch } from "react-redux";
 import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
-import { SET_SELECTED_CONDICIONROLES_DATA } from "../../redux/slices/CondicionRolesSlice";
+import { SET_SELECTED_CONDICIONPRODUCTO_DATA } from "../../redux/slices/CondicionProductoSlice";
 import { SET_SELECTED_CONDPROCONDICION_DATA } from "../../redux/slices/CondProCondicionSlice";
 
 const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondProConValoresShowModal }) => {

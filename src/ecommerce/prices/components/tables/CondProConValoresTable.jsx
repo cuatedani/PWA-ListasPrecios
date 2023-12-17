@@ -339,7 +339,7 @@ const CondProConValoresTable = () => {
             </Dialog>
             {/* EDIT MODAL */}
             <Dialog open={EditCondProConValoresShowModal}>
-                {EditCondProConValoresShowModal(
+                {EditCondProConValoresShowModal &&(
                     <EditCondProConValoresModal
                         EditCondProConValoresShowModal={EditCondProConValoresShowModal}
                         setEditCondProConValoresShowModal={setEditCondProConValoresShowModal}
