@@ -81,6 +81,7 @@ const PresentaPreciosTable = () => {
                 setSelectedPriceListData(priceListData);
                 //Obtenemos los PresentaPrecios de PriceList
                 setPresentaPreciosData(priceListData?.cat_listas_presenta_precios || []);
+                console.log(PresentaPreciosData);
 
                 //Reseteamos Indices
                 setLoadingTable(false);
