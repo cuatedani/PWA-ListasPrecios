@@ -12,14 +12,19 @@ import * as Yup from "yup";
 import { PriceListValues } from "../../helpers/PriceListValues";
 import { AddOnePriceList } from "../../../prices/services/remote/post/AddOnePriceList";
 import getAllInstitutes from "../../../prices/services/remote/get/getAllInstitutes";
-import GetAllLabels from "../../../prices/services/remote/get/getAllLabels";
+import getAllPricesList from '../../services/remote/get/getAllPricesList';
+import getAllLabels from "../../../prices/services/remote/get/getAllLabels";
 import { v4 as genID } from "uuid";
 
-const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal, onClose }) => {
+const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) => {
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+
     const [InstitutesValues, setInstitutesValues] = useState([]);
     const [TipoListaValues, setTipoListaValues] = useState([]);
+    const [TipoFormulaValues, setTipoFormulaValues] = useState([]);
+    const [ListaBaseValues, setListaBaseValues] = useState([]);
+
     const [Loading, setLoading] = useState(false);
     const [IdGen, setIdGen] = useState(
         genID().replace(/-/g, "").substring(0, 12)
@@ -27,7 +32,8 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal, on
 
     useEffect(() => {
         getDataSelectInstitutes();
-        getDataSelectTipoLista();
+        getDataSelectEtiquetas();
+        getDataSelectPriceList();
     }, []);
 
     //Equipo 2: Ejecutamos la API que obtiene todos los institutos.
@@ -41,15 +47,33 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal, on
     }
 
     //Equipo 2: Ejecutamos la API que obtiene todos los Etiquetas.
-    async function getDataSelectTipoLista() {
+    async function getDataSelectEtiquetas() {
         try {
-            const Labels = await GetAllLabels();
-            const values = Labels.find(
+            //Obtenemos todas las etiquetas
+            const Labels = await getAllLabels();
+            //Obtenemosa las Etiquetas IdTipoListasPrecios
+            const TipoLista = Labels.find(
                 (Labels) => Labels.IdEtiquetaOK === "IdTipoListasPrecios"
             );
-            setTipoListaValues(values.valores);
+            setTipoListaValues(TipoLista.valores);
+
+            //Obtenemosa las Etiquetas IdTipoListasPrecios
+            const TipoFormula = Labels.find(
+                (Labels) => Labels.IdEtiquetaOK === "IdTipoFormula"
+            );
+            setTipoFormulaValues(TipoFormula.valores);
         } catch (e) {
             console.error("Error al obtener Etiquetas para Tipos de Lista:", e);
+        }
+    }
+
+    // Equipo 2: Ejecutamos la API que obtiene las listas de Precio.
+    async function getDataSelectPriceList() {
+        try {
+            const Prices = await getAllPricesList();
+            setListaBaseValues(Prices);
+        } catch (e) {
+            console.error("Error al obtener Listas de Precio:", e);
         }
     }
 
@@ -119,7 +143,6 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal, on
             open={AddPriceListShowModal}
             onClose={() => {
                 setAddPriceListShowModal(false);
-                onClose();
             }}
             fullWidth
         >
@@ -244,22 +267,50 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal, on
                         error={formik.touched.IdTipoGeneraListaOK && Boolean(formik.errors.IdTipoGeneraListaOK)}
                         helperText={formik.touched.IdTipoGeneraListaOK && formik.errors.IdTipoGeneraListaOK}
                     />
-                    <TextField
-                        id="IdListaBaseOK"
-                        label="IdListaBaseOK*"
+                    <Select
                         value={formik.values.IdListaBaseOK}
-                        {...commonTextFieldProps}
+                        label="Selecciona una Lista Base:"
+                        name="IdListaBaseOK"
+                        onBlur={formik.handleBlur}
+                        disabled={!!mensajeExitoAlert}
                         error={formik.touched.IdListaBaseOK && Boolean(formik.errors.IdListaBaseOK)}
-                        helperText={formik.touched.IdListaBaseOK && formik.errors.IdListaBaseOK}
-                    />
-                    <TextField
-                        id="IdTipoFormulaOK"
-                        label="IdTipoFormulaOK*"
+                        onChange={(e) => {
+                            const selectedListaBase = e.target.value;
+                            formik.setFieldValue("IdListaBaseOK", selectedListaBase);
+                            formik.handleChange(e);
+                        }}
+                    >
+                        {ListaBaseValues.map((tipo) => (
+                            <MenuItem
+                                value={tipo.IdListaOK}
+                                key={tipo.IdListaBK}
+                            >
+                                {tipo.IdListaBK}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <Select
                         value={formik.values.IdTipoFormulaOK}
-                        {...commonTextFieldProps}
+                        label="Selecciona un Tipo de Formula:"
+                        name="IdTipoFormulaOK"
+                        onBlur={formik.handleBlur}
+                        disabled={!!mensajeExitoAlert}
                         error={formik.touched.IdTipoFormulaOK && Boolean(formik.errors.IdTipoFormulaOK)}
-                        helperText={formik.touched.IdTipoFormulaOK && formik.errors.IdTipoFormulaOK}
-                    />
+                        onChange={(e) => {
+                            const selectedTipoFormula = e.target.value;
+                            formik.setFieldValue("IdTipoFormulaOK", selectedTipoFormula);
+                            formik.handleChange(e);
+                        }}
+                    >
+                        {TipoFormulaValues.map((tipo) => (
+                            <MenuItem
+                                value={tipo.IdValorOK}
+                                key={tipo.Valor}
+                            >
+                                {tipo.Valor}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 </DialogContent>
                 {/* Equipo 2: Aqui van las acciones del usuario como son las alertas o botones */}
                 <DialogActions
@@ -285,7 +336,6 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal, on
                         variant="outlined"
                         onClick={() => {
                             setAddPriceListShowModal(false);
-                            onClose();
                         }}
                     >
                         <span>CERRAR</span>

@@ -257,20 +257,29 @@ const PricesListTable = () => {
             {/* M O D A L E S */}
             {/* ADD MODAL */}
             <Dialog open={AddPriceListShowModal}>
-                <AddPriceListModal
-                    AddPriceListShowModal={AddPriceListShowModal}
-                    setAddPriceListShowModal={setAddPriceListShowModal}
-                    onClose={Reload}
-                />
+                {AddPriceListShowModal && (
+                    <AddPriceListModal
+                        AddPriceListShowModal={AddPriceListShowModal}
+                        setAddPriceListShowModal={setAddPriceListShowModal}
+                        onClose={() => {
+                            setAddPriceListShowModal(false);
+                            Reload();
+                        }}
+                    />
+                )}
             </Dialog>
             {/* EDIT MODAL */}
             <Dialog open={EditPriceListShowModal}>
-                <EditPriceListModal
+                {EditPriceListShowModal && (<EditPriceListModal
                     EditPriceListShowModal={EditPriceListShowModal}
                     setEditPriceListShowModal={setEditPriceListShowModal}
                     RowData={RowData}
-                    onClose={Reload}
+                    onClose={() => {
+                        setEditPriceListShowModal(false);
+                        Reload();
+                    }}
                 />
+                )}
             </Dialog>
         </Box>
     );

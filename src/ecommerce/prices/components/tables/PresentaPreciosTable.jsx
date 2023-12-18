@@ -26,7 +26,7 @@ import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice"
 const PresentaPreciosColumns = [
     {
         accessorKey: "IdProdServOK",
-        header: "PRODUCTO SERVICIO",
+        header: "PRODUCTO",
         size: 150, //small column
     },
     {

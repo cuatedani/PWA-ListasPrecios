@@ -16,7 +16,7 @@ import { CondProConValoresValues } from "../../helpers/CondProConValoresValues";
 //Equipo 2: Redux
 import { useSelector, useDispatch } from "react-redux";
 import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice";
-import { SET_SELECTED_CONDICIONROLES_DATA } from "../../redux/slices/CondicionRolesSlice";
+import { SET_SELECTED_CONDICIONPRODUCTO_DATA } from "../../redux/slices/CondicionProductoSlice";
 import { SET_SELECTED_CONDPROCONDICION_DATA } from "../../redux/slices/CondProCondicionSlice";
 
 const EditCondProConValoresModal = ({ EditCondProConValoresShowModal, setEditCondProConValoresShowModal, RowData }) => {
@@ -81,7 +81,7 @@ const EditCondProConValoresModal = ({ EditCondProConValoresShowModal, setEditCon
             try {
                 //Equipo 2: Extraer los datos de los campos de
                 //la ventana modal que ya tiene Formik.
-                const CondProConValor = CondRolCondicionValues(values);
+                const CondProConValor = CondProCondicionValues(values);
 
                 // Equipo 2: mandamos a consola los datos extraidos
                 console.log("<<CondProConValor>>", CondProConValor);

@@ -43,7 +43,7 @@ const EditCondRolCondicionModal = ({ EditCondRolCondicionShowModal, setEditCondR
                 setCondicionRolesData(selectedPriceListData.cat_listas_condicion_roles);
                 setCondRolCondicionData(selectedCondicionRolesData.condicion);
             } catch (error) {
-                console.error("Error al cargar las Presentaciondes de Precios en useEffect de AddPresentaPreciosModal:", error);
+                console.error("Error al cargar las Condicones de Rol en useEffect de AddCondRolConModal:", error);
             }
         }
         fetchData();
@@ -75,7 +75,7 @@ const EditCondRolCondicionModal = ({ EditCondRolCondicionShowModal, setEditCondR
                 const CondRolCon = CondRolCondicionValues(values);
 
                 // Equipo 2: mandamos a consola los datos extraidos
-                console.log("<<PresentaPrecio>>", PresentaPrecio);
+                console.log("<<CondRolCon>>", CondRolCon);
 
                 // Equipo 2: Encuentra el índice del elemento en CondicionRolCondicionData que coincide con RowData
                 const indexToUpdate = CondRolCondicionData.findIndex(item => (
@@ -101,7 +101,7 @@ const EditCondRolCondicionModal = ({ EditCondRolCondicionShowModal, setEditCondR
                     ...selectedCondicionRolesData,
                     condicion: updatedCondRolCondicionData,
                 };
-                console.log("Nuevo selectedPriceListData: ", updatedCondicionRolesData);
+                console.log("Nuevo CondicionRolesData: ", updatedCondicionRolesData);
 
                 // Equipo 2: Añadir la informacion actualizada del sub-documento mediante redux
                 dispatch(SET_SELECTED_CONDICIONROLES_DATA(updatedCondicionRolesData));
