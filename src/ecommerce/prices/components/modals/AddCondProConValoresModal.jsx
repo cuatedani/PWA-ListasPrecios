@@ -1,7 +1,8 @@
 //Equipo 2: React
 import React, { useState, useEffect } from "react";
 //Equipo 2: Material UI
-import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions,
+     Box, Alert, Select, MenuItem } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
@@ -9,6 +10,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 //Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+import getAllLabels from "../../../prices/services/remote/get/getAllLabels";
 //Equipo 2: Helpers
 import { CondProConValoresValues } from "../../helpers/CondProConValoresValues";
 //Equipo 2: Redux
@@ -21,6 +23,7 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
     //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    const [TipoComparadorValues, setTipoComparadorValues] = useState([]);
     //Equipo 2: Dispatch para actualizar la data local
     const dispatch = useDispatch();
     //Equipo 2: Loader
@@ -49,6 +52,7 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
     useEffect(() => {
         async function fetchData() {
             try {
+                getDataSelectEtiquetas();
                 setCondicionProductoData(priceListData.cat_listas_condicion_prod_serv);
                 setCondProCondicionData(condicionProductoData.condicion);
                 setCondProConValoresData(condProCondicionData.Valores);
@@ -58,6 +62,21 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
         }
         fetchData();
     }, []);
+
+    //Equipo 2: Ejecutamos la API que obtiene todos los Etiquetas.
+    async function getDataSelectEtiquetas() {
+        try {
+            //Obtenemos todas las etiquetas
+            const Labels = await getAllLabels();
+            //Obtenemosa las Etiquetas IdTipoComparador
+            const TipoComparador = Labels.find(
+                (Labels) => Labels.IdEtiquetaOK === "IdTipoComparador"
+            );
+            setTipoComparadorValues(TipoComparador.valores);
+        } catch (e) {
+            console.error("Error al obtener Etiquetas para Tipos de Lista:", e);
+        }
+    }
 
     //Equipo 2: Definición del Formik
     const formik = useFormik({
@@ -176,14 +195,28 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
                         error={formik.touched.valor && Boolean(formik.errors.valor)}
                         helperText={formik.touched.valor && formik.errors.valor}
                     />
-                    <TextField
-                        id="IdComparaValor"
-                        label="IdComparaValor*"
+                    <Select
                         value={formik.values.IdComparaValor}
-                        {...commonTextFieldProps}
+                        label="Selecciona un Tipo de Comparador:"
+                        name="IdComparaValor"
+                        onBlur={formik.handleBlur}
+                        disabled={!!mensajeExitoAlert}
                         error={formik.touched.IdComparaValor && Boolean(formik.errors.IdComparaValor)}
-                        helperText={formik.touched.IdComparaValor && formik.errors.IdComparaValor}
-                    />
+                        onChange={(e) => {
+                            const selectedTipoComparador = e.target.key;
+                            formik.setFieldValue("IdComparaValor", selectedTipoComparador);
+                            formik.handleChange(e);
+                        }}
+                    >
+                        {TipoComparadorValues.map((tipo) => (
+                            <MenuItem
+                                value={tipo.IdValorOK}
+                                key={tipo.Valor}
+                            >
+                                {tipo.Valor}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 </DialogContent>
                 {/* Equipo 2: Aqui van las acciones del usuario como son las alertas o botones */}
                 <DialogActions
