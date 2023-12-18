@@ -1,7 +1,10 @@
 //Equipo 2: React
 import React, { useState, useEffect } from "react";
 //Equipo 2: Material UI
-import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
+import {
+    Dialog, DialogContent, DialogTitle, Typography, TextField,
+    DialogActions, Box, Alert, Select, MenuItem
+} from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
@@ -9,6 +12,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 //Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+import getAllLabels from "../../../prices/services/remote/get/getAllLabels";
 //Equipo 2: Helpers
 import { PresentaPreciosValues } from "../../helpers/PresentaPreciosValues";
 //Equipo 2: Redux
@@ -20,6 +24,8 @@ const EditPresentaPreciosModal = ({ EditPresentaPreciosShowModal, setEditPresent
     //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    const [TipoFormulaValues, setTipoFormulaValues] = useState([]);
+
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //Equipo 2: controlar el estado de la data de PresentaPrecios.
@@ -33,6 +39,7 @@ const EditPresentaPreciosModal = ({ EditPresentaPreciosShowModal, setEditPresent
     useEffect(() => {
         async function fetchData() {
             try {
+                getDataSelectEtiquetas();
                 setPresentaPreciosData(selectedPriceListData.cat_listas_presenta_precios);
             } catch (error) {
                 console.error("Error al cargar las Presentaciondes de Precios en useEffect de EditPresentaPreciosModla:", error);
@@ -40,6 +47,21 @@ const EditPresentaPreciosModal = ({ EditPresentaPreciosShowModal, setEditPresent
         }
         fetchData();
     }, []);
+
+    //Equipo 2: Ejecutamos la API que obtiene todos los Etiquetas.
+    async function getDataSelectEtiquetas() {
+        try {
+            //Obtenemos todas las etiquetas
+            const Labels = await getAllLabels();
+            //Obtenemosa las Etiquetas IdTipoListasPrecios
+            const TipoFormula = Labels.find(
+                (Labels) => Labels.IdEtiquetaOK === "IdTipoFormula"
+            );
+            setTipoFormulaValues(TipoFormula.valores);
+        } catch (e) {
+            console.error("Error al obtener Etiquetas para Tipos de Lista:", e);
+        }
+    }
 
     //Equipo 2: Definición del Formik
     const formik = useFormik({
@@ -170,14 +192,28 @@ const EditPresentaPreciosModal = ({ EditPresentaPreciosShowModal, setEditPresent
                         error={formik.touched.IdPresentaBK && Boolean(formik.errors.IdPresentaBK)}
                         helperText={formik.touched.IdPresentaBK && formik.errors.IdPresentaBK}
                     />
-                    <TextField
-                        id="IdTipoFormulaOK"
-                        label="IdTipoFormulaOK*"
+                    <Select
                         value={formik.values.IdTipoFormulaOK}
-                        {...commonTextFieldProps}
+                        label="Selecciona un Tipo de Formula:"
+                        name="IdTipoFormulaOK"
+                        onBlur={formik.handleBlur}
+                        disabled={!!mensajeExitoAlert}
                         error={formik.touched.IdTipoFormulaOK && Boolean(formik.errors.IdTipoFormulaOK)}
-                        helperText={formik.touched.IdLisIdTipoFormulaOKtaBK && formik.errors.IdTipoFormulaOK}
-                    />
+                        onChange={(e) => {
+                            const selectedTipoFormula = e.target.value;
+                            formik.setFieldValue("IdTipoFormulaOK", selectedTipoFormula);
+                            formik.handleChange(e);
+                        }}
+                    >
+                        {TipoFormulaValues.map((tipo) => (
+                            <MenuItem
+                                value={tipo.IdValorOK}
+                                key={tipo.Valor}
+                            >
+                                {tipo.Valor}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <TextField
                         id="Formula"
                         label="Formula*"
