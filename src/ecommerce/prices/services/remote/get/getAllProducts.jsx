@@ -13,7 +13,7 @@ export default function getAllProducts() {
           resolve([]);
         } else if (data.success) {
           const products = data.data[0].dataRes;
-          //console.log("Coleccion: <<cat_products>>", products);
+          console.log("Coleccion: <<cat_products>>", products);
           resolve(JSON.parse(JSON.stringify(products))); // Resuelve la promesa y hace una copia profunda
         }
       })

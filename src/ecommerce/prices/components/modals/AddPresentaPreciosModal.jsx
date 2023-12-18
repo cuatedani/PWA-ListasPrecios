@@ -6,7 +6,6 @@ import {
     DialogActions, Box, Alert, Select, MenuItem
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
-import Autocomplete from "@mui/material/Autocomplete";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
@@ -30,7 +29,7 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
     const [TipoFormulaValues, setTipoFormulaValues] = useState([]);
     const [ProductosValues, setProductosValues] = useState([]);
     const [PresentacionesValues, setPresentacionesValues] = useState([]);
-    const [SelectProd, setSelectProd] = useState([]);
+    let SelectProd = "";
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //Equipo 2: controlar el estado de la data de PresentaPrecios.
@@ -79,19 +78,24 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
         }
     }
 
-   // Equipo 2: Ejecutamos la API que obtiene todas las Presentaciones.
-async function getDataSelectPresentaciones() {
-    try {
-        // Obtenemos todas las Presentaciones
-        const Pres = ProductosValues.Presentaciones;
-        // Filtrar las presentaciones según el producto seleccionado (SelectProd)
-        const presentacionesFiltradas = Pres.filter(presentacion => presentacion.IdProdServOK === SelectProd.IdProdServOK);
-        // Setear las presentaciones filtradas
-        setPresentacionesValues(presentacionesFiltradas);
-    } catch (e) {
-        console.error("Error al obtener Presentaciones:", e);
+    // Equipo 2: Ejecutamos la API que obtiene todas las Presentaciones.
+    async function getDataSelectPresentaciones() {
+        try {
+            console.log("Seleccionado: ", SelectProd);
+            // Obtenemos todas las Presentaciones
+            //const ProdPres = ProductosValues.filter(producto => producto.IdProdServOK === SelectProd);
+            //console.log("ProdPres: ", ProdPres);
+
+            // Filtrar las presentaciones según el producto seleccionado (SelectProd)
+            const presentacionesFiltradas = SelectProd.cat_prod_serv_presenta;
+            console.log("presentacionesFiltradas: ", presentacionesFiltradas);
+
+            // Setear las presentaciones filtradas
+            setPresentacionesValues(presentacionesFiltradas);
+        } catch (e) {
+            console.error("Error al obtener Presentaciones:", e);
+        }
     }
-}
 
     //Equipo 2: Definición del Formik
     const formik = useFormik({
@@ -99,7 +103,7 @@ async function getDataSelectPresentaciones() {
         //Equipo 2: Valores Iniciales
         initialValues: {
             IdProdServOK: "",
-            IdPresentaBK: "",
+            IdPresentaOK: "",
             IdTipoFormulaOK: "",
             Formula: "",
             Precio: "",
@@ -108,7 +112,7 @@ async function getDataSelectPresentaciones() {
         //Equipo 2: Restricciones
         validationSchema: Yup.object({
             IdProdServOK: Yup.string().required("Campo requerido"),
-            IdPresentaBK: Yup.string().required("Campo requerido"),
+            IdPresentaOK: Yup.string().required("Campo requerido"),
             IdTipoFormulaOK: Yup.string().required("Campo requerido"),
             Formula: Yup.string().required("Campo requerido"),
             Precio: Yup.number().required("Campo requerido"),
@@ -190,21 +194,45 @@ async function getDataSelectPresentaciones() {
                     dividers
                 >
                     {/* Equipo 2: Campos de captura o selección */}
-                    <TextField
-                        id="IdProdServOK"
-                        label="IdProdServOK*"
-                        value={formik.values.IdProdServOK}
-                        {...commonTextFieldProps}
-                        error={formik.touched.IdProdServOK && Boolean(formik.errors.IdProdServOK)}
-                        helperText={formik.touched.IdProdServOK && formik.errors.IdProdServOK}
+                    <Autocomplete
+                        value={ProductosValues.find(tipo => tipo.IdProdServOK === formik.values.IdProdServOK) || null}
+                        options={ProductosValues}
+                        getOptionLabel={(tipo) => tipo.DesProdServ}
+                        onChange={(e, selectedval) => {
+                            SelectProd = selectedval;
+                            formik.setFieldValue("IdProdServOK", SelectProd ? SelectProd.IdProdServOK : "");
+                            formik.handleChange(e);
+                            getDataSelectPresentaciones();
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Selecciona un Producto:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdProdServOK && Boolean(formik.errors.IdProdServOK)}
+                                helperText={formik.touched.IdProdServOK && formik.errors.IdProdServOK}
+                            />
+                        )}
                     />
-                    <TextField
-                        id="IdPresentaBK"
-                        label="IdPresentaBK*"
-                        value={formik.values.IdPresentaBK}
-                        {...commonTextFieldProps}
-                        error={formik.touched.IdPresentaBK && Boolean(formik.errors.IdPresentaBK)}
-                        helperText={formik.touched.IdPresentaBK && formik.errors.IdPresentaBK}
+                    <Autocomplete
+                        value={PresentacionesValues.find(tipo => tipo.IdPresentaOK === formik.values.IdPresentaOK) || null}
+                        options={PresentacionesValues}
+                        getOptionLabel={(tipo) => tipo.DesPresenta}
+                        onChange={(e, selectedpres) => {
+                            formik.setFieldValue("IdPresentaOK", selectedpres ? selectedpres.IdPresentaOK : "");
+                            formik.handleChange(e);
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona una Presentación::"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdPresentaOK && Boolean(formik.errors.IdPresentaOK)}
+                                helperText={formik.touched.IdPresentaOK && formik.errors.IdPresentaOK}
+                            />
+                        )}
                     />
                     <Autocomplete
                         value={TipoFormulaValues.find(tipo => tipo.IdValorOK === formik.values.IdTipoFormulaOK) || null}

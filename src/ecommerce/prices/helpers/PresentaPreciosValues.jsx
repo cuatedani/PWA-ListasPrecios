@@ -5,7 +5,7 @@ import { PresentaPreciosModel } from "../models/PresentaPreciosModel";
 export const PresentaPreciosValues = (values) => {
   const PresentaPrecios = { ...PresentaPreciosModel };
   PresentaPrecios.IdProdServOK = values.IdProdServOK;
-  PresentaPrecios.IdPresentaBK = values.IdPresentaBK;
+  PresentaPrecios.IdPresentaOK = values.IdPresentaBK;
   PresentaPrecios.IdTipoFormulaOK = values.IdTipoFormulaOK;
   PresentaPrecios.Formula = values.Formula;
   PresentaPrecios.Precio = values.Precio;

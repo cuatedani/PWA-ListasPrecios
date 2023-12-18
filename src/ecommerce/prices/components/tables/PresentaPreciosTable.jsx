@@ -30,7 +30,7 @@ const PresentaPreciosColumns = [
         size: 150, //small column
     },
     {
-        accessorKey: "IdPresentaBK",
+        accessorKey: "IdPresentaOK",
         header: "PRESENTACIÓN",
         size: 150, //small column
     },
@@ -113,8 +113,8 @@ const PresentaPreciosTable = () => {
         const handleRowClick = (index) => {
             const clickedRow = PresentaPreciosData[index];
             if (clickedRow) {
-                console.log("<<ID DEL DOCUMENTO SELECCIONADO>>:", clickedRow.IdPresentaBK);
-                setIdRowSel(clickedRow.IdPresentaBK);
+                console.log("<<ID DEL DOCUMENTO SELECCIONADO>>:", clickedRow.IdPresentaOK);
+                setIdRowSel(clickedRow.IdPresentaOK);
                 setSelectedRowIndex(index);
                 setRowData(clickedRow);
             }
@@ -138,7 +138,7 @@ const PresentaPreciosTable = () => {
                     // Equipo 2: Encuentra el índice del elemento en PresentaPreciosData que coincide con RowData
                     const indexToUpdate = PresentaPreciosData.findIndex(item => (
                         item.IdProdServOK === RowData.IdProdServOK
-                        && item.IdPresentaBK === RowData.IdPresentaBK
+                        && item.IdPresentaOK === RowData.IdPresentaOK
                         && item.IdTipoFormulaOK === RowData.IdTipoFormulaOK
                         && item.Formula === RowData.Formula
                         && item.Precio === RowData.Precio
