@@ -1,18 +1,16 @@
 //Equipo 2: React
 import React, { useState, useEffect } from "react";
 //Equipo 2: Material UI
-import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions,
+     Box, Alert, Select, MenuItem } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import {
-    showMensajeConfirm,
-    showMensajeError,
-} from "../../../../share/components/elements/messages/MySwalAlerts";
 //Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+import getAllLabels from "../../../prices/services/remote/get/getAllLabels";
 //Equipo 2: Helpers
 import { CondicionProductoValues } from "../../helpers/CondicionProductoValues";
 //Equipo 2: Redux
@@ -23,6 +21,7 @@ const AddCondicionProductoModal = ({ AddCondicionProductoShowModal, setAddCondic
     //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    const [TipoPromocionValues, setTipoPromocionValues] = useState([]);
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //Equipo 2: controlar el estado de la data de CondicionProducto.
@@ -30,6 +29,10 @@ const AddCondicionProductoModal = ({ AddCondicionProductoShowModal, setAddCondic
     const dispatch = useDispatch();
     //Loader
     const [Loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        getDataSelectEtiquetas();
+    }, []);
 
     //Equipo 2: useEffect para cargar datos
     useEffect(() => {
@@ -42,6 +45,21 @@ const AddCondicionProductoModal = ({ AddCondicionProductoShowModal, setAddCondic
         }
         fetchData();
     }, []);
+
+    //Equipo 2: Ejecutamos la API que obtiene todos los Etiquetas.
+    async function getDataSelectEtiquetas() {
+        try {
+            //Obtenemos todas las etiquetas
+            const Labels = await getAllLabels();
+            //Obtenemosa las Etiquetas IdTipoListasPrecios
+            const TipoPromocion = Labels.find(
+                (Labels) => Labels.IdEtiquetaOK === "IdTipoFormula"
+            );
+            setTipoPromocionValues(TipoPromocion.valores);
+        } catch (e) {
+            console.error("Error al obtener Etiquetas para Tipos de Lista:", e);
+        }
+    }
 
     //Equipo 2: Definición del Formik    
     const formik = useFormik({
@@ -141,14 +159,28 @@ const AddCondicionProductoModal = ({ AddCondicionProductoShowModal, setAddCondic
                         error={formik.touched.DesPromo && Boolean(formik.errors.DesPromo)}
                         helperText={formik.touched.DesPromo && formik.errors.DesPromo}
                     />
-                    <TextField
-                        id="IdTipoPromoOK"
-                        label="IdTipoPromoOK*"
+                    <Select
                         value={formik.values.IdTipoPromoOK}
-                        {...commonTextFieldProps}
+                        label="Selecciona un Tipo de Promocion:"
+                        name="IdTipoPromoOK"
+                        onBlur={formik.handleBlur}
+                        disabled={!!mensajeExitoAlert}
                         error={formik.touched.IdTipoPromoOK && Boolean(formik.errors.IdTipoPromoOK)}
-                        helperText={formik.touched.IdTipoPromoOK && formik.errors.IdTipoPromoOK}
-                    />
+                        onChange={(e) => {
+                            const selectedTipoPromocion = e.target.value;
+                            formik.setFieldValue("IdTipoPromoOK", selectedTipoPromocion);
+                            formik.handleChange(e);
+                        }}
+                    >
+                        {TipoPromocionValues.map((tipo) => (
+                            <MenuItem
+                                value={tipo.IdValorOK}
+                                key={tipo.Valor}
+                            >
+                                {tipo.Valor}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <TextField
                         id="Formula"
                         label="Formula*"

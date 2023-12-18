@@ -1,7 +1,8 @@
 //Equipo 2: React
 import React, { useState, useEffect } from "react";
 //Equipo 2: Material UI
-import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, Box, Alert } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions,
+     Box, Alert, Select, MenuItem } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
@@ -9,6 +10,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 //Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
+import getAllLabels from "../../../prices/services/remote/get/getAllLabels";
 //Equipo 2: Helpers
 import { CondRolCondicionValues } from "../../helpers/CondRolCondicionValues";
 //Equipo 2: Redux
@@ -20,6 +22,9 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
     //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
+    const [TipoCondicionValues, setTipoCondicionValues] = useState([]);
+    const [TipoOperadorValues, setTipoOperadorValues] = useState([]);
+
     //Equipo 2: Dispatch para actualizar la data local
     const dispatch = useDispatch();
     //Equipo 2: Loader
@@ -34,6 +39,10 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
     const selectedCondicionRolesData = useSelector((state) => state.CondicionRolesReducer.SelCondicionRolesData);
     //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", condicionRolesData);
 
+    useEffect(() => {
+        getDataSelectEtiquetas();
+    }, []);
+
     //Equipo 2: useEffect para cargar datos
     useEffect(() => {
         async function fetchData() {
@@ -46,6 +55,28 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
         }
         fetchData();
     }, []);
+
+    //Equipo 2: Ejecutamos la API que obtiene todos los Etiquetas.
+    async function getDataSelectEtiquetas() {
+        try {
+            //Obtenemos todas las etiquetas
+            const Labels = await getAllLabels();
+            //Obtenemosa las Etiquetas IdTipoListasPrecios
+            const TipoCondicion = Labels.find(
+                (Labels) => Labels.IdEtiquetaOK === "IdTipoCondicion"
+            );
+            setTipoCondicionValues(TipoCondicion.valores);
+
+            //Obtenemosa las Etiquetas IdTipoListasPrecios
+            const TipoOperador = Labels.find(
+                (Labels) => Labels.IdEtiquetaOK === "IdTipoOperadorAritmetico"
+            );
+            setTipoOperadorValues(TipoOperador.valores);
+
+        } catch (e) {
+            console.error("Error al obtener Etiquetas para Tipos de Lista:", e);
+        }
+    }
 
     //Equipo 2: Definición del Formik
     const formik = useFormik({
@@ -62,7 +93,7 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
         validationSchema: Yup.object({
             IdTipoCondicionOK: Yup.string().required("Campo requerido"),
             IdTipoOperadorOK: Yup.string().required("Campo requerido"),
-            Valor: Yup.string().required("Campo requerido"),
+            Valor: Yup.string(),
             Secuecia: Yup.string().required("Campo requerido"),
         }),
 
@@ -150,22 +181,50 @@ const AddCondRolCondicionModal = ({ AddCondRolCondicionShowModal, setAddCondRolC
                     dividers
                 >
                     {/* Equipo 2: Campos de captura o selección */}
-                    <TextField
-                        id="IdTipoCondicionOK"
-                        label="IdTipoCondicionOK*"
+                    <Select
                         value={formik.values.IdTipoCondicionOK}
-                        {...commonTextFieldProps}
+                        label="Selecciona un Tipo de Condicion:"
+                        name="IdTipoCondicionOK"
+                        onBlur={formik.handleBlur}
+                        disabled={!!mensajeExitoAlert}
                         error={formik.touched.IdTipoCondicionOK && Boolean(formik.errors.IdTipoCondicionOK)}
-                        helperText={formik.touched.IdTipoCondicionOK && formik.errors.IdTipoCondicionOK}
-                    />
-                    <TextField
-                        id="IdTipoOperadorOK"
-                        label="IdTipoOperadorOK*"
+                        onChange={(e) => {
+                            const selectedTipoCondicion = e.target.value;
+                            formik.setFieldValue("IdTipoCondicionOK", selectedTipoCondicion);
+                            formik.handleChange(e);
+                        }}
+                    >
+                        {TipoCondicionValues.map((tipo) => (
+                            <MenuItem
+                                value={tipo.IdValorOK}
+                                key={tipo.Valor}
+                            >
+                                {tipo.Valor}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <Select
                         value={formik.values.IdTipoOperadorOK}
-                        {...commonTextFieldProps}
+                        label="Selecciona un Tipo de Operador:"
+                        name="IdTipoOperadorOK"
+                        onBlur={formik.handleBlur}
+                        disabled={!!mensajeExitoAlert}
                         error={formik.touched.IdTipoOperadorOK && Boolean(formik.errors.IdTipoOperadorOK)}
-                        helperText={formik.touched.IdTipoOperadorOK && formik.errors.IdTipoOperadorOK}
-                    />
+                        onChange={(e) => {
+                            const selectedTipoOperador = e.target.value;
+                            formik.setFieldValue("IdTipoOperadorOK", selectedTipoOperador);
+                            formik.handleChange(e);
+                        }}
+                    >
+                        {TipoOperadorValues.map((tipo) => (
+                            <MenuItem
+                                value={tipo.IdValorOK}
+                                key={tipo.Valor}
+                            >
+                                {tipo.Valor}
+                            </MenuItem>
+                        ))}
+                    </Select>
                     <TextField
                         id="Valor"
                         label="Valor*"
