@@ -1,8 +1,11 @@
 //Equipo 2: React
 import React, { useState, useEffect } from "react";
 //Equipo 2: Material UI
-import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions,
-     Box, Alert, Select, MenuItem } from "@mui/material";
+import {
+    Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions,
+    Box, Alert, Select, MenuItem
+} from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
@@ -171,28 +174,25 @@ const EditCondicionProductoModal = ({ EditCondicionProductoShowModal, setEditCon
                         error={formik.touched.DesPromo && Boolean(formik.errors.DesPromo)}
                         helperText={formik.touched.DesPromo && formik.errors.DesPromo}
                     />
-                    <Select
-                        value={formik.values.IdTipoPromoOK}
-                        label="Selecciona un Tipo de Promocion:"
-                        name="IdTipoPromoOK"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdTipoPromoOK && Boolean(formik.errors.IdTipoPromoOK)}
-                        onChange={(e) => {
-                            const selectedTipoPromocion = e.target.value;
-                            formik.setFieldValue("IdTipoPromoOK", selectedTipoPromocion);
+                    <Autocomplete
+                        value={TipoPromocionValues.find(tipo => tipo.IdValorOK === formik.values.IdTipoPromoOK) || null}
+                        options={TipoPromocionValues}
+                        getOptionLabel={(tipo) => tipo.Valor}
+                        onChange={(e, selectedTipoPromocion) => {
+                            formik.setFieldValue("IdTipoPromoOK", selectedTipoPromocion ? selectedTipoPromocion.IdValorOK : "");
                             formik.handleChange(e);
                         }}
-                    >
-                        {TipoPromocionValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdValorOK}
-                                key={tipo.Valor}
-                            >
-                                {tipo.Valor}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Tipo de Promoción:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdTipoPromoOK && Boolean(formik.errors.IdTipoPromoOK)}
+                                helperText={formik.touched.IdTipoPromoOK && formik.errors.IdTipoPromoOK}
+                            />
+                        )}
+                    />
                     <TextField
                         id="Formula"
                         label="Formula*"

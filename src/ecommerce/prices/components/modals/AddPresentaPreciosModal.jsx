@@ -1,8 +1,12 @@
 //Equipo 2: React
 import React, { useState, useEffect } from "react";
 //Equipo 2: Material UI
-import { Dialog, DialogContent, DialogTitle, Typography, TextField,
-     DialogActions, Box, Alert, Select, MenuItem} from "@mui/material";
+import {
+    Dialog, DialogContent, DialogTitle, Typography, TextField,
+    DialogActions, Box, Alert, Select, MenuItem
+} from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
+import Autocomplete from "@mui/material/Autocomplete";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
@@ -11,6 +15,7 @@ import * as Yup from "yup";
 //Equipo 2: Services
 import PatchOnePriceList from "../../services/remote/patch/PatchOnePriceList";
 import getAllLabels from "../../../prices/services/remote/get/getAllLabels";
+import getAllProducts from "../../../prices/services/remote/get/getAllProducts";
 //Equipo 2: Helpers
 import { PresentaPreciosValues } from "../../helpers/PresentaPreciosValues";
 //Equipo 2: Redux
@@ -18,11 +23,14 @@ import { SET_SELECTED_PRICELIST_DATA } from "../../redux/slices/PricesListSlice"
 import { useSelector, useDispatch } from "react-redux";
 
 
-const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal}) => {
+const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPreciosShowModal }) => {
     //Equipo 2: Inicializacion de States
     const [mensajeErrorAlert, setMensajeErrorAlert] = useState("");
     const [mensajeExitoAlert, setMensajeExitoAlert] = useState("");
     const [TipoFormulaValues, setTipoFormulaValues] = useState([]);
+    const [ProductosValues, setProductosValues] = useState([]);
+    const [PresentacionesValues, setPresentacionesValues] = useState([]);
+    const [SelectProd, setSelectProd] = useState([]);
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const selectedPriceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //Equipo 2: controlar el estado de la data de PresentaPrecios.
@@ -36,6 +44,7 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
         async function fetchData() {
             try {
                 getDataSelectEtiquetas();
+                getDataSelectProductos();
                 setPresentaPreciosData(selectedPriceListData.cat_listas_presenta_precios);
             } catch (error) {
                 console.error("Error al cargar las Presentaciondes de Precios en useEffect de AddPresentaPreciosModal:", error);
@@ -58,6 +67,31 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
             console.error("Error al obtener Etiquetas para Tipos de Lista:", e);
         }
     }
+
+    //Equipo 2: Ejecutamos la API que obtiene todos los Productos.
+    async function getDataSelectProductos() {
+        try {
+            //Obtenemos todas las etiquetas
+            const Prods = await getAllProducts();
+            setProductosValues(Prods);
+        } catch (e) {
+            console.error("Error al obtener Etiquetas para Tipos de Lista:", e);
+        }
+    }
+
+   // Equipo 2: Ejecutamos la API que obtiene todas las Presentaciones.
+async function getDataSelectPresentaciones() {
+    try {
+        // Obtenemos todas las Presentaciones
+        const Pres = ProductosValues.Presentaciones;
+        // Filtrar las presentaciones según el producto seleccionado (SelectProd)
+        const presentacionesFiltradas = Pres.filter(presentacion => presentacion.IdProdServOK === SelectProd.IdProdServOK);
+        // Setear las presentaciones filtradas
+        setPresentacionesValues(presentacionesFiltradas);
+    } catch (e) {
+        console.error("Error al obtener Presentaciones:", e);
+    }
+}
 
     //Equipo 2: Definición del Formik
     const formik = useFormik({
@@ -172,28 +206,25 @@ const AddPresentaPreciosModal = ({ AddPresentaPreciosShowModal, setAddPresentaPr
                         error={formik.touched.IdPresentaBK && Boolean(formik.errors.IdPresentaBK)}
                         helperText={formik.touched.IdPresentaBK && formik.errors.IdPresentaBK}
                     />
-                    <Select
-                        value={formik.values.IdTipoFormulaOK}
-                        label="Selecciona un Tipo de Formula:"
-                        name="IdTipoFormulaOK"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdTipoFormulaOK && Boolean(formik.errors.IdTipoFormulaOK)}
-                        onChange={(e) => {
-                            const selectedTipoFormula = e.target.value;
-                            formik.setFieldValue("IdTipoFormulaOK", selectedTipoFormula);
+                    <Autocomplete
+                        value={TipoFormulaValues.find(tipo => tipo.IdValorOK === formik.values.IdTipoFormulaOK) || null}
+                        options={TipoFormulaValues}
+                        getOptionLabel={(tipo) => tipo.Valor}
+                        onChange={(e, selectedTipoFormula) => {
+                            formik.setFieldValue("IdTipoFormulaOK", selectedTipoFormula ? selectedTipoFormula.IdValorOK : "");
                             formik.handleChange(e);
                         }}
-                    >
-                        {TipoFormulaValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdValorOK}
-                                key={tipo.Valor}
-                            >
-                                {tipo.Valor}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Tipo de Fórmula:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdTipoFormulaOK && Boolean(formik.errors.IdTipoFormulaOK)}
+                                helperText={formik.touched.IdTipoFormulaOK && formik.errors.IdTipoFormulaOK}
+                            />
+                        )}
+                    />
                     <TextField
                         id="Formula"
                         label="Formula*"

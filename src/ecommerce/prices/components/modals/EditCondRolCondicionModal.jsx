@@ -1,8 +1,11 @@
 //Equipo 2: React
 import React, { useState, useEffect } from "react";
 //Equipo 2: Material UI
-import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions,
-     Box, Alert, Select, MenuItem } from "@mui/material";
+import {
+    Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions,
+    Box, Alert, Select, MenuItem
+} from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
@@ -188,50 +191,44 @@ const EditCondRolCondicionModal = ({ EditCondRolCondicionShowModal, setEditCondR
                     dividers
                 >
                     {/* Equipo 2: Campos de captura o selección */}
-                    <Select
-                        value={formik.values.IdTipoCondicionOK}
-                        label="Selecciona un Tipo de Condicion:"
-                        name="IdTipoCondicionOK"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdTipoCondicionOK && Boolean(formik.errors.IdTipoCondicionOK)}
-                        onChange={(e) => {
-                            const selectedTipoCondicion = e.target.value;
-                            formik.setFieldValue("IdTipoCondicionOK", selectedTipoCondicion);
+                    <Autocomplete
+                        value={TipoCondicionValues.find(tipo => tipo.IdValorOK === formik.values.IdTipoCondicionOK) || null}
+                        options={TipoCondicionValues}
+                        getOptionLabel={(tipo) => tipo.Valor}
+                        onChange={(e, selectedTipoCondicion) => {
+                            formik.setFieldValue("IdTipoCondicionOK", selectedTipoCondicion ? selectedTipoCondicion.IdValorOK : "");
                             formik.handleChange(e);
                         }}
-                    >
-                        {TipoCondicionValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdValorOK}
-                                key={tipo.Valor}
-                            >
-                                {tipo.Valor}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    <Select
-                        value={formik.values.IdTipoOperadorOK}
-                        label="Selecciona un Tipo de Operador:"
-                        name="IdTipoOperadorOK"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdTipoOperadorOK && Boolean(formik.errors.IdTipoOperadorOK)}
-                        onChange={(e) => {
-                            const selectedTipoOperador = e.target.value;
-                            formik.setFieldValue("IdTipoOperadorOK", selectedTipoOperador);
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Tipo de Condición:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdTipoCondicionOK && Boolean(formik.errors.IdTipoCondicionOK)}
+                                helperText={formik.touched.IdTipoCondicionOK && formik.errors.IdTipoCondicionOK}
+                            />
+                        )}
+                    />
+                    <Autocomplete
+                        value={TipoOperadorValues.find(tipo => tipo.IdValorOK === formik.values.IdTipoOperadorOK) || null}
+                        options={TipoOperadorValues}
+                        getOptionLabel={(tipo) => tipo.Valor}
+                        onChange={(e, selectedTipoOperador) => {
+                            formik.setFieldValue("IdTipoOperadorOK", selectedTipoOperador ? selectedTipoOperador.IdValorOK : "");
                             formik.handleChange(e);
                         }}
-                    >
-                        {TipoOperadorValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdValorOK}
-                                key={tipo.Valor}
-                            >
-                                {tipo.Valor}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Tipo de Operador:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdTipoOperadorOK && Boolean(formik.errors.IdTipoOperadorOK)}
+                                helperText={formik.touched.IdTipoOperadorOK && formik.errors.IdTipoOperadorOK}
+                            />
+                        )}
+                    />
                     <TextField
                         id="Valor"
                         label="Valor*"

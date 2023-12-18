@@ -5,6 +5,7 @@ import {
     Dialog, DialogContent, DialogTitle, Typography, TextField,
     DialogActions, Box, Alert, Select, MenuItem
 } from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
@@ -192,28 +193,25 @@ const EditPresentaPreciosModal = ({ EditPresentaPreciosShowModal, setEditPresent
                         error={formik.touched.IdPresentaBK && Boolean(formik.errors.IdPresentaBK)}
                         helperText={formik.touched.IdPresentaBK && formik.errors.IdPresentaBK}
                     />
-                    <Select
-                        value={formik.values.IdTipoFormulaOK}
-                        label="Selecciona un Tipo de Formula:"
-                        name="IdTipoFormulaOK"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdTipoFormulaOK && Boolean(formik.errors.IdTipoFormulaOK)}
-                        onChange={(e) => {
-                            const selectedTipoFormula = e.target.value;
-                            formik.setFieldValue("IdTipoFormulaOK", selectedTipoFormula);
+                    <Autocomplete
+                        value={TipoFormulaValues.find(tipo => tipo.IdValorOK === formik.values.IdTipoFormulaOK) || null}
+                        options={TipoFormulaValues}
+                        getOptionLabel={(tipo) => tipo.Valor}
+                        onChange={(e, selectedTipoFormula) => {
+                            formik.setFieldValue("IdTipoFormulaOK", selectedTipoFormula ? selectedTipoFormula.IdValorOK : "");
                             formik.handleChange(e);
                         }}
-                    >
-                        {TipoFormulaValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdValorOK}
-                                key={tipo.Valor}
-                            >
-                                {tipo.Valor}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Tipo de Fórmula:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdTipoFormulaOK && Boolean(formik.errors.IdTipoFormulaOK)}
+                                helperText={formik.touched.IdTipoFormulaOK && formik.errors.IdTipoFormulaOK}
+                            />
+                        )}
+                    />
                     <TextField
                         id="Formula"
                         label="Formula*"

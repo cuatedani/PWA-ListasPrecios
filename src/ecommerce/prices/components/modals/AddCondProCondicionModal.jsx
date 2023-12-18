@@ -1,8 +1,11 @@
 //Equipo 2: React
 import React, { useState, useEffect } from "react";
 //Equipo 2: Material UI
-import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions, 
-    Box, Alert, Select, MenuItem } from "@mui/material";
+import {
+    Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions,
+    Box, Alert, Select, MenuItem
+} from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
@@ -68,13 +71,13 @@ const AddCondProCondicionModal = ({ AddCondProCondicionShowModal, setAddCondProC
 
             //Obtenemosa las Etiquetas IdTipoComparador
             const TipoComparador = Labels.find(
-                (Labels) => Labels.IdEtiquetaOK === "IdTipoComparador"
+                (Labels) => Labels.IdEtiquetaOK === "IdTipoOperadorAritmetico"
             );
             setTipoComparadorValues(TipoComparador.valores);
 
             //Obtenemosa las Etiquetas IdTipoOperadorAritmetico
             const TipoOperador = Labels.find(
-                (Labels) => Labels.IdEtiquetaOK === "IdTipoOperadorAritmetico"
+                (Labels) => Labels.IdEtiquetaOK === "IdTipoComparadorLogico"
             );
             setTipoOperadorValues(TipoOperador.valores);
         } catch (e) {
@@ -190,75 +193,66 @@ const AddCondProCondicionModal = ({ AddCondProCondicionShowModal, setAddCondProC
                         disabled={true}
                         helperText={formik.touched.IdEtiqueta && formik.errors.IdEtiqueta}
                     />
-                    <Select
-                        value={formik.values.Etiqueta}
-                        label="Selecciona un Tipo de Etiqueta:"
-                        name="Etiqueta"
-                        {...commonTextFieldProps}
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.Etiqueta && Boolean(formik.errors.Etiqueta)}
-                        onChange={(e) => {
-                            const selectedTipoEtiqueta = e.target.value;
-                            const selectedkey = e.target.key;
-                            formik.setFieldValue("Etiqueta", selectedkey);
-                            formik.setFieldValue("IdEtiqueta", selectedTipoEtiqueta);
+                    <Autocomplete
+                        value={TipoEtiquetaValues.find(tipo => tipo.IdValorOK === formik.values.IdEtiqueta) || null}
+                        options={TipoEtiquetaValues}
+                        getOptionLabel={(tipo) => tipo.Valor}
+                        onChange={(e, selectedTipoEtiqueta) => {
+                            const selectedKey = selectedTipoEtiqueta ? selectedTipoEtiqueta.IdValorOK : "";
+                            formik.setFieldValue("Etiqueta", selectedKey);
+                            formik.setFieldValue("IdEtiqueta", selectedKey);
                             formik.handleChange(e);
                         }}
-                    >
-                        {TipoEtiquetaValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdValorOK}
-                                key={tipo.Valor}
-                            >
-                                {tipo.Valor}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    <Select
-                        value={formik.values.IdOpComparaValores}
-                        label="Selecciona un Tipo de Comparador:"
-                        name="IdOpComparaValores"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdOpComparaValores && Boolean(formik.errors.IdOpComparaValores)}
-                        onChange={(e) => {
-                            const selectedTipoComparador = e.target.value;
-                            formik.setFieldValue("IdOpComparaValores", selectedTipoComparador);
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Tipo de Etiqueta:"
+                                {...commonTextFieldProps}
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.Etiqueta && Boolean(formik.errors.Etiqueta)}
+                                helperText={formik.touched.Etiqueta && formik.errors.Etiqueta}
+                            />
+                        )}
+                    />
+                    <Autocomplete
+                        value={TipoComparadorValues.find(tipo => tipo.IdValorOK === formik.values.IdOpComparaValores) || null}
+                        options={TipoComparadorValues}
+                        getOptionLabel={(tipo) => tipo.Valor}
+                        onChange={(e, selectedTipoComparador) => {
+                            formik.setFieldValue("IdOpComparaValores", selectedTipoComparador ? selectedTipoComparador.IdValorOK : "");
                             formik.handleChange(e);
                         }}
-                    >
-                        {TipoComparadorValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdValorOK}
-                                key={tipo.Valor}
-                            >
-                                {tipo.Valor}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    <Select
-                        value={formik.values.IdOpLogicoEtiqueta}
-                        label="Selecciona un Tipo de Operador Logico:"
-                        name="IdOpLogicoEtiqueta"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdOpLogicoEtiqueta && Boolean(formik.errors.IdOpLogicoEtiqueta)}
-                        onChange={(e) => {
-                            const selectedTipoOperador = e.target.value;
-                            formik.setFieldValue("IdOpLogicoEtiqueta", selectedTipoOperador);
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Tipo de Comparador:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdOpComparaValores && Boolean(formik.errors.IdOpComparaValores)}
+                                helperText={formik.touched.IdOpComparaValores && formik.errors.IdOpComparaValores}
+                            />
+                        )}
+                    />
+                    <Autocomplete
+                        value={TipoOperadorValues.find(tipo => tipo.IdValorOK === formik.values.IdOpLogicoEtiqueta) || null}
+                        options={TipoOperadorValues}
+                        getOptionLabel={(tipo) => tipo.Valor}
+                        onChange={(e, selectedTipoOperador) => {
+                            formik.setFieldValue("IdOpLogicoEtiqueta", selectedTipoOperador ? selectedTipoOperador.IdValorOK : "");
                             formik.handleChange(e);
                         }}
-                    >
-                        {TipoOperadorValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdValorOK}
-                                key={tipo.Valor}
-                            >
-                                {tipo.Valor}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Tipo de Operador Logico:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdOpLogicoEtiqueta && Boolean(formik.errors.IdOpLogicoEtiqueta)}
+                                helperText={formik.touched.IdOpLogicoEtiqueta && formik.errors.IdOpLogicoEtiqueta}
+                            />
+                        )}
+                    />
                 </DialogContent>
                 {/* Equipo 2: Aqui van las acciones del usuario como son las alertas o botones */}
                 <DialogActions

@@ -1,8 +1,11 @@
 //Equipo 2: React
 import React, { useState, useEffect } from "react";
 //Equipo 2: Material UI
-import { Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions,
-     Box, Alert, Select, MenuItem } from "@mui/material";
+import {
+    Dialog, DialogContent, DialogTitle, Typography, TextField, DialogActions,
+    Box, Alert, Select, MenuItem
+} from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
@@ -35,7 +38,7 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
     const [CondProCondicionData, setCondProCondicionData] = useState([]);
     //Equipo 2: controlar el estado de la data de PriceList.
     const [CondProConValoresData, setCondProConValoresData] = useState(null);
-    
+
     //Equipo 2: Mediante redux obtener la data que se envió de PricesListTable
     const priceListData = useSelector((state) => state.PricesListReducer.SelPriceListData);
     //console.log("<<DATA DEL DOCUMENTO SELECCIONADO RECIBIDA>>:", priceListData);
@@ -88,7 +91,7 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
             valor: Yup.string().required("Campo requerido"),
             IdComparaValor: Yup.string().required("Campo requerido")
         }),
-        
+
         //Equipo 2: Metodo que acciona el boton
         onSubmit: async (values) => {
 
@@ -142,7 +145,7 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
                     cat_listas_condicion_prod_serv: updatedCondicionProductoData,
                 };
                 console.log("Nuevo selectedPriceListData: ", updatedPriceListData);
-                
+
                 // Actualizar el documento PriceList en BD
                 await PatchOnePriceList(updatedPriceListData);
 
@@ -195,28 +198,25 @@ const AddCondProConValoresModal = ({ AddCondProConValoresShowModal, setAddCondPr
                         error={formik.touched.valor && Boolean(formik.errors.valor)}
                         helperText={formik.touched.valor && formik.errors.valor}
                     />
-                    <Select
-                        value={formik.values.IdComparaValor}
-                        label="Selecciona un Tipo de Comparador:"
-                        name="IdComparaValor"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdComparaValor && Boolean(formik.errors.IdComparaValor)}
-                        onChange={(e) => {
-                            const selectedTipoComparador = e.target.key;
-                            formik.setFieldValue("IdComparaValor", selectedTipoComparador);
+                    <Autocomplete
+                        value={TipoComparadorValues.find(tipo => tipo.IdValorOK === formik.values.IdComparaValor) || null}
+                        options={TipoComparadorValues}
+                        getOptionLabel={(tipo) => tipo.Valor}
+                        onChange={(e, selectedTipoComparador) => {
+                            formik.setFieldValue("IdComparaValor", selectedTipoComparador ? selectedTipoComparador.IdValorOK : "");
                             formik.handleChange(e);
                         }}
-                    >
-                        {TipoComparadorValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdValorOK}
-                                key={tipo.Valor}
-                            >
-                                {tipo.Valor}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Tipo de Comparador:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdComparaValor && Boolean(formik.errors.IdComparaValor)}
+                                helperText={formik.touched.IdComparaValor && formik.errors.IdComparaValor}
+                            />
+                        )}
+                    />
                 </DialogContent>
                 {/* Equipo 2: Aqui van las acciones del usuario como son las alertas o botones */}
                 <DialogActions

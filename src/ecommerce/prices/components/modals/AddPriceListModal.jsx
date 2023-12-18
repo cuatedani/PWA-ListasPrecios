@@ -3,6 +3,7 @@ import {
     Dialog, DialogContent, DialogTitle, Typography, TextField,
     DialogActions, Box, Alert, Select, MenuItem
 } from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import { LoadingButton } from "@mui/lab";
 import { DatePicker } from "@mui/x-date-pickers";
 import CloseIcon from "@mui/icons-material/Close";
@@ -159,30 +160,25 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
                     dividers
                 >
                     {/* Equipo 2: Campos de captura o selección */}
-                    <Select
-                        value={formik.values.IdInstitutoOK}
-                        label="Selecciona un Instituto"
-                        name="IdInstitutoOK"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdInstitutoOK && Boolean(formik.errors.IdInstitutoOK)}
-                        onChange={(e) => {
-                            const selectedInstituto = e.target.value;
-                            formik.setFieldValue("IdInstitutoOK", selectedInstituto);
-                            formik.setFieldValue("IdListaOK", `${selectedInstituto}-${IdGen}`);
-                            formik.handleChange(e);
+                    <Autocomplete
+                        value={InstitutesValues.find(instituto => instituto.IdInstitutoOK === formik.values.IdInstitutoOK) || null}
+                        options={InstitutesValues}
+                        getOptionLabel={(instituto) => instituto.Alias}
+                        onChange={(e, selectedInstituto) => {
+                            formik.setFieldValue("IdInstitutoOK", selectedInstituto ? selectedInstituto.IdInstitutoOK : "");
+                            formik.setFieldValue("IdListaOK", `${selectedInstituto ? selectedInstituto.IdInstitutoOK : ""}-${IdGen}`);
                         }}
-                    >
-                        {InstitutesValues.map((instituto) => (
-                            <MenuItem
-                                value={instituto.IdInstitutoOK}
-                                key={instituto.Alias}
-                            >
-                                {instituto.Alias}
-                            </MenuItem>
-                        ))}
-                    </Select>
-
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Instituto"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdInstitutoOK && Boolean(formik.errors.IdInstitutoOK)}
+                                helperText={formik.touched.IdInstitutoOK && formik.errors.IdInstitutoOK}
+                            />
+                        )}
+                    />
                     <TextField
                         id="IdListaOK"
                         label="IdListaOK*"
@@ -237,28 +233,25 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
                             />
                         )}
                     />
-                    <Select
-                        value={formik.values.IdTipoListaOK}
-                        label="Selecciona un Tipo de Lista:"
-                        name="IdTipoListaOK"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdTipoListaOK && Boolean(formik.errors.IdTipoListaOK)}
-                        onChange={(e) => {
-                            const selectedTipoLista = e.target.value;
-                            formik.setFieldValue("IdTipoListaOK", selectedTipoLista);
+                    <Autocomplete
+                        value={TipoListaValues.find(tipo => tipo.IdValorOK === formik.values.IdTipoListaOK) || null}
+                        options={TipoListaValues}
+                        getOptionLabel={(tipo) => tipo.Valor}
+                        onChange={(e, selectedTipoLista) => {
+                            formik.setFieldValue("IdTipoListaOK", selectedTipoLista ? selectedTipoLista.IdValorOK : "");
                             formik.handleChange(e);
                         }}
-                    >
-                        {TipoListaValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdValorOK}
-                                key={tipo.Valor}
-                            >
-                                {tipo.Valor}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Tipo de Lista:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdTipoListaOK && Boolean(formik.errors.IdTipoListaOK)}
+                                helperText={formik.touched.IdTipoListaOK && formik.errors.IdTipoListaOK}
+                            />
+                        )}
+                    />
                     <TextField
                         id="IdTipoGeneraListaOK"
                         label="IdTipoGeneraListaOK*"
@@ -267,50 +260,44 @@ const AddPriceListModal = ({ AddPriceListShowModal, setAddPriceListShowModal }) 
                         error={formik.touched.IdTipoGeneraListaOK && Boolean(formik.errors.IdTipoGeneraListaOK)}
                         helperText={formik.touched.IdTipoGeneraListaOK && formik.errors.IdTipoGeneraListaOK}
                     />
-                    <Select
-                        value={formik.values.IdListaBaseOK}
-                        label="Selecciona una Lista Base:"
-                        name="IdListaBaseOK"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdListaBaseOK && Boolean(formik.errors.IdListaBaseOK)}
-                        onChange={(e) => {
-                            const selectedListaBase = e.target.value;
-                            formik.setFieldValue("IdListaBaseOK", selectedListaBase);
+                    <Autocomplete
+                        value={ListaBaseValues.find(tipo => tipo.IdListaOK === formik.values.IdListaBaseOK) || null}
+                        options={ListaBaseValues}
+                        getOptionLabel={(tipo) => tipo.IdListaBK}
+                        onChange={(e, selectedListaBase) => {
+                            formik.setFieldValue("IdListaBaseOK", selectedListaBase ? selectedListaBase.IdListaOK : "");
                             formik.handleChange(e);
                         }}
-                    >
-                        {ListaBaseValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdListaOK}
-                                key={tipo.IdListaBK}
-                            >
-                                {tipo.IdListaBK}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    <Select
-                        value={formik.values.IdTipoFormulaOK}
-                        label="Selecciona un Tipo de Formula:"
-                        name="IdTipoFormulaOK"
-                        onBlur={formik.handleBlur}
-                        disabled={!!mensajeExitoAlert}
-                        error={formik.touched.IdTipoFormulaOK && Boolean(formik.errors.IdTipoFormulaOK)}
-                        onChange={(e) => {
-                            const selectedTipoFormula = e.target.value;
-                            formik.setFieldValue("IdTipoFormulaOK", selectedTipoFormula);
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona una Lista Base:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdListaBaseOK && Boolean(formik.errors.IdListaBaseOK)}
+                                helperText={formik.touched.IdListaBaseOK && formik.errors.IdListaBaseOK}
+                            />
+                        )}
+                    />
+                    <Autocomplete
+                        value={TipoFormulaValues.find(tipo => tipo.IdValorOK === formik.values.IdTipoFormulaOK) || null}
+                        options={TipoFormulaValues}
+                        getOptionLabel={(tipo) => tipo.Valor}
+                        onChange={(e, selectedTipoFormula) => {
+                            formik.setFieldValue("IdTipoFormulaOK", selectedTipoFormula ? selectedTipoFormula.IdValorOK : "");
                             formik.handleChange(e);
                         }}
-                    >
-                        {TipoFormulaValues.map((tipo) => (
-                            <MenuItem
-                                value={tipo.IdValorOK}
-                                key={tipo.Valor}
-                            >
-                                {tipo.Valor}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Selecciona un Tipo de Fórmula:"
+                                onBlur={formik.handleBlur}
+                                disabled={!!mensajeExitoAlert}
+                                error={formik.touched.IdTipoFormulaOK && Boolean(formik.errors.IdTipoFormulaOK)}
+                                helperText={formik.touched.IdTipoFormulaOK && formik.errors.IdTipoFormulaOK}
+                            />
+                        )}
+                    />
                 </DialogContent>
                 {/* Equipo 2: Aqui van las acciones del usuario como son las alertas o botones */}
                 <DialogActions
